@@ -1,0 +1,225 @@
+{
+  "reviewStatus": "needs-human-review",
+  "floor": 2,
+  "topics": [
+    {
+      "topicId": 7,
+      "spell": {
+        "id": "s7",
+        "name": "Mantra Pembersih Data",
+        "formulas": [
+          "split dulu, baru preprocessing: fit pada data latih SAJA, lalu transform data latih dan data uji",
+          "standarisasi: z = (x − rata-rata) ÷ simpangan baku",
+          "min-max: x' = (x − min) ÷ (max − min)",
+          "one-hot encoding untuk kategori tanpa urutan"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Kebocoran data (data leakage) terjadi ketika informasi yang tidak akan tersedia saat prediksi nyata ikut dipakai membangun model. Akibatnya skor terlihat lebih bagus dari kenyataan.",
+          "Aturan emasnya: bagi data menjadi latih dan uji PERTAMA. Semua langkah yang 'belajar' dari data (scaler, imputasi rata-rata, seleksi fitur, PCA) hanya boleh di-fit pada data latih.",
+          "Data uji hanya di-transform dengan parameter yang dipelajari dari data latih. Karena itu nilai uji boleh jatuh di luar rentang 0–1 pada min-max.",
+          "Kategori tanpa urutan (misalnya warna) sebaiknya di-one-hot encode agar tidak ada urutan atau jarak palsu. Gunakan stratify saat split jika kelas tidak seimbang."
+        ],
+        "workedExample": "Data latih punya min 10 dan max 30. Nilai x = 25 menjadi (25 − 10) ÷ (30 − 10) = 0,75.",
+        "commonMistake": "Menghitung scaler atau rata-rata imputasi dari seluruh dataset sebelum split."
+      },
+      "references": [
+        { "label": "scikit-learn: Common pitfalls and recommended practices", "url": "https://scikit-learn.org/stable/common_pitfalls.html" },
+        { "label": "An Introduction to Statistical Learning with Python (ISLP)", "url": "https://statlearning.com" }
+      ],
+      "quiz": [
+        { "id": "t7q1", "difficulty": "mudah", "question": "Apa yang dimaksud data leakage?", "options": ["Data latih terlalu sedikit", "Informasi yang tidak tersedia saat prediksi nyata ikut dipakai membangun model, sehingga skor terlihat terlalu bagus", "File dataset bocor ke internet", "Model terlalu sederhana"], "correctIndex": 1, "explanation": "Leakage membuat estimasi performa terlalu optimistis dan model gagal pada data baru." },
+        { "id": "t7q2", "difficulty": "sedang", "question": "Urutan yang benar untuk menormalkan fitur?", "options": ["Normalisasi seluruh dataset dulu, baru split", "Fit scaler terpisah pada data uji", "Fit scaler pada data latih dan data uji sekaligus", "Split dulu, fit scaler hanya pada data latih, lalu transform data latih dan data uji"], "correctIndex": 3, "explanation": "Parameter scaler hanya boleh dipelajari dari data latih supaya data uji tetap 'belum terlihat'." },
+        { "id": "t7q3", "difficulty": "mudah", "question": "Data latih punya min 10 dan max 30. Berapa nilai min-max untuk x = 25?", "options": ["0,25", "0,5", "0,75", "1,25"], "correctIndex": 2, "explanation": "(25 − 10) ÷ (30 − 10) = 15 ÷ 20 = 0,75." },
+        { "id": "t7q4", "difficulty": "sedang", "question": "Mengapa kolom 'warna' (merah, biru, hijau) sebaiknya di-one-hot encode, bukan diberi angka 1, 2, 3?", "options": ["Agar tidak muncul urutan atau jarak palsu antar kategori", "Agar data menjadi lebih kecil", "Agar akurasi pasti naik", "Agar kolom boleh berisi nilai kosong"], "correctIndex": 0, "explanation": "Angka 1, 2, 3 menyiratkan bahwa hijau 'lebih besar' dari merah, padahal tidak ada urutan." },
+        { "id": "t7q5", "difficulty": "sedang", "question": "Dataset berisi 95% kelas A dan 5% kelas B. Mengapa split memakai stratify?", "options": ["Mengurutkan data berdasarkan kelas", "Menjaga proporsi kelas pada data latih dan uji tetap mirip", "Menghapus kelas minoritas", "Menggandakan data uji"], "correctIndex": 1, "explanation": "Tanpa stratify, data uji bisa kebetulan hampir tidak punya kelas minoritas." }
+      ]
+    },
+    {
+      "topicId": 8,
+      "spell": {
+        "id": "s8",
+        "name": "Mantra Garis & Sigmoid",
+        "formulas": [
+          "prediksi linear: ŷ = w·x + b",
+          "MSE = rata-rata dari (y − ŷ)²",
+          "sigmoid: σ(z) = 1 ÷ (1 + e^(−z)); σ(0) = 0,5",
+          "log loss satu contoh: −[y·ln(p) + (1 − y)·ln(1 − p)]",
+          "gradient descent: w ← w − η · ∂L/∂w"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Regresi linear memprediksi angka. Fungsi loss-nya biasanya MSE. Regresi logistik memprediksi peluang kelas positif lewat sigmoid dan dilatih dengan log loss.",
+          "Gradient descent memperbarui bobot searah negatif gradien loss. Learning rate η yang terlalu besar membuat loss berosilasi atau membesar.",
+          "Pada regresi linear, koefisien adalah perubahan rata-rata y setiap fitur naik 1 (fitur lain tetap). Pada regresi logistik, koefisien adalah perubahan log-odds, dan e^koefisien adalah faktor pengali odds."
+        ],
+        "workedExample": "y = [3, 5] dan ŷ = [2, 7]. Galat = 1 dan −2, kuadratnya 1 dan 4, MSE = (1 + 4) ÷ 2 = 2,5.",
+        "commonMistake": "Menafsirkan koefisien regresi logistik sebagai perubahan peluang secara langsung (padahal itu log-odds)."
+      },
+      "references": [
+        { "label": "An Introduction to Statistical Learning with Python (ISLP), bab regresi dan klasifikasi", "url": "https://statlearning.com" },
+        { "label": "scikit-learn User Guide, bagian Linear Models (cari dari menu User Guide)", "url": null }
+      ],
+      "quiz": [
+        { "id": "t8q1", "difficulty": "mudah", "question": "y = [3, 5] dan prediksi ŷ = [2, 7]. Berapa MSE?", "options": ["1,5", "2,5", "5", "−1"], "correctIndex": 1, "explanation": "Galat 1 dan −2; kuadrat 1 dan 4; rata-rata = 2,5." },
+        { "id": "t8q2", "difficulty": "mudah", "question": "Berapa nilai sigmoid σ(0)?", "options": ["0", "1", "0,5", "e"], "correctIndex": 2, "explanation": "σ(0) = 1 ÷ (1 + e⁰) = 1 ÷ 2 = 0,5." },
+        { "id": "t8q3", "difficulty": "mudah", "question": "Regresi logistik memberi keluaran 0,8 untuk sebuah contoh. Artinya?", "options": ["Contoh itu pasti kelas positif", "80% fitur dipakai", "Akurasi model 80%", "Model memperkirakan peluang kelas positif sekitar 80%"], "correctIndex": 3, "explanation": "Keluaran sigmoid adalah estimasi peluang, bukan kepastian atau akurasi." },
+        { "id": "t8q4", "difficulty": "sulit", "question": "Koefisien regresi logistik untuk fitur 'merokok' = 0,7. Interpretasi yang tepat?", "options": ["Log-odds naik 0,7 untuk setiap kenaikan 1 pada fitur; odds dikali e^0,7 ≈ 2,0", "Peluang naik 0,7", "Peluang dikali 0,7", "Merokok menyebabkan kelas positif pada 70% orang"], "correctIndex": 0, "explanation": "Koefisien bekerja pada skala log-odds. e^0,7 ≈ 2,01 sehingga odds sekitar dua kali lipat." },
+        { "id": "t8q5", "difficulty": "sedang", "question": "Apa akibat learning rate yang terlalu besar pada gradient descent?", "options": ["Pelatihan selalu lebih cepat dan stabil", "Bobot tidak pernah berubah", "Loss bisa berosilasi atau malah membesar (divergen)", "Model otomatis menjadi lebih akurat"], "correctIndex": 2, "explanation": "Langkah terlalu besar melompati minimum sehingga loss tidak turun dengan stabil." }
+      ]
+    },
+    {
+      "topicId": 9,
+      "spell": {
+        "id": "s9",
+        "name": "Mantra Penilai",
+        "formulas": [
+          "precision = TP ÷ (TP + FP)",
+          "recall = TP ÷ (TP + FN)",
+          "F1 = 2·precision·recall ÷ (precision + recall)",
+          "akurasi = (TP + TN) ÷ total",
+          "ROC-AUC: 0,5 = setara tebakan acak; 1,0 = sempurna",
+          "overfitting: skor latih tinggi, skor uji/validasi jauh lebih rendah"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Confusion matrix menghitung TP, FP, FN, dan TN. Precision menjawab 'dari yang kuprediksi positif, berapa yang benar?'. Recall menjawab 'dari semua yang benar-benar positif, berapa yang tertangkap?'.",
+          "Akurasi bisa menyesatkan pada data tidak seimbang. F1 adalah rata-rata harmonik precision dan recall, jadi ia rendah jika salah satunya rendah.",
+          "Cross-validation membagi data menjadi k lipatan dan bergiliran memakai tiap lipatan sebagai validasi untuk estimasi performa yang lebih stabil.",
+          "Overfitting terlihat dari jurang antara skor latih dan skor uji. Underfitting terlihat dari skor yang rendah di keduanya."
+        ],
+        "workedExample": "TP = 40, FP = 10, FN = 20, TN = 930. Precision = 40 ÷ 50 = 0,8. Recall = 40 ÷ 60 ≈ 0,67. Akurasi = 970 ÷ 1000 = 0,97.",
+        "commonMistake": "Hanya melihat akurasi ketika kelas sangat tidak seimbang."
+      },
+      "references": [
+        { "label": "An Introduction to Statistical Learning with Python (ISLP), bab klasifikasi dan resampling", "url": "https://statlearning.com" },
+        { "label": "scikit-learn User Guide, bagian Metrics and scoring (cari dari menu User Guide)", "url": null }
+      ],
+      "quiz": [
+        { "id": "t9q1", "difficulty": "mudah", "question": "Dari 1.000 contoh: TP = 40, FP = 10, FN = 20, TN = 930. Berapa precision?", "options": ["0,8", "0,67", "0,97", "0,5"], "correctIndex": 0, "explanation": "Precision = TP ÷ (TP + FP) = 40 ÷ 50 = 0,8. Angka 0,67 adalah recall dan 0,97 adalah akurasi." },
+        { "id": "t9q2", "difficulty": "sedang", "question": "Pada skrining penyakit serius, yang terpenting adalah jangan sampai ada orang sakit yang terlewat. Metrik yang diprioritaskan?", "options": ["Precision", "Recall", "Akurasi pada data latih", "Jumlah fitur"], "correctIndex": 1, "explanation": "Recall = TP ÷ (TP + FN). FN adalah orang sakit yang terlewat, jadi recall tinggi menekan FN." },
+        { "id": "t9q3", "difficulty": "sedang", "question": "Dari 1.000 pasien, 10 sakit. Model selalu memprediksi 'sehat'. Mana yang benar?", "options": ["Akurasi 1%, recall 100%", "Akurasi 50%, recall 50%", "Akurasi 99%, tetapi recall kelas sakit 0%", "Akurasi 0%, precision 100%"], "correctIndex": 2, "explanation": "990 dari 1.000 tebakan benar (99%), tetapi tidak satu pun pasien sakit tertangkap." },
+        { "id": "t9q4", "difficulty": "sedang", "question": "Precision 0,6 dan recall 0,3. Berapa F1?", "options": ["0,90", "0,18", "0,45", "0,40"], "correctIndex": 3, "explanation": "F1 = 2×0,6×0,3 ÷ (0,6+0,3) = 0,36 ÷ 0,9 = 0,40. Angka 0,45 adalah rata-rata biasa, bukan harmonik." },
+        { "id": "t9q5", "difficulty": "sedang", "question": "Skor latih 99% tetapi skor validasi 70%. Diagnosis paling mungkin?", "options": ["Underfitting (bias tinggi)", "Model sudah ideal", "Overfitting (varians tinggi): model menghafal data latih", "Kebocoran data pasti terjadi"], "correctIndex": 2, "explanation": "Jurang besar antara skor latih dan validasi adalah tanda overfitting." }
+      ]
+    },
+    {
+      "topicId": 10,
+      "spell": {
+        "id": "s10",
+        "name": "Mantra Pohon",
+        "formulas": [
+          "Gini = 1 − Σ pₖ²",
+          "entropi = −Σ pₖ · log₂(pₖ)",
+          "random forest: banyak pohon pada sampel bootstrap berbeda, hasil digabung (voting/rata-rata)",
+          "gradient boosting: pohon dibangun berurutan, tiap pohon memperbaiki kesalahan sebelumnya",
+          "k-NN: prediksi dari k tetangga terdekat; skala fitur penting"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Decision tree memecah data dengan aturan 'fitur ≤ ambang' yang menurunkan ketidakmurnian (Gini atau entropi). Pohon yang dibiarkan tumbuh tanpa batas cenderung menghafal data latih.",
+          "Random forest melatih banyak pohon pada sampel bootstrap berbeda lalu menggabungkan hasilnya, sehingga varians turun. Gradient boosting melatih pohon secara berurutan dan tiap pohon memperbaiki kesalahan sebelumnya.",
+          "k-NN memprediksi dari k tetangga terdekat, jadi sangat bergantung pada jarak dan skala fitur. SVM mencari batas dengan margin terbesar."
+        ],
+        "workedExample": "Sebuah node berisi 10 sampel: 6 kelas A dan 4 kelas B. Gini = 1 − (0,6² + 0,4²) = 1 − 0,52 = 0,48.",
+        "commonMistake": "Memakai k-NN atau SVM tanpa menyetarakan skala fitur."
+      },
+      "references": [
+        { "label": "An Introduction to Statistical Learning with Python (ISLP), bab metode berbasis pohon dan SVM", "url": "https://statlearning.com" },
+        { "label": "scikit-learn User Guide, bagian Decision Trees dan Ensembles (cari dari menu User Guide)", "url": null }
+      ],
+      "quiz": [
+        { "id": "t10q1", "difficulty": "sedang", "question": "Sebuah node berisi 10 sampel: 6 kelas A dan 4 kelas B. Berapa Gini?", "options": ["0,24", "0,48", "0,52", "0,60"], "correctIndex": 1, "explanation": "Gini = 1 − (0,36 + 0,16) = 0,48. Angka 0,52 adalah jumlah kuadratnya sebelum dikurangkan dari 1." },
+        { "id": "t10q2", "difficulty": "sedang", "question": "Apa ide utama random forest?", "options": ["Satu pohon sangat dalam menghafal data", "Pohon dilatih berurutan, tiap pohon memperbaiki kesalahan pohon sebelumnya", "Banyak pohon dilatih pada sampel bootstrap berbeda lalu hasilnya digabung (voting/rata-rata), sehingga varians turun", "Satu pohon memakai semua fitur sekaligus"], "correctIndex": 2, "explanation": "Itu bagging. Pilihan kedua adalah ide gradient boosting." },
+        { "id": "t10q3", "difficulty": "sedang", "question": "Apa yang membedakan gradient boosting dari random forest?", "options": ["Pohon dilatih paralel dan independen lalu di-voting", "Tidak memakai pohon sama sekali", "Hanya satu pohon yang dipertahankan", "Pohon dibangun berurutan; tiap pohon baru memperbaiki kesalahan pohon sebelumnya"], "correctIndex": 3, "explanation": "Boosting bersifat sekuensial, sedangkan random forest melatih pohon-pohonnya secara independen." },
+        { "id": "t10q4", "difficulty": "sedang", "question": "k-NN dengan fitur 'umur' (0–100) dan 'gaji' (jutaan rupiah) tanpa penskalaan. Apa masalahnya?", "options": ["Fitur gaji akan mendominasi jarak sehingga umur nyaris diabaikan; perlu standarisasi", "Fitur umur akan mendominasi jarak", "Tidak ada pengaruh", "k-NN tidak memakai jarak"], "correctIndex": 0, "explanation": "Selisih gaji jauh lebih besar secara numerik, jadi jarak hampir hanya ditentukan oleh gaji." },
+        { "id": "t10q5", "difficulty": "mudah", "question": "Apa risiko decision tree tanpa batas kedalaman?", "options": ["Pohon pasti underfitting", "Skor uji pasti sempurna", "Pohon cenderung menghafal data latih (overfitting)", "Pohon otomatis menjadi regresi linear"], "correctIndex": 2, "explanation": "Pohon yang sangat dalam bisa memisahkan tiap contoh latih, termasuk noise." }
+      ]
+    },
+    {
+      "topicId": 11,
+      "spell": {
+        "id": "s11",
+        "name": "Mantra Pengelompok",
+        "formulas": [
+          "k-means: tetapkan tiap titik ke pusat terdekat, hitung ulang pusat = rata-rata anggota, ulangi",
+          "inertia = Σ jarak² titik ke pusat klusternya",
+          "PCA: proyeksi ke arah dengan varians terbesar",
+          "varians dijelaskan komponen i = λᵢ ÷ Σλ"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "k-means mengelompokkan data ke k klaster dengan mengulang dua langkah: tetapkan titik ke pusat terdekat, lalu hitung ulang pusat sebagai rata-rata anggotanya.",
+          "PCA mencari arah dengan varians terbesar dan memproyeksikan data ke dimensi lebih sedikit. Fitur sebaiknya diskalakan dulu agar fitur berskala besar tidak mendominasi.",
+          "Clustering bisa menyesatkan: k-means selalu menghasilkan klaster walau data tidak punya struktur, mengasumsikan klaster berbentuk bulat, sensitif pada skala fitur, dan hasilnya bergantung pada pilihan k."
+        ],
+        "workedExample": "Titik [1, 2, 9, 10] dengan pusat awal 1 dan 10: klaster {1, 2} dan {9, 10}. Pusat baru = 1,5 dan 9,5.",
+        "commonMistake": "Menganggap klaster yang dihasilkan selalu nyata dan bermakna."
+      },
+      "references": [
+        { "label": "An Introduction to Statistical Learning with Python (ISLP), bab unsupervised learning", "url": "https://statlearning.com" },
+        { "label": "scikit-learn User Guide, bagian Clustering dan Decomposition (cari dari menu User Guide)", "url": null }
+      ],
+      "quiz": [
+        { "id": "t11q1", "difficulty": "mudah", "question": "Sebuah klaster beranggota titik 2, 4, dan 6. Berapa pusat barunya pada langkah k-means?", "options": ["3", "4", "6", "12"], "correctIndex": 1, "explanation": "Pusat baru adalah rata-rata anggota: (2 + 4 + 6) ÷ 3 = 4." },
+        { "id": "t11q2", "difficulty": "sedang", "question": "Eigenvalue komponen PCA adalah 6, 3, dan 1. Berapa persen varians dijelaskan komponen pertama?", "options": ["30%", "6%", "90%", "60%"], "correctIndex": 3, "explanation": "6 ÷ (6 + 3 + 1) = 0,6 = 60%." },
+        { "id": "t11q3", "difficulty": "sulit", "question": "Kapan hasil k-means paling mungkin menyesatkan?", "options": ["Tidak pernah, k-means selalu menemukan struktur asli", "Hanya saat k = 1", "Saat fitur berskala sangat berbeda atau bentuk klaster aslinya tidak bulat; k-means tetap menghasilkan klaster walau tak bermakna", "Hanya saat data sangat sedikit"], "correctIndex": 2, "explanation": "k-means selalu mengeluarkan k klaster, sehingga hasilnya bisa tampak meyakinkan padahal tidak mencerminkan struktur data." },
+        { "id": "t11q4", "difficulty": "sedang", "question": "Fitur A berskala 0–1 dan fitur B berskala 0–10.000. Apa yang terjadi pada PCA tanpa standarisasi?", "options": ["PCA tidak terpengaruh skala", "Fitur B akan mendominasi komponen utama; standarisasi dulu", "Fitur A akan mendominasi", "PCA otomatis menghapus fitur B"], "correctIndex": 1, "explanation": "PCA mengejar varians terbesar, dan fitur berskala besar punya varians mentah yang jauh lebih besar." },
+        { "id": "t11q5", "difficulty": "mudah", "question": "Titik [1, 2, 9, 10] dengan pusat awal 1 dan 10. Berapa pusat baru setelah satu iterasi?", "options": ["1 dan 10", "2 dan 9", "5,5 dan 5,5", "1,5 dan 9,5"], "correctIndex": 3, "explanation": "Klaster {1, 2} dan {9, 10}, sehingga pusatnya 1,5 dan 9,5." }
+      ]
+    }
+  ],
+  "boss": {
+    "name": "Golem Pohon Purba",
+    "phases": [
+      {
+        "phase": 1, "topicId": 7, "spellId": "s7",
+        "variants": [
+          { "scenario": "Golem menyerang dengan data baru. Kamu menormalkan fitur dengan min-max memakai parameter data latih: min 10 dan max 30. Satu titik uji bernilai x = 40. Berapa nilainya setelah transformasi?", "options": ["1,0", "1,5", "0,75", "Error"], "correctIndex": 1, "explanation": "(40 − 10) ÷ (30 − 10) = 1,5. Karena parameter hanya dari data latih, nilai uji boleh di luar rentang 0–1." },
+          { "scenario": "Parameter min-max dari data latih: min 20 dan max 60. Satu titik uji bernilai x = 10. Berapa nilai transformasinya?", "options": ["0,25", "0", "−0,25", "−1"], "correctIndex": 2, "explanation": "(10 − 20) ÷ (60 − 20) = −10 ÷ 40 = −0,25." }
+        ]
+      },
+      {
+        "phase": 2, "topicId": 8, "spellId": "s8",
+        "variants": [
+          { "scenario": "Model logistikmu memberi p = 0,8 pada contoh yang kelas sebenarnya y = 1. Berapa log loss contoh itu?", "options": ["0,223", "0,8", "0,2", "1,609"], "correctIndex": 0, "explanation": "−ln(0,8) ≈ 0,223." },
+          { "scenario": "Model logistikmu memberi p = 0,8 pada contoh yang kelas sebenarnya y = 0. Berapa log loss contoh itu?", "options": ["0,223", "1,609", "0,8", "0,2"], "correctIndex": 1, "explanation": "Untuk y = 0, loss = −ln(1 − p) = −ln(0,2) ≈ 1,609." }
+        ]
+      },
+      {
+        "phase": 3, "topicId": 9, "spellId": "s9",
+        "variants": [
+          { "scenario": "Pendeteksi serangan sang Golem menghasilkan TP = 30, FP = 10, FN = 30. Berapa F1?", "options": ["0,625", "0,60", "0,50", "0,75"], "correctIndex": 1, "explanation": "Precision = 30 ÷ 40 = 0,75; recall = 30 ÷ 60 = 0,5. F1 = 2×0,75×0,5 ÷ 1,25 = 0,60." },
+          { "scenario": "Pendeteksi lain menghasilkan TP = 20, FP = 20, FN = 0. Berapa F1?", "options": ["0,75", "Sekitar 0,67", "0,50", "1,00"], "correctIndex": 1, "explanation": "Precision = 0,5; recall = 1,0. F1 = 2×0,5×1 ÷ 1,5 ≈ 0,67." }
+        ]
+      },
+      {
+        "phase": 4, "topicId": 10, "spellId": "s10",
+        "variants": [
+          { "scenario": "Sebuah node pohon sang Golem berisi 8 sampel: 6 kelas A dan 2 kelas B. Berapa Gini?", "options": ["0,375", "0,25", "0,75", "0,625"], "correctIndex": 0, "explanation": "Gini = 1 − (0,75² + 0,25²) = 1 − 0,625 = 0,375." },
+          { "scenario": "Node lain berisi 5 sampel: 4 kelas A dan 1 kelas B. Berapa Gini?", "options": ["0,32", "0,68", "0,20", "0,80"], "correctIndex": 0, "explanation": "Gini = 1 − (0,8² + 0,2²) = 1 − 0,68 = 0,32." }
+        ]
+      },
+      {
+        "phase": 5, "topicId": 11, "spellId": "s11",
+        "variants": [
+          { "scenario": "Titik-titik [2, 4, 10, 12] dikelompokkan k-means dengan pusat awal 2 dan 12. Berapa pusat baru setelah satu iterasi?", "options": ["3 dan 11", "2 dan 12", "4 dan 10", "7 dan 7"], "correctIndex": 0, "explanation": "Klaster {2, 4} dan {10, 12}. Pusat baru = 3 dan 11." },
+          { "scenario": "Titik-titik [1, 3, 8, 12] dengan pusat awal 1 dan 12. Berapa pusat baru setelah satu iterasi?", "options": ["2 dan 10", "1 dan 12", "3 dan 8", "2 dan 12"], "correctIndex": 0, "explanation": "Titik 3 lebih dekat ke 1, titik 8 lebih dekat ke 12. Klaster {1, 3} dan {8, 12}, pusat baru 2 dan 10." }
+        ]
+      },
+      {
+        "phase": 6, "topicId": 5, "spellId": "s5",
+        "title": "Gema Lantai 1",
+        "variants": [
+          { "spellId": "s5", "scenario": "Gema dari Lantai 1: loss sang Golem adalah L(w) = (w − 3)², kamu berdiri di w = 0, learning rate 0,1. Berapa w setelah satu langkah gradient descent?", "options": ["0,6", "−0,6", "3", "0,3"], "correctIndex": 0, "explanation": "L'(w) = 2(w − 3), jadi L'(0) = −6. w baru = 0 − 0,1 × (−6) = 0,6." },
+          { "spellId": "s2", "scenario": "Gema dari Lantai 1: 5% surat sang Golem adalah spam. Filtermu menandai 90% spam dan juga 10% surat biasa. Sebuah surat ditandai. Berapa peluang ia benar-benar spam?", "options": ["90%", "5%", "Sekitar 32%", "Sekitar 4,5%"], "correctIndex": 2, "explanation": "0,9×0,05 ÷ (0,9×0,05 + 0,1×0,95) = 0,045 ÷ 0,14 ≈ 0,32." }
+        ]
+      }
+    ]
+  }
+}

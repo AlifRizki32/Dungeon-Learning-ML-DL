@@ -1,0 +1,254 @@
+{
+  "reviewStatus": "needs-human-review",
+  "floor": 1,
+  "topics": [
+    {
+      "topicId": 1,
+      "spell": {
+        "id": "s1",
+        "name": "Mantra Persen & Garis Lurus",
+        "formulas": [
+          "persen = bagian ÷ total × 100",
+          "perubahan % = (baru − lama) ÷ lama × 100",
+          "garis lurus: y = m·x + c"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Pecahan disederhanakan dengan membagi pembilang dan penyebut dengan faktor persekutuan terbesar. Contoh: 3/12 = 1/4.",
+          "Persen adalah pecahan per seratus. Perubahan persen selalu dihitung terhadap nilai LAMA.",
+          "Fungsi linear y = m·x + c: m adalah kemiringan (perubahan y setiap x naik 1), c adalah titik potong sumbu y. Grafiknya berupa garis lurus."
+        ],
+        "workedExample": "Harga naik dari 80 menjadi 100: (100 − 80) ÷ 80 × 100 = 25%.",
+        "commonMistake": "Menghitung persen perubahan terhadap nilai baru, bukan nilai lama."
+      },
+      "references": [
+        { "label": "Belum ada referensi terverifikasi. Cari materi 'pre-aljabar' di platform pilihanmu.", "url": null }
+      ],
+      "quiz": [
+        { "id": "t1q1", "difficulty": "mudah", "question": "Bentuk paling sederhana dari 3/12 adalah...", "options": ["1/3", "1/4", "1/6", "3/4"], "correctIndex": 1, "explanation": "Bagi pembilang dan penyebut dengan 3: 3/12 = 1/4." },
+        { "id": "t1q2", "difficulty": "mudah", "question": "Harga naik dari 80 menjadi 100. Berapa persen kenaikannya?", "options": ["20%", "80%", "25%", "125%"], "correctIndex": 2, "explanation": "(100 − 80) ÷ 80 = 0,25 = 25%. Dasar perhitungannya nilai lama (80)." },
+        { "id": "t1q3", "difficulty": "mudah", "question": "Pada y = 2x + 3, berapa y ketika x = 4?", "options": ["11", "9", "14", "8"], "correctIndex": 0, "explanation": "y = 2×4 + 3 = 11." },
+        { "id": "t1q4", "difficulty": "sedang", "question": "Pada y = m·x + c, apa arti m?", "options": ["Nilai y saat x = 0", "Titik potong sumbu x", "Jarak antara dua titik", "Perubahan y setiap x naik 1"], "correctIndex": 3, "explanation": "m adalah kemiringan garis. Nilai y saat x = 0 adalah c." },
+        { "id": "t1q5", "difficulty": "sedang", "question": "Sebuah barang berharga 150 dengan diskon 20%. Berapa yang dibayar?", "options": ["30", "120", "130", "170"], "correctIndex": 1, "explanation": "Diskon 20% berarti membayar 80%: 150 × 0,8 = 120." }
+      ]
+    },
+    {
+      "topicId": 2,
+      "spell": {
+        "id": "s2",
+        "name": "Mantra Bayes",
+        "formulas": [
+          "rata-rata = Σx ÷ n",
+          "varians sampel s² = Σ(x − rata-rata)² ÷ (n − 1)",
+          "P(A|B) = P(A dan B) ÷ P(B)",
+          "Bayes: P(A|B) = P(B|A) · P(A) ÷ P(B)"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Rata-rata sensitif terhadap outlier. Median (nilai tengah setelah data diurutkan) lebih tahan terhadap outlier.",
+          "Varians mengukur sebaran data di sekitar rata-rata. Untuk data sampel, pembaginya n − 1.",
+          "Probabilitas bersyarat P(A|B) adalah peluang A jika kita sudah tahu B terjadi. Teorema Bayes membalik arah syarat: dari P(B|A) menjadi P(A|B)."
+        ],
+        "workedExample": "Prevalensi penyakit 1%, tes punya sensitivitas 90% dan positif palsu 5%. P(sakit|positif) = 0,9×0,01 ÷ (0,9×0,01 + 0,05×0,99) = 0,009 ÷ 0,0585 ≈ 15%.",
+        "commonMistake": "Mengira P(A|B) sama dengan P(B|A) dan mengabaikan seberapa langka kejadiannya (base rate)."
+      },
+      "references": [
+        { "label": "OpenStax Introductory Statistics 2e", "url": "https://openstax.org/books/introductory-statistics-2e/pages/preface" },
+        { "label": "Seeing Theory (Brown University, situs arsip)", "url": "https://seeing-theory.brown.edu/" }
+      ],
+      "quiz": [
+        { "id": "t2q1", "difficulty": "mudah", "question": "Data: 1, 2, 3, 4, 100. Ukuran pusat mana yang paling mewakili data 'tipikal'?", "options": ["Rata-rata (22)", "Median (3)", "Jumlah (110)", "Rentang (99)"], "correctIndex": 1, "explanation": "Outlier 100 menarik rata-rata ke 22, sedangkan median tetap 3." },
+        { "id": "t2q2", "difficulty": "sedang", "question": "Berapa varians sampel dari data 2, 4, 6?", "options": ["2", "2,67", "4", "8"], "correctIndex": 2, "explanation": "Rata-rata 4. Σ(x − 4)² = 4 + 0 + 4 = 8. Dibagi (n − 1) = 2 hasilnya 4. Angka 2,67 adalah varians populasi (8 ÷ 3)." },
+        { "id": "t2q3", "difficulty": "sedang", "question": "Sebuah dadu adil dilempar dan diketahui hasilnya lebih dari 3. Berapa peluang hasilnya genap?", "options": ["1/2", "1/3", "1/6", "2/3"], "correctIndex": 3, "explanation": "Hasil yang mungkin: 4, 5, 6. Yang genap: 4 dan 6. Jadi 2/3." },
+        { "id": "t2q4", "difficulty": "sulit", "question": "Prevalensi penyakit 1%, sensitivitas tes 90%, positif palsu 5%. Jika tes positif, berapa peluang benar-benar sakit?", "options": ["90%", "50%", "Sekitar 15%", "1%"], "correctIndex": 2, "explanation": "0,9×0,01 ÷ (0,9×0,01 + 0,05×0,99) ≈ 0,154." },
+        { "id": "t2q5", "difficulty": "sulit", "question": "Pada contoh gulungan, tes positif hanya berarti sekitar 15% sakit meski sensitivitasnya 90%. Penyebab utamanya?", "options": ["Tesnya selalu salah", "Penyakitnya langka sehingga positif palsu dari orang sehat jumlahnya mendominasi", "Sensitivitas dihitung salah", "Teorema Bayes tidak berlaku di sini"], "correctIndex": 1, "explanation": "Karena 99% orang sehat, 5% positif palsu dari mereka lebih banyak daripada 90% positif benar dari 1% orang sakit." }
+      ]
+    },
+    {
+      "topicId": 3,
+      "spell": {
+        "id": "s3",
+        "name": "Mantra Uji Hipotesis",
+        "formulas": [
+          "Normal: ±1σ ≈ 68%, ±2σ ≈ 95%, ±3σ ≈ 99,7%",
+          "Binomial: P(X=k) = C(n,k) · p^k · (1−p)^(n−k); rata-rata = n·p",
+          "p-value = P(hasil sekurang-kurangnya seekstrem yang teramati | H0 benar)",
+          "regresi sederhana: y = b0 + b1·x"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Uji hipotesis dimulai dari H0 ('tidak ada efek'). Jika p-value lebih kecil dari ambang α (misalnya 0,05), H0 ditolak. Jika tidak, kita gagal menolak H0, dan itu BUKAN bukti bahwa H0 benar.",
+          "Confidence interval 95%: prosedur yang, bila diulang pada banyak sampel berbeda, menangkap nilai sebenarnya pada sekitar 95% pengulangan.",
+          "Korelasi r berkisar dari −1 sampai 1 dan mengukur kekuatan hubungan linear, bukan sebab-akibat."
+        ],
+        "workedExample": "Koin adil dilempar 10 kali. Rata-rata jumlah 'gambar' = n·p = 10 × 0,5 = 5.",
+        "commonMistake": "Mengartikan p-value sebagai peluang H0 benar."
+      },
+      "references": [
+        { "label": "OpenStax Introductory Statistics 2e", "url": "https://openstax.org/books/introductory-statistics-2e/pages/preface" },
+        { "label": "Seeing Theory (Brown University, situs arsip)", "url": "https://seeing-theory.brown.edu/" }
+      ],
+      "quiz": [
+        { "id": "t3q1", "difficulty": "mudah", "question": "Sekitar berapa persen data berdistribusi normal berada dalam ±2 standar deviasi dari rata-rata?", "options": ["68%", "95%", "99,7%", "50%"], "correctIndex": 1, "explanation": "Aturan 68–95–99,7: ±1σ ≈ 68%, ±2σ ≈ 95%, ±3σ ≈ 99,7%." },
+        { "id": "t3q2", "difficulty": "mudah", "question": "Koin adil dilempar 10 kali. Berapa rata-rata jumlah 'gambar' yang diharapkan?", "options": ["5", "2,5", "10", "0,5"], "correctIndex": 0, "explanation": "Rata-rata binomial = n·p = 10 × 0,5 = 5." },
+        { "id": "t3q3", "difficulty": "sulit", "question": "Hasil uji menunjukkan p-value = 0,03. Interpretasi yang benar?", "options": ["Peluang H0 benar adalah 3%", "Peluang hasil ini murni kebetulan adalah 97%", "Jika H0 benar, peluang mendapat hasil sekurang-kurangnya seekstrem ini sekitar 3%", "Peluang H1 benar adalah 97%"], "correctIndex": 2, "explanation": "p-value adalah peluang data (atau yang lebih ekstrem) dengan asumsi H0 benar, bukan peluang H0 itu sendiri." },
+        { "id": "t3q4", "difficulty": "sedang", "question": "Penjualan es krim dan kasus tenggelam berkorelasi r = 0,8. Kesimpulan paling tepat?", "options": ["Es krim menyebabkan tenggelam", "Tenggelam membuat orang membeli es krim", "Korelasi tidak membuktikan sebab-akibat; bisa ada faktor ketiga seperti musim panas", "Datanya pasti salah"], "correctIndex": 2, "explanation": "Musim panas bisa meningkatkan keduanya. Korelasi hanya menunjukkan hubungan, bukan penyebab." },
+        { "id": "t3q5", "difficulty": "mudah", "question": "Pada model y = 2 + 3x, jika x naik 1 satuan, perkiraan y berubah...", "options": ["naik 2", "naik 3", "naik 5", "tetap"], "correctIndex": 1, "explanation": "Koefisien b1 = 3 adalah perubahan rata-rata y setiap x naik 1." }
+      ]
+    },
+    {
+      "topicId": 4,
+      "spell": {
+        "id": "s4",
+        "name": "Mantra Matriks",
+        "formulas": [
+          "dot product: a·b = a1·b1 + a2·b2 + ...",
+          "(m×n) · (n×p) = (m×p)",
+          "C[i][j] = baris ke-i dari A · kolom ke-j dari B",
+          "A·v = λ·v (v: eigenvector, λ: eigenvalue)",
+          "SVD: A = U · Σ · Vᵀ"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Perkalian matriks berarti menerapkan satu transformasi setelah transformasi lain. Dimensi dalam harus sama dan urutan penting: A·B umumnya tidak sama dengan B·A.",
+          "Eigenvector adalah arah yang tidak berubah saat ditransformasi oleh A. Ia hanya diregangkan atau dikecilkan oleh faktor λ.",
+          "SVD menguraikan sebuah matriks menjadi tiga bagian dan dipakai antara lain untuk reduksi dimensi dan kompresi.",
+          "Di neural network, satu lapisan menghitung W·x + b, yaitu kombinasi berbobot dari semua fitur sekaligus."
+        ],
+        "workedExample": "[1, 2, 3] · [4, 5, 6] = 1×4 + 2×5 + 3×6 = 32.",
+        "commonMistake": "Mengira A·B = B·A."
+      },
+      "references": [
+        { "label": "3Blue1Brown: Essence of Linear Algebra", "url": "https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab" },
+        { "label": "MIT 18.06 Linear Algebra", "url": "https://ocw.mit.edu/courses/mathematics/18-06-linear-algebra-spring-2010/" },
+        { "label": "Mathematics for Machine Learning (Deisenroth, Faisal, Ong)", "url": "https://mml-book.com" }
+      ],
+      "quiz": [
+        { "id": "t4q1", "difficulty": "mudah", "question": "Berapa hasil dot product [1, 2, 3] · [4, 5, 6]?", "options": ["15", "32", "21", "28"], "correctIndex": 1, "explanation": "1×4 + 2×5 + 3×6 = 4 + 10 + 18 = 32." },
+        { "id": "t4q2", "difficulty": "mudah", "question": "Matriks A berukuran 2×3 dikalikan matriks B berukuran 3×4. Ukuran hasilnya?", "options": ["2×3", "3×3", "Tidak bisa dikalikan", "2×4"], "correctIndex": 3, "explanation": "Dimensi dalam (3 dan 3) cocok, hasilnya berukuran baris A × kolom B = 2×4." },
+        { "id": "t4q3", "difficulty": "sedang", "question": "Hitung [[1,2],[3,4]] · [[0,1],[1,0]].", "options": ["[[0,2],[4,0]]", "[[2,1],[4,3]]", "[[1,2],[3,4]]", "[[3,4],[1,2]]"], "correctIndex": 1, "explanation": "Baris1·kolom1 = 2, baris1·kolom2 = 1, baris2·kolom1 = 4, baris2·kolom2 = 3. Opsi [[3,4],[1,2]] adalah hasil B·A, bukan A·B." },
+        { "id": "t4q4", "difficulty": "sedang", "question": "Apa arti A·v = λ·v?", "options": ["v adalah vektor yang arahnya tidak berubah oleh A, hanya diskalakan oleh λ", "v selalu menjadi vektor nol", "v tegak lurus terhadap semua vektor lain", "λ adalah panjang dari A"], "correctIndex": 0, "explanation": "Itu definisi eigenvector (v) dan eigenvalue (λ)." },
+        { "id": "t4q5", "difficulty": "sedang", "question": "Apa fungsi utama perkalian matriks W·x pada satu lapisan neural network?", "options": ["Mengurutkan data", "Menghapus outlier", "Menghitung kombinasi berbobot dari semua fitur masukan sekaligus", "Membagi data latih dan uji"], "correctIndex": 2, "explanation": "Setiap baris W memberi bobot pada semua fitur x dan menjumlahkannya menjadi satu keluaran." }
+      ]
+    },
+    {
+      "topicId": 5,
+      "spell": {
+        "id": "s5",
+        "name": "Mantra Gradien",
+        "formulas": [
+          "(xⁿ)' = n · xⁿ⁻¹",
+          "aturan rantai: (f(g(x)))' = f'(g(x)) · g'(x)",
+          "gradien: ∇f = (∂f/∂x, ∂f/∂y, ...)",
+          "gradient descent: θ_baru = θ − η · ∇L"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Turunan adalah laju perubahan sesaat. Secara geometri, ia adalah kemiringan garis singgung.",
+          "Turunan parsial: turunkan terhadap satu variabel dan anggap variabel lain konstan.",
+          "Gradien menunjuk arah kenaikan tercepat. Untuk meminimalkan loss, melangkahlah berlawanan arah gradien (gradient descent) dengan learning rate η.",
+          "Aturan rantai adalah dasar dari backpropagation."
+        ],
+        "workedExample": "f(x) = x², x = 3, η = 0,1. f'(3) = 6, maka x baru = 3 − 0,1 × 6 = 2,4.",
+        "commonMistake": "Lupa mengalikan dengan turunan fungsi dalam pada aturan rantai."
+      },
+      "references": [
+        { "label": "3Blue1Brown: Essence of Calculus", "url": "https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr" },
+        { "label": "MIT 18.01 Single Variable Calculus", "url": "https://ocw.mit.edu/courses/mathematics/18-01-single-variable-calculus-fall-2006/" },
+        { "label": "Mathematics for Machine Learning, bab Vector Calculus", "url": "https://mml-book.com" }
+      ],
+      "quiz": [
+        { "id": "t5q1", "difficulty": "mudah", "question": "Berapa turunan dari 3x²?", "options": ["3x", "6x", "6x²", "x³"], "correctIndex": 1, "explanation": "(xⁿ)' = n·xⁿ⁻¹, jadi 3 × 2x = 6x." },
+        { "id": "t5q2", "difficulty": "sedang", "question": "Untuk f(x, y) = x²·y, berapa ∂f/∂x?", "options": ["x²", "2x", "x²y", "2xy"], "correctIndex": 3, "explanation": "Anggap y konstan: turunan x² adalah 2x, dikali y menjadi 2xy." },
+        { "id": "t5q3", "difficulty": "sedang", "question": "Berapa turunan dari (2x + 1)³?", "options": ["6(2x + 1)²", "3(2x + 1)²", "2(2x + 1)²", "3(2x + 1)³"], "correctIndex": 0, "explanation": "Aturan rantai: 3(2x + 1)² × turunan dalam (2) = 6(2x + 1)²." },
+        { "id": "t5q4", "difficulty": "sedang", "question": "Gradien fungsi loss pada suatu titik menunjuk ke arah...", "options": ["penurunan loss tercepat", "titik minimum global", "kenaikan loss tercepat; untuk meminimalkan loss kita melangkah berlawanan arahnya", "arah di mana loss tidak berubah"], "correctIndex": 2, "explanation": "Gradien menunjuk kenaikan tercepat. Gradient descent bergerak ke arah negatifnya." },
+        { "id": "t5q5", "difficulty": "sedang", "question": "f(x) = x², x = 3, learning rate 0,1. Berapa x setelah satu langkah gradient descent?", "options": ["2,7", "2,4", "3,6", "0,3"], "correctIndex": 1, "explanation": "f'(3) = 6, maka x baru = 3 − 0,1 × 6 = 2,4." }
+      ]
+    },
+    {
+      "topicId": 6,
+      "spell": {
+        "id": "s6",
+        "name": "Mantra Pandas",
+        "formulas": [
+          "import numpy as np; import pandas as pd; import matplotlib.pyplot as plt",
+          "a @ b untuk perkalian matriks; a * b untuk perkalian per elemen",
+          "df.isna().sum() menghitung nilai kosong per kolom",
+          "df.groupby('kolom')['nilai'].mean() menghitung rata-rata per kelompok",
+          "plt.hist(x) menampilkan histogram"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "NumPy bekerja dengan array dan operasi vektorisasi (per elemen, tanpa loop).",
+          "pandas DataFrame adalah tabel berlabel. Langkah awal yang umum: df.head(), df.info(), df.describe(), df.isna().sum().",
+          "matplotlib: histogram untuk distribusi satu variabel, scatter plot untuk hubungan dua variabel."
+        ],
+        "workedExample": "Rata-rata harga per kota: df.groupby('kota')['harga'].mean()",
+        "commonMistake": "Memakai * untuk perkalian matriks (itu perkalian per elemen). Gunakan @."
+      },
+      "references": [
+        { "label": "Python Data Science Handbook (Jake VanderPlas)", "url": "https://jakevdp.github.io/PythonDataScienceHandbook/" }
+      ],
+      "quiz": [
+        { "id": "t6q1", "difficulty": "mudah", "question": "Jika a = np.array([1, 2, 3]), berapa hasil a * 2?", "options": ["[1, 2, 3, 1, 2, 3]", "[3, 4, 5]", "[2, 4, 6]", "Error"], "correctIndex": 2, "explanation": "Array NumPy dikalikan per elemen. Duplikasi isi terjadi pada list Python biasa, bukan array NumPy." },
+        { "id": "t6q2", "difficulty": "mudah", "question": "Operator mana yang menghitung perkalian matriks pada array NumPy?", "options": ["@", "*", "+", "%"], "correctIndex": 0, "explanation": "@ adalah perkalian matriks, sedangkan * adalah perkalian per elemen." },
+        { "id": "t6q3", "difficulty": "mudah", "question": "Perintah untuk menghitung jumlah nilai kosong di setiap kolom DataFrame df?", "options": ["df.count_missing()", "df.isna().sum()", "df.null()", "df.drop_na().sum()"], "correctIndex": 1, "explanation": "df.isna() menghasilkan True/False per sel, dan .sum() menjumlahkannya per kolom." },
+        { "id": "t6q4", "difficulty": "sedang", "question": "Perintah untuk menghitung rata-rata kolom 'harga' per 'kota'?", "options": ["df.mean('kota', 'harga')", "df['harga'].group('kota')", "df.agg('kota').mean", "df.groupby('kota')['harga'].mean()"], "correctIndex": 3, "explanation": "groupby membentuk kelompok per kota, lalu mean() dihitung pada kolom harga." },
+        { "id": "t6q5", "difficulty": "mudah", "question": "Visualisasi paling tepat untuk melihat distribusi satu variabel numerik?", "options": ["Diagram lingkaran", "Histogram", "Scatter plot (dua variabel)", "Peta panas"], "correctIndex": 1, "explanation": "Histogram menunjukkan sebaran nilai satu variabel. Scatter plot dipakai untuk hubungan dua variabel." }
+      ]
+    }
+  ],
+  "boss": {
+    "name": "Raja Matematika",
+    "phases": [
+      {
+        "phase": 1, "topicId": 1, "spellId": "s1",
+        "variants": [
+          { "scenario": "Raja Matematika memperbesar HP-nya dari 400 menjadi 500. Berapa persen kenaikannya?", "options": ["20%", "25%", "80%", "125%"], "correctIndex": 1, "explanation": "(500 − 400) ÷ 400 × 100 = 25%." },
+          { "scenario": "Perisai sang Raja melemah dari 250 menjadi 200. Berapa persen perubahannya?", "options": ["−20%", "−25%", "−5%", "−50%"], "correctIndex": 0, "explanation": "(200 − 250) ÷ 250 × 100 = −20%. Angka 25% muncul jika salah memakai nilai baru sebagai dasar." }
+        ]
+      },
+      {
+        "phase": 2, "topicId": 2, "spellId": "s2",
+        "variants": [
+          { "scenario": "20% serangan sang Raja adalah serangan Api. Perisaimu menyala dengan peluang 0,9 jika serangannya Api dan 0,1 jika bukan. Perisai menyala. Berapa peluang serangan itu Api?", "options": ["Sekitar 18%", "Sekitar 69%", "90%", "20%"], "correctIndex": 1, "explanation": "0,9×0,2 ÷ (0,9×0,2 + 0,1×0,8) = 0,18 ÷ 0,26 ≈ 0,69." },
+          { "scenario": "10% serangan sang Raja adalah serangan Es. Perisai biru menyala dengan peluang 0,8 jika serangannya Es dan 0,2 jika bukan. Perisai menyala. Berapa peluang serangan itu Es?", "options": ["80%", "10%", "Sekitar 31%", "Sekitar 8%"], "correctIndex": 2, "explanation": "0,8×0,1 ÷ (0,8×0,1 + 0,2×0,9) = 0,08 ÷ 0,26 ≈ 0,31." }
+        ]
+      },
+      {
+        "phase": 3, "topicId": 3, "spellId": "s3",
+        "variants": [
+          { "scenario": "Sang Raja mengklaim koin kutukannya adil (H0). Setelah banyak lemparan, p-value = 0,02 dan α = 0,05. Keputusanmu?", "options": ["Tolak H0: ada bukti koinnya tidak adil", "Gagal menolak H0: koinnya pasti adil", "Peluang koin itu adil adalah 2%", "H1 benar dengan kepastian 98%"], "correctIndex": 0, "explanation": "p-value 0,02 lebih kecil dari α = 0,05, jadi H0 ditolak. p-value bukan peluang H0 benar." },
+          { "scenario": "Pada ujian lain, p-value = 0,20 dan α = 0,05. Keputusanmu?", "options": ["Tolak H0", "Gagal menolak H0: bukti belum cukup, bukan berarti H0 pasti benar", "Peluang H0 benar adalah 20%", "H1 pasti benar"], "correctIndex": 1, "explanation": "0,20 lebih besar dari α, jadi kita gagal menolak H0. Itu bukan bukti bahwa H0 benar." }
+        ]
+      },
+      {
+        "phase": 4, "topicId": 4, "spellId": "s4",
+        "variants": [
+          { "scenario": "Gerbang rune mengubah vektor dengan matriks A = [[2,0],[0,3]]. Vektor masukanmu v = [1, 2]. Berapa A·v?", "options": ["[2, 6]", "[3, 5]", "[2, 3]", "[1, 6]"], "correctIndex": 0, "explanation": "Baris1·v = 2×1 + 0×2 = 2. Baris2·v = 0×1 + 3×2 = 6." },
+          { "scenario": "Gerbang rune lain memakai A = [[1,1],[0,2]] dan vektor v = [3, 1]. Berapa A·v?", "options": ["[3, 2]", "[4, 1]", "[4, 2]", "[2, 4]"], "correctIndex": 2, "explanation": "Baris1·v = 1×3 + 1×1 = 4. Baris2·v = 0×3 + 2×1 = 2." }
+        ]
+      },
+      {
+        "phase": 5, "topicId": 5, "spellId": "s5",
+        "variants": [
+          { "scenario": "Kekuatan sang Raja memenuhi f(x) = (x − 4)², dan kamu berdiri di x = 0. Dengan learning rate 0,25, di mana kamu berdiri setelah satu langkah gradient descent?", "options": ["−2", "2", "4", "1"], "correctIndex": 1, "explanation": "f'(x) = 2(x − 4), jadi f'(0) = −8. x baru = 0 − 0,25 × (−8) = 2." },
+          { "scenario": "Sekarang kekuatannya f(x) = (x − 6)², kamu di x = 0, learning rate 0,25. Posisimu setelah satu langkah?", "options": ["3", "−3", "6", "1,5"], "correctIndex": 0, "explanation": "f'(0) = 2(0 − 6) = −12. x baru = 0 − 0,25 × (−12) = 3." }
+        ]
+      },
+      {
+        "phase": 6, "topicId": 6, "spellId": "s6",
+        "variants": [
+          { "scenario": "Gulungan catatan serangan sang Raja adalah DataFrame df dengan kolom 'jenis' dan 'damage'. Perintah untuk rata-rata damage per jenis serangan?", "options": ["df.groupby('jenis')['damage'].mean()", "df.mean('jenis')", "df['damage'].group('jenis')", "df.avg('jenis', 'damage')"], "correctIndex": 0, "explanation": "groupby membentuk kelompok per jenis, lalu mean() dihitung pada kolom damage." },
+          { "scenario": "Untuk melihat sebaran nilai damage sang Raja, perintah mana yang tepat?", "options": ["plt.hist(df['damage'])", "plt.pie(df['damage'])", "df.hist_damage()", "plt.scatter(df['damage'])"], "correctIndex": 0, "explanation": "plt.hist menampilkan distribusi satu variabel. scatter butuh dua variabel." }
+        ]
+      }
+    ]
+  }
+}

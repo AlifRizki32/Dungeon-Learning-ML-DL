@@ -1,0 +1,6 @@
+{
+  "name": "Dungeon Belajar ML & DL",
+  "description": "Game RPG dungeon crawler bergaya piksel retro untuk menaklukkan peta jalan belajar Machine Learning & Deep Learning (28 topik, 5 fase, dan Menara Master).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
