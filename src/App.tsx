@@ -14,6 +14,8 @@ import { CampPage } from './pages/CampPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { TowerPage } from './pages/TowerPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { AIChatbot } from './components/AIChatbot/AIChatbot';
+import { Dungeon3D } from './components/Dungeon3D/Dungeon3D';
 
 export default function App() {
   const currentView = useGameStore((s) => s.currentView);
@@ -21,6 +23,7 @@ export default function App() {
   const continueAdventure = useGameStore((s) => s.continueAdventure);
 
   const [osReducedMotion, setOsReducedMotion] = useState(false);
+  const [is3DDungeonOpen, setIs3DDungeonOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -66,7 +69,7 @@ export default function App() {
         <TitleScreen />
       ) : (
         <div className="min-h-screen flex flex-col">
-          <XPBar />
+          <XPBar onOpen3DDungeon={() => setIs3DDungeonOpen(true)} />
 
           <AnimatePresence mode="wait">
             <motion.main
@@ -104,8 +107,15 @@ export default function App() {
           <BossModal />
           <LevelUpModal />
           <StandaloneScrollModal />
+          <Dungeon3D
+            isOpen={is3DDungeonOpen}
+            onClose={() => setIs3DDungeonOpen(false)}
+          />
         </div>
       )}
+
+      {/* Floating AI Dungeon Mentor Assistant */}
+      <AIChatbot />
     </div>
   );
 }

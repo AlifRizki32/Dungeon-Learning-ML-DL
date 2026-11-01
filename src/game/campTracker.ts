@@ -357,6 +357,56 @@ export function validateAndParseSaveJSON(
         (x) => typeof x === 'string'
       );
     }
+    if (Array.isArray(candidate.towerCompleted)) {
+      sanitized.towerCompleted = candidate.towerCompleted.filter(
+        (x) => typeof x === 'string'
+      );
+    }
+    if (
+      candidate.towerSteps &&
+      typeof candidate.towerSteps === 'object' &&
+      !Array.isArray(candidate.towerSteps)
+    ) {
+      const cleanSteps: Record<string, Record<string, boolean>> = {};
+      for (const [qId, stepMap] of Object.entries(
+        candidate.towerSteps as Record<string, unknown>
+      )) {
+        if (stepMap && typeof stepMap === 'object' && !Array.isArray(stepMap)) {
+          cleanSteps[qId] = {};
+          for (const [sId, val] of Object.entries(stepMap as Record<string, unknown>)) {
+            if (typeof val === 'boolean' && val) {
+              cleanSteps[qId][sId] = true;
+            }
+          }
+        }
+      }
+      sanitized.towerSteps = cleanSteps;
+    }
+    if (
+      candidate.reflections &&
+      typeof candidate.reflections === 'object' &&
+      !Array.isArray(candidate.reflections)
+    ) {
+      const cleanReflections: Record<string, string> = {};
+      for (const [pId, val] of Object.entries(candidate.reflections as Record<string, unknown>)) {
+        if (typeof val === 'string') {
+          cleanReflections[pId] = val.slice(0, 500);
+        }
+      }
+      sanitized.reflections = cleanReflections;
+    }
+    if (typeof candidate.specialization === 'string' || candidate.specialization === null) {
+      sanitized.specialization =
+        typeof candidate.specialization === 'string'
+          ? candidate.specialization.trim() || null
+          : null;
+    }
+    if (
+      typeof candidate.certificateIssuedAt === 'string' ||
+      candidate.certificateIssuedAt === null
+    ) {
+      sanitized.certificateIssuedAt = candidate.certificateIssuedAt;
+    }
     if (Array.isArray(candidate.relics)) {
       sanitized.relics = candidate.relics.filter((x) => typeof x === 'string');
     }
@@ -390,6 +440,19 @@ export function validateAndParseSaveJSON(
     }
     if (candidate.dojoDailyXP && typeof candidate.dojoDailyXP === 'object') {
       sanitized.dojoDailyXP = candidate.dojoDailyXP;
+    }
+    if (
+      candidate.evidenceNotes &&
+      typeof candidate.evidenceNotes === 'object' &&
+      !Array.isArray(candidate.evidenceNotes)
+    ) {
+      const cleanNotes: Record<string, string> = {};
+      for (const [k, v] of Object.entries(candidate.evidenceNotes as Record<string, unknown>)) {
+        if (typeof v === 'string') {
+          cleanNotes[String(k)] = v.slice(0, 300);
+        }
+      }
+      sanitized.evidenceNotes = cleanNotes;
     }
     if (Array.isArray(candidate.studySessions)) {
       sanitized.studySessions = candidate.studySessions.filter(

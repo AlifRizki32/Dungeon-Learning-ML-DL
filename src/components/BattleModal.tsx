@@ -54,6 +54,8 @@ export const BattleModal: React.FC = () => {
   const defeatRoom = useGameStore((s) => s.defeatRoom);
   const recordQuizAttempt = useGameStore((s) => s.recordQuizAttempt);
   const recordQuestionAnswer = useGameStore((s) => s.recordQuestionAnswer);
+  const evidenceNotes = useGameStore((s) => s.evidenceNotes);
+  const setEvidenceNote = useGameStore((s) => s.setEvidenceNote);
   const setView = useGameStore((s) => s.setView);
 
   const { playAttack, playDefeat, playPlayerHit, playClick, playCast, playFizzle } = useSound();
@@ -445,6 +447,28 @@ export const BattleModal: React.FC = () => {
                               ? { opacity: 1, scale: [0.5, 1.25, 1], y: [-14, 4, 0] }
                               : spellCastEffect.animStyle === 'schedule'
                               ? { opacity: 1, rotate: [0, 10, -10, 0], scale: [0.7, 1.15, 1] }
+                              : spellCastEffect.animStyle === 'pipeline'
+                              ? { opacity: 1, x: [-30, 15, 0], scale: [0.85, 1.15, 1] }
+                              : spellCastEffect.animStyle === 'quantize'
+                              ? { opacity: 1, scale: [1.3, 0.75, 1], y: [-12, 4, 0] }
+                              : spellCastEffect.animStyle === 'edge'
+                              ? { opacity: 1, scale: [0.65, 1.2, 1], rotate: [-4, 4, 0] }
+                              : spellCastEffect.animStyle === 'compass'
+                              ? { opacity: 1, rotate: [-15, 15, 0], scale: [0.7, 1.18, 1] }
+                              : spellCastEffect.animStyle === 'lens'
+                              ? { opacity: 1, scale: [0.5, 1.25, 1], x: [-12, 12, 0] }
+                              : spellCastEffect.animStyle === 'circuit'
+                              ? { opacity: 1, x: [-28, 14, 0], scale: [0.85, 1.15, 1] }
+                              : spellCastEffect.animStyle === 'scale'
+                              ? { opacity: 1, rotate: [-10, 10, -5, 0], scale: [0.8, 1.15, 1] }
+                              : spellCastEffect.animStyle === 'shield'
+                              ? { opacity: 1, scale: [1.25, 0.9, 1], y: [-8, 4, 0] }
+                              : spellCastEffect.animStyle === 'mic'
+                              ? { opacity: 1, scale: [0.6, 1.22, 1], y: [-12, 6, 0] }
+                              : spellCastEffect.animStyle === 'map'
+                              ? { opacity: 1, x: [-22, 16, 0], scale: [0.75, 1.15, 1] }
+                              : spellCastEffect.animStyle === 'vault'
+                              ? { opacity: 1, scale: [0.7, 1.2, 1], rotate: [0, -8, 8, 0] }
                               : { opacity: 1, scale: [0.8, 1.15, 1], x: [-25, 25, 0] }
                           }
                           exit={{ opacity: 0 }}
@@ -490,6 +514,8 @@ export const BattleModal: React.FC = () => {
                                 ? '#1d8a3d'
                                 : floor.id === 3
                                 ? '#9b5de5'
+                                : floor.id === 4
+                                ? '#3ac5eb'
                                 : '#e83b47',
                           }}
                         />
@@ -568,7 +594,11 @@ export const BattleModal: React.FC = () => {
                         Mantra ini kini telah terbuka di <strong>Grimoire</strong> dan siap digunakan
                         untuk melawan{' '}
                         <strong>
-                          {floor.id === 3
+                          {floor.id === 5
+                            ? 'Raja Deadline'
+                            : floor.id === 4
+                            ? 'Mecha-Core'
+                            : floor.id === 3
                             ? 'Hydra Berkepala Banyak'
                             : floor.id === 2
                             ? 'Golem Pohon Purba'
@@ -632,7 +662,9 @@ export const BattleModal: React.FC = () => {
                         <RelicSprite iconType={topic.relic.iconType} size={32} />
                         <div>
                           <div className="font-pixel text-[8px] text-[#f5b935]">RELIK BARU!</div>
-                          <div className="font-vt text-lg text-[#f4f1ea]">{topic.relic.name}</div>
+                          <div className="font-vt text-lg text-[#f4f1ea]">
+                            {floor1TopicContent?.relic || topic.relic.name}
+                          </div>
                         </div>
                       </div>
                     )}
@@ -725,6 +757,43 @@ export const BattleModal: React.FC = () => {
                       </span>
                     </label>
                   </div>
+
+                  {/* Optional "Catatan bukti" Input for Floor 5 Guild Quests (Plain text only, max 300 chars) */}
+                  {floor.id === 5 && (
+                    <div className="bg-[#120d26] border-2 border-[#fb923c] p-3.5 space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <label
+                          htmlFor="evidence-note-input"
+                          className="font-pixel text-[10px] text-[#fb923c]"
+                        >
+                          CATATAN BUKTI (OPSIONAL — TIDAK MENGHALANGI KELULUSAN RUANG)
+                        </label>
+                        <span className="font-mono text-xs text-[#b3aad1] tabular-nums">
+                          {(evidenceNotes[topic.id] || '').length}/300 karakter
+                        </span>
+                      </div>
+                      <input
+                        id="evidence-note-input"
+                        type="text"
+                        maxLength={300}
+                        value={evidenceNotes[topic.id] || ''}
+                        onChange={(e) => setEvidenceNote(topic.id, e.target.value)}
+                        placeholder={
+                          floor1TopicContent?.evidenceHint ||
+                          'Catatan singkat bukti proyek (opsional)'
+                        }
+                        className="w-full bg-[#0d0a1a] border-2 border-[#5c4e99] focus:border-[#fb923c] px-3 py-2 font-vt text-xl text-[#f4f1ea] placeholder-[#64748b] outline-none"
+                      />
+                      <div className="flex flex-wrap items-center justify-between gap-2 font-vt text-base text-[#b3aad1]">
+                        <span>Catatan ini hanya tersimpan di browser ini.</span>
+                        {floor1TopicContent?.relic && (
+                          <span className="text-[#f5b935]">
+                            Hadiah Relik Quest: <strong>{floor1TopicContent.relic}</strong>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Step 2: Floor 1 Spellbook Quiz + "Gema Masa Lalu" Echo Question */}
                   {isFloor1Room && floor1TopicContent && (

@@ -63,6 +63,28 @@ const FLOOR2_MONSTER_DIALOGUE: Record<string, string> = {
     'Setiap kepalaku menimbang Query dan Key untuk memusatkan perhatian langsung ke bagian urutan terpenting! Bagi skor dot-product dengan akar dimensi agar bobot softmax-ku tidak membeku!',
   'topic-17':
     'Hanya penjadwalan laju belajar, pencari AdamW, dan perisai regularisasi yang sanggup menjaga latihanku tetap stabil! Buktikan kau mampu meredam overfitting di kuil terdalam ini!',
+  'topic-18':
+    'Kontainer serverku hanya menerima model yang dikemas rapi beserta langkah prapemrosesannya! Waspadalah terhadap pergeseran distribusi data saat sistemmu berjalan di produksi!',
+  'topic-19':
+    'Sirkuit mikrokontrolerku hanya menyediakan ruang kilobyte yang sempit di flash dan RAM! Padatkan bobot float32-mu menjadi int8 dan pastikan tensor arena muat sebelum melintas!',
+  'topic-20':
+    'Dari pembacaan sensor hingga aksi perangkat, setiap milidetik dihitung dalam anggaran latensi total! Bangunlah pipa ujung-ke-ujung yang tangguh dan temukan penghambat utamanya!',
+  'topic-21':
+    'Satu commit raksasa tanpa pesan jelas atau kunci rahasia yang bocor di riwayat Git akan mengacaukan proyekmu! Tunjukkan cabang yang rapi dan barisan tes otomatis yang lulus!',
+  'topic-22':
+    'Data sensor dunia nyata penuh nilai hilang, derau, dan kelas yang timpang! Selidiki penyebab kejanggalan data dan catat kualitasnya sebelum kau berani melatih model!',
+  'topic-23':
+    'Tegangan ADC, kalibrasi dua titik, dan tingkat QoS MQTT menentukan apakah perangkatmu bertahan 24 jam! Hitung daya bateraimu dengan cermat sebelum sirkuit ini padam!',
+  'topic-24':
+    'Skor tinggi tanpa pembanding hanyalah ilusi jika kalah oleh baseline sederhana! Buktikan peningkatan relatif modelmu dan catat seed eksperimen agar hasilnya jujur serta dapat diulang!',
+  'topic-25':
+    'Semakin banyak komponen saat demo, semakin besar peluang ada yang gagal di panggung! Siapkan log yang jelas, langkah reproduksi minimal, serta rekaman cadangan sebelum hari-H!',
+  'topic-26':
+    'Waktu sepuluh menit di panggung akan habis jika kau tenggelam dalam tabel mentah! Sampaikan satu pesan per slide dan jawab pertanyaan sulit dengan jujur beserta data analisis kesalahan!',
+  'topic-27':
+    'Fitur tambahan yang terus menyelinap akan menenggelamkan proyek solomu sebelum selesai! Kunci rencana satu halaman dengan batas lingkup tertulis dan fokuslah menuntaskan MVP!',
+  'topic-28':
+    'Kata sandi bawaan dan broker terbuka adalah celah empuk bagi penyusup perangkat IoT! Terapkan enkripsi, minimisasi data pengguna, dan siapkan jawaban keamanan untuk setiap proyekmu!',
 };
 
 /**

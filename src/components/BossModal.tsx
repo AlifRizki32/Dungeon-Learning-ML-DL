@@ -55,6 +55,32 @@ const HYDRA_HEAD_SPARKS = [
   { head: 6, label: 'Kepala 6 (Latihan)', x: '85%', delay: 0.6, color: '#9b5de5' },
 ];
 
+const MECHA_CIRCUIT_TRACES = [
+  { trace: 1, label: 'Jalur 1 (Pipeline)', delay: 0, color: '#0891b2' },
+  { trace: 2, label: 'Jalur 2 (Kuantis)', delay: 0.12, color: '#2dd4bf' },
+  { trace: 3, label: 'Jalur 3 (Edge IoT)', delay: 0.24, color: '#3ac5eb' },
+  { trace: 4, label: 'Jalur 4 (Gema L2-3)', delay: 0.36, color: '#fb923c' },
+  { trace: 5, label: 'Jalur 5 (Inti Daya)', delay: 0.48, color: '#f5b935' },
+];
+
+const MECHA_DEFEAT_SPARKS = [
+  { x: '16%', y: -32, delay: 0, color: '#3ac5eb' },
+  { x: '32%', y: -44, delay: 0.1, color: '#f5b935' },
+  { x: '48%', y: -38, delay: 0.18, color: '#fb923c' },
+  { x: '66%', y: -46, delay: 0.08, color: '#2dd4bf' },
+  { x: '82%', y: -30, delay: 0.22, color: '#e83b47' },
+];
+
+const CLOCK_SHATTER_FRAGMENTS = [
+  { x: '14%', y: -38, rotate: -35, delay: 0, color: '#e83b47' },
+  { x: '26%', y: -52, rotate: 28, delay: 0.06, color: '#fb923c' },
+  { x: '38%', y: -42, rotate: -48, delay: 0.12, color: '#f5b935' },
+  { x: '50%', y: -56, rotate: 42, delay: 0.04, color: '#f4f1ea' },
+  { x: '62%', y: -44, rotate: -25, delay: 0.15, color: '#fb923c' },
+  { x: '74%', y: -50, rotate: 36, delay: 0.09, color: '#e83b47' },
+  { x: '86%', y: -36, rotate: -40, delay: 0.18, color: '#f5b935' },
+];
+
 export const BossModal: React.FC = () => {
   const selectedBossFloorId = useGameStore((s) => s.selectedBossFloorId);
   const defeatedBosses = useGameStore((s) => s.defeatedBosses);
@@ -93,6 +119,8 @@ export const BossModal: React.FC = () => {
   const isSpellbookBoss = Boolean(floorSpellbookContent);
   const isFloor2Boss = floor?.id === 2;
   const isFloor3Boss = floor?.id === 3;
+  const isFloor4Boss = floor?.id === 4;
+  const isFloor5Boss = floor?.id === 5;
 
   const totalSpellbookPhases = getTotalBossPhases(floorId);
   const maxPotionsForFloor = getInitialBossPotions(floorId);
@@ -103,6 +131,10 @@ export const BossModal: React.FC = () => {
       ? 'Daun Emas'
       : floor?.id === 3
       ? 'Inti Neuron'
+      : floor?.id === 4
+      ? 'Chip Edge'
+      : floor?.id === 5
+      ? 'Stopwatch Perak'
       : floor?.boss.relic.name || 'Relik Bos';
 
   const currentFloorBossProgress =
@@ -112,16 +144,18 @@ export const BossModal: React.FC = () => {
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
   const [challengeReady, setChallengeReady] = useState(false);
   const [bossDefeatedAnim, setBossDefeatedAnim] = useState(false);
+  const [claimedBossXP, setClaimedBossXP] = useState<number | null>(null);
   const [bossSpriteState, setBossSpriteState] = useState<SpriteCombatState>('idle');
   const [shakeScreen, setShakeScreen] = useState(false);
   const [showIntroBanner, setShowIntroBanner] = useState(false);
   const [segmentBreakBurst, setSegmentBreakBurst] = useState(false);
 
-  // Multi-Phase Spellbook Boss Fight State (Floors 1, 2, 3)
+  // Multi-Phase Spellbook Boss Fight State (Floors 1, 2, 3, 4, 5)
   const [hearts, setHearts] = useState(MAX_HEARTS);
   const [phaseStep, setPhaseStep] = useState<'spell' | 'calc'>('spell');
-  const [selectedSpellFloorTab, setSelectedSpellFloorTab] = useState<1 | 2 | 3>(1);
+  const [selectedSpellFloorTab, setSelectedSpellFloorTab] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [formulaPeekActive, setFormulaPeekActive] = useState(false);
+  const [deadlineClockTick, setDeadlineClockTick] = useState<'00:03' | '00:02' | '00:01' | '00:00!'>('00:03');
   const [spellFeedback, setSpellFeedback] = useState<{
     isCorrect: boolean;
     chosenSpellId: string;
@@ -137,6 +171,8 @@ export const BossModal: React.FC = () => {
   const floor1Spells = useMemo(() => getSpellsByFloor(1), []);
   const floor2Spells = useMemo(() => getSpellsByFloor(2), []);
   const floor3Spells = useMemo(() => getSpellsByFloor(3), []);
+  const floor4Spells = useMemo(() => getSpellsByFloor(4), []);
+  const floor5Spells = useMemo(() => getSpellsByFloor(5), []);
 
   const unlockedFloor1Spells = useMemo(() => {
     const filtered = floor1Spells.filter(
@@ -158,6 +194,20 @@ export const BossModal: React.FC = () => {
     );
     return filtered.length > 0 ? filtered : floor3Spells;
   }, [floor3Spells, spellsUnlocked, completedRooms]);
+
+  const unlockedFloor4Spells = useMemo(() => {
+    const filtered = floor4Spells.filter(
+      (s) => spellsUnlocked.includes(s.id) || completedRooms.includes(s.roadmapTopicId)
+    );
+    return filtered.length > 0 ? filtered : floor4Spells;
+  }, [floor4Spells, spellsUnlocked, completedRooms]);
+
+  const unlockedFloor5Spells = useMemo(() => {
+    const filtered = floor5Spells.filter(
+      (s) => spellsUnlocked.includes(s.id) || completedRooms.includes(s.roadmapTopicId)
+    );
+    return filtered.length > 0 ? filtered : floor5Spells;
+  }, [floor5Spells, spellsUnlocked, completedRooms]);
 
   // Determine active Spellbook phase (1..totalSpellbookPhases)
   const activePhaseNumber = useMemo(() => {
@@ -205,23 +255,51 @@ export const BossModal: React.FC = () => {
       setCheckedItems(initialChecks);
       setChallengeReady(done);
       setBossDefeatedAnim(done);
+      setClaimedBossXP(null);
       setBossSpriteState(done ? 'defeated' : 'idle');
       setShowIntroBanner(!done);
       setHearts(MAX_HEARTS);
       setPhaseStep('spell');
       setSelectedSpellFloorTab(
-        floor.id === 3 ? 3 : floor.id === 2 ? 2 : 1
+        floor.id === 5
+          ? 5
+          : floor.id === 4
+          ? 4
+          : floor.id === 3
+          ? 3
+          : floor.id === 2
+          ? 2
+          : 1
       );
       setFormulaPeekActive(false);
+      setDeadlineClockTick('00:03');
       setSpellFeedback(null);
       setSelectedCalcOptionId(null);
       setCalcFeedback(null);
 
       if (!reduceMotion) {
-        if (floor.id === 3) {
-          // Hydra heads light up one at a time, with screen shake on the last head
-          const shakeStart = setTimeout(() => setShakeScreen(true), 600);
-          const shakeEnd = setTimeout(() => setShakeScreen(false), 1050);
+        if (floor.id === 5) {
+          // Digital countdown clock ticks down 00:03 -> 00:02 -> 00:01 -> 00:00! then cracks with screen shake
+          const tick1 = setTimeout(() => setDeadlineClockTick('00:02'), 350);
+          const tick2 = setTimeout(() => setDeadlineClockTick('00:01'), 700);
+          const tick3 = setTimeout(() => {
+            setDeadlineClockTick('00:00!');
+            setShakeScreen(true);
+          }, 1050);
+          const shakeEnd = setTimeout(() => setShakeScreen(false), 1550);
+          const introTimer = setTimeout(() => setShowIntroBanner(false), 2600);
+          return () => {
+            clearTimeout(tick1);
+            clearTimeout(tick2);
+            clearTimeout(tick3);
+            clearTimeout(shakeEnd);
+            clearTimeout(introTimer);
+          };
+        }
+        if (floor.id === 3 || floor.id === 4) {
+          // Hydra heads or Mecha-Core circuit traces light up one at a time, with screen shake on power-up
+          const shakeStart = setTimeout(() => setShakeScreen(true), 550);
+          const shakeEnd = setTimeout(() => setShakeScreen(false), 1000);
           const introTimer = setTimeout(() => setShowIntroBanner(false), 2300);
           return () => {
             clearTimeout(shakeStart);
@@ -237,6 +315,7 @@ export const BossModal: React.FC = () => {
           clearTimeout(introTimer);
         };
       } else {
+        setDeadlineClockTick('00:00!');
         const introTimer = setTimeout(() => setShowIntroBanner(false), 900);
         return () => clearTimeout(introTimer);
       }
@@ -384,7 +463,17 @@ export const BossModal: React.FC = () => {
       // Break segment and advance to next phase
       completeBossPhase(floor.id, currentPhaseData.phase);
       setPhaseStep('spell');
-      setSelectedSpellFloorTab(floor.id === 3 ? 3 : floor.id === 2 ? 2 : 1);
+      setSelectedSpellFloorTab(
+        floor.id === 5
+          ? 5
+          : floor.id === 4
+          ? 4
+          : floor.id === 3
+          ? 3
+          : floor.id === 2
+          ? 2
+          : 1
+      );
       setFormulaPeekActive(false);
       setSpellFeedback(null);
       setSelectedCalcOptionId(null);
@@ -409,7 +498,17 @@ export const BossModal: React.FC = () => {
     faintBossFight(floor.id);
     setHearts(MAX_HEARTS);
     setPhaseStep('spell');
-    setSelectedSpellFloorTab(floor.id === 3 ? 3 : floor.id === 2 ? 2 : 1);
+    setSelectedSpellFloorTab(
+      floor.id === 5
+        ? 5
+        : floor.id === 4
+        ? 4
+        : floor.id === 3
+        ? 3
+        : floor.id === 2
+        ? 2
+        : 1
+    );
     setFormulaPeekActive(false);
     setSpellFeedback(null);
     setSelectedCalcOptionId(null);
@@ -427,8 +526,9 @@ export const BossModal: React.FC = () => {
     setTimeout(() => {
       playDefeat();
       setBossSpriteState('defeated');
+      const res = defeatBoss(floor.id);
+      setClaimedBossXP(res.xpGained);
       setBossDefeatedAnim(true);
-      defeatBoss(floor.id);
     }, 380);
   };
 
@@ -439,14 +539,24 @@ export const BossModal: React.FC = () => {
       ? '#1d8a3d'
       : floor.id === 3
       ? '#9b5de5'
-      : '#e83b47';
+      : floor.id === 4
+      ? '#3ac5eb'
+      : '#fb923c';
 
   const activeSpellTabList =
-    selectedSpellFloorTab === 3
+    selectedSpellFloorTab === 5
+      ? unlockedFloor5Spells
+      : selectedSpellFloorTab === 4
+      ? unlockedFloor4Spells
+      : selectedSpellFloorTab === 3
       ? unlockedFloor3Spells
       : selectedSpellFloorTab === 2
       ? unlockedFloor2Spells
       : unlockedFloor1Spells;
+
+  const undefeatedBossFloors = FLOORS.filter(
+    (f) => !defeatedBosses.includes(f.boss.id)
+  );
 
   return (
     <AnimatePresence>
@@ -477,12 +587,20 @@ export const BossModal: React.FC = () => {
           <div
             className="border-b-4 p-4 flex items-center justify-between gap-3"
             style={{
-              backgroundColor: isFloor3Boss
+              backgroundColor: isFloor5Boss
+                ? '#210d14'
+                : isFloor4Boss
+                ? '#0a1924'
+                : isFloor3Boss
                 ? '#1a102b'
                 : isFloor2Boss
                 ? '#141f16'
                 : '#291324',
-              borderColor: isFloor3Boss
+              borderColor: isFloor5Boss
+                ? '#fb923c'
+                : isFloor4Boss
+                ? '#3ac5eb'
+                : isFloor3Boss
                 ? '#9b5de5'
                 : isFloor2Boss
                 ? '#1d8a3d'
@@ -522,7 +640,11 @@ export const BossModal: React.FC = () => {
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 style={{
-                  backgroundColor: isFloor3Boss
+                  backgroundColor: isFloor5Boss
+                    ? '#9a1c28'
+                    : isFloor4Boss
+                    ? '#0891b2'
+                    : isFloor3Boss
                     ? '#7e22ce'
                     : isFloor2Boss
                     ? '#1d8a3d'
@@ -530,7 +652,48 @@ export const BossModal: React.FC = () => {
                 }}
                 className="text-[#f4f1ea] px-4 py-2.5 text-center font-pixel text-[10px] sm:text-xs tracking-wider border-b-2 border-[#f4f1ea] relative overflow-hidden"
               >
-                {isFloor3Boss ? (
+                {isFloor5Boss ? (
+                  <div className="space-y-1.5">
+                    <div>
+                      ⏱ JAM HITUNG MUNDUR BERDETAK DAN RETAK — RAJA DEADLINE BANGKIT DARI RETAKAN! ⏱
+                    </div>
+                    <div
+                      className="inline-flex items-center gap-2 bg-[#0d0a1a] border-2 border-[#fb923c] px-3 py-1 font-mono text-sm text-[#e83b47]"
+                      aria-hidden="true"
+                    >
+                      <span>[{deadlineClockTick}]</span>
+                      {deadlineClockTick === '00:00!' && (
+                        <span className="font-pixel text-[9px] text-[#f5b935]">
+                          ⚡ KACA JAM RETAK!
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ) : isFloor4Boss ? (
+                  <div className="space-y-1.5">
+                    <div>
+                      🔌 JALUR SIRKUIT MENYALA SATU DEMI SATU HINGGA MECHA-CORE AKTIF PENUH! 🔌
+                    </div>
+                    {!reduceMotion && (
+                      <div
+                        className="flex items-center justify-center gap-2 pt-1"
+                        aria-hidden="true"
+                      >
+                        {MECHA_CIRCUIT_TRACES.map((tr, idx) => (
+                          <motion.div
+                            key={tr.trace}
+                            initial={{ opacity: 0.15, scaleX: 0.3 }}
+                            animate={{ opacity: 1, scaleX: [0.4, 1.2, 1] }}
+                            transition={{ duration: 0.3, delay: idx * 0.1 }}
+                            style={{ backgroundColor: tr.color }}
+                            className="w-6 h-3 border border-[#f4f1ea] shadow-[0_0_8px_#3ac5eb]"
+                            title={tr.label}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : isFloor3Boss ? (
                   <div className="space-y-1.5">
                     <div>
                       ⚡ KEPALA-KEPALA HYDRANYA MENYALA SATU DEMI SATU SEPERTI LAPISAN NEURON! ⚡
@@ -589,7 +752,11 @@ export const BossModal: React.FC = () => {
           <div
             className="p-4 sm:p-5 bg-[#0d0a1a] border-b-4 relative overflow-hidden"
             style={{
-              borderColor: isFloor3Boss
+              borderColor: isFloor5Boss
+                ? '#fb923c'
+                : isFloor4Boss
+                ? '#3ac5eb'
+                : isFloor3Boss
                 ? '#9b5de5'
                 : isFloor2Boss
                 ? '#1d8a3d'
@@ -656,6 +823,79 @@ export const BossModal: React.FC = () => {
                   ))}
                 </div>
               )}
+
+            {/* Floor 4 Defeat Animation: Sparks fly, then screen dims as if power went off */}
+            {(bossDefeatedAnim || (isFloor4Boss && allPhasesCleared)) && isFloor4Boss && (
+              <div
+                className="pointer-events-none absolute inset-0 overflow-hidden"
+                aria-hidden="true"
+              >
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: reduceMotion ? 0.35 : [0, 0.15, 0.48, 0.38] }}
+                  transition={{ duration: reduceMotion ? 0.1 : 1.1 }}
+                  className="absolute inset-0 bg-[#05030a]"
+                />
+                {!reduceMotion &&
+                  MECHA_DEFEAT_SPARKS.map((sp, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ y: 10, opacity: 1, scale: 1 }}
+                      animate={{
+                        y: [10, sp.y, 35],
+                        x: [0, idx % 2 === 0 ? 18 : -18],
+                        opacity: [1, 0.9, 0],
+                        scale: [1, 1.25, 0.3],
+                      }}
+                      transition={{
+                        duration: 1.8,
+                        repeat: Infinity,
+                        delay: sp.delay,
+                        ease: 'easeOut',
+                      }}
+                      style={{ left: sp.x, backgroundColor: sp.color }}
+                      className="w-2.5 h-2.5 absolute bottom-6 border border-[#f4f1ea]"
+                    />
+                  ))}
+              </div>
+            )}
+
+            {/* Floor 5 Defeat Animation: Clock shatters into pixel fragments and gentle light wash as time resumes */}
+            {(bossDefeatedAnim || (isFloor5Boss && allPhasesCleared)) && isFloor5Boss && (
+              <div
+                className="pointer-events-none absolute inset-0 overflow-hidden"
+                aria-hidden="true"
+              >
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: reduceMotion ? 0.22 : [0, 0.35, 0.18, 0.25] }}
+                  transition={{ duration: reduceMotion ? 0.1 : 1.5 }}
+                  className="absolute inset-0 bg-gradient-to-r from-[#f5b935]/20 via-[#fb923c]/25 to-[#f4f1ea]/20"
+                />
+                {!reduceMotion &&
+                  CLOCK_SHATTER_FRAGMENTS.map((frag, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ y: 0, opacity: 1, rotate: 0, scale: 1 }}
+                      animate={{
+                        y: [0, frag.y, 45],
+                        x: [0, idx % 2 === 0 ? 22 : -22],
+                        rotate: [0, frag.rotate],
+                        opacity: [1, 0.85, 0],
+                        scale: [1, 1.15, 0.35],
+                      }}
+                      transition={{
+                        duration: 2.1,
+                        repeat: Infinity,
+                        delay: frag.delay,
+                        ease: 'easeOut',
+                      }}
+                      style={{ left: frag.x, backgroundColor: frag.color }}
+                      className="w-3 h-3 absolute bottom-5 border border-[#0d0a1a]"
+                    />
+                  ))}
+              </div>
+            )}
 
             <div className="flex flex-col sm:flex-row items-center justify-around gap-4 relative z-10">
               {/* Player Side + 3 Hearts & Potions (2 on Floors 1-2, 3 on Floor 3) */}
@@ -768,7 +1008,9 @@ export const BossModal: React.FC = () => {
                 <div
                   className="w-24 h-24 bg-[#16112b] border-2 flex items-center justify-center relative"
                   style={{
-                    borderColor: isFloor3Boss
+                    borderColor: isFloor4Boss
+                      ? '#3ac5eb'
+                      : isFloor3Boss
                       ? '#9b5de5'
                       : isFloor2Boss
                       ? '#a87312'
@@ -814,7 +1056,7 @@ export const BossModal: React.FC = () => {
 
           {/* Main Body */}
           <div className="p-4 sm:p-6 space-y-5 max-h-[60vh] overflow-y-auto">
-            {/* SPELLBOOK MULTI-PHASE COMBAT (FLOORS 1, 2, 3) */}
+            {/* SPELLBOOK MULTI-PHASE COMBAT (FLOORS 1, 2, 3, 4) */}
             {isSpellbookBoss && !allPhasesCleared && (
               <div className="space-y-4">
                 {/* Fainted at 0 Hearts */}
@@ -842,7 +1084,9 @@ export const BossModal: React.FC = () => {
                   <div
                     className="bg-[#120d26] border-2 p-4 space-y-4"
                     style={{
-                      borderColor: isFloor3Boss
+                      borderColor: isFloor4Boss
+                        ? '#3ac5eb'
+                        : isFloor3Boss
                         ? '#9b5de5'
                         : isFloor2Boss
                         ? '#1d8a3d'
@@ -887,14 +1131,16 @@ export const BossModal: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Special Callout for Echo Boss Phases ("Gema Lantai 1" / "Gema Lantai 1-2") */}
+                    {/* Special Callout for Echo Boss Phases ("Gema Lantai 1" / "Gema Lantai 1-2" / "Gema Lantai 2-3") */}
                     {currentPhaseData.title && (
                       <div className="bg-[#291324] border-2 border-[#f5b935] px-3.5 py-2 flex items-center justify-between gap-2">
                         <span className="font-pixel text-[9px] text-[#f5b935]">
                           ★ FASE KHUSUS: {currentPhaseData.title.toUpperCase()}
                         </span>
                         <span className="font-vt text-base text-[#f4f1ea]">
-                          {isFloor3Boss
+                          {isFloor4Boss
+                            ? 'Gunakan tab Lantai 1, Lantai 2, atau Lantai 3 untuk memilih mantra gema yang tepat!'
+                            : isFloor3Boss
                             ? 'Gunakan tab Lantai 1 atau Lantai 2 untuk memilih mantra gema yang tepat!'
                             : 'Pilih mantra yang sesuai dari tab Mantra Lantai 1!'}
                         </span>
@@ -918,7 +1164,7 @@ export const BossModal: React.FC = () => {
                           LANGKAH 1 — PILIH MANTRA UNTUK MENANGKAL SKENARIO INI (RUMUS TERSEMBUNYI):
                         </div>
 
-                        {/* Floor 2 & Floor 3: Grouped under Floor Tabs, current floor tab open by default */}
+                        {/* Floors 2, 3, 4, 5: Grouped under Floor Tabs, current floor tab open by default */}
                         {floor.id >= 2 ? (
                           <div
                             className="space-y-3 border-2 border-[#3a306e] p-3 bg-[#0d0a1a]"
@@ -930,48 +1176,65 @@ export const BossModal: React.FC = () => {
                               aria-label="Tab Kelompok Mantra per Lantai"
                               className="flex flex-wrap items-center gap-2 border-b-2 border-[#3a306e] pb-2.5"
                             >
-                              {(isFloor3Boss ? ([3, 2, 1] as const) : ([2, 1] as const)).map(
-                                (tabFloorId) => {
-                                  const isTabActive = selectedSpellFloorTab === tabFloorId;
-                                  const tabCount =
-                                    tabFloorId === 3
-                                      ? unlockedFloor3Spells.length
-                                      : tabFloorId === 2
-                                      ? unlockedFloor2Spells.length
-                                      : unlockedFloor1Spells.length;
-                                  const tabLabel =
-                                    tabFloorId === 3
-                                      ? `Lantai 3 (${tabCount} Mantra)`
-                                      : tabFloorId === 2
-                                      ? `Lantai 2 (${tabCount} Mantra)`
-                                      : `Lantai 1 (${tabCount} Mantra)`;
+                              {(isFloor5Boss
+                                ? ([5, 4, 3, 2, 1] as const)
+                                : isFloor4Boss
+                                ? ([4, 3, 2, 1] as const)
+                                : isFloor3Boss
+                                ? ([3, 2, 1] as const)
+                                : ([2, 1] as const)
+                              ).map((tabFloorId) => {
+                                const isTabActive = selectedSpellFloorTab === tabFloorId;
+                                const tabCount =
+                                  tabFloorId === 5
+                                    ? unlockedFloor5Spells.length
+                                    : tabFloorId === 4
+                                    ? unlockedFloor4Spells.length
+                                    : tabFloorId === 3
+                                    ? unlockedFloor3Spells.length
+                                    : tabFloorId === 2
+                                    ? unlockedFloor2Spells.length
+                                    : unlockedFloor1Spells.length;
+                                const tabLabel =
+                                  tabFloorId === 5
+                                    ? `Lantai 5 (${tabCount} Mantra)`
+                                    : tabFloorId === 4
+                                    ? `Lantai 4 (${tabCount} Mantra)`
+                                    : tabFloorId === 3
+                                    ? `Lantai 3 (${tabCount} Mantra)`
+                                    : tabFloorId === 2
+                                    ? `Lantai 2 (${tabCount} Mantra)`
+                                    : `Lantai 1 (${tabCount} Mantra)`;
 
-                                  return (
-                                    <button
-                                      key={tabFloorId}
-                                      type="button"
-                                      role="tab"
-                                      aria-selected={isTabActive}
-                                      data-floor-tab={tabFloorId}
-                                      onClick={() => {
-                                        playClick();
-                                        setSelectedSpellFloorTab(tabFloorId);
-                                      }}
-                                      className={`pixel-btn px-3 py-1.5 font-pixel text-[9px] ${
-                                        isTabActive
-                                          ? tabFloorId === 3
-                                            ? 'bg-[#9b5de5] text-[#0d0a1a]'
-                                            : tabFloorId === 2
-                                            ? 'bg-[#1d8a3d] text-[#f4f1ea]'
-                                            : 'bg-[#38d864] text-[#0d0a1a]'
-                                          : 'bg-[#16112b] text-[#b3aad1]'
-                                      }`}
-                                    >
-                                      {tabLabel}
-                                    </button>
-                                  );
-                                }
-                              )}
+                                return (
+                                  <button
+                                    key={tabFloorId}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={isTabActive}
+                                    data-floor-tab={tabFloorId}
+                                    onClick={() => {
+                                      playClick();
+                                      setSelectedSpellFloorTab(tabFloorId);
+                                    }}
+                                    className={`pixel-btn px-3 py-1.5 font-pixel text-[9px] ${
+                                      isTabActive
+                                        ? tabFloorId === 5
+                                          ? 'bg-[#fb923c] text-[#0d0a1a]'
+                                          : tabFloorId === 4
+                                          ? 'bg-[#3ac5eb] text-[#0d0a1a]'
+                                          : tabFloorId === 3
+                                          ? 'bg-[#9b5de5] text-[#0d0a1a]'
+                                          : tabFloorId === 2
+                                          ? 'bg-[#1d8a3d] text-[#f4f1ea]'
+                                          : 'bg-[#38d864] text-[#0d0a1a]'
+                                        : 'bg-[#16112b] text-[#b3aad1]'
+                                    }`}
+                                  >
+                                    {tabLabel}
+                                  </button>
+                                );
+                              })}
                             </div>
 
                             {/* Active Floor Tab Spell Cards */}
@@ -1181,12 +1444,28 @@ export const BossModal: React.FC = () => {
               </div>
             )}
 
-            {/* COMBINED "TANDA SUDAH PAHAM" CHECKLIST (Shown after all phases cleared on Floors 1-3, or always on Floors 4-5) */}
+            {/* COMBINED "TANDA SUDAH PAHAM" CHECKLIST (Shown after all phases cleared on Floors 1-4, or always on Floor 5) */}
             {(!isSpellbookBoss || allPhasesCleared) && (
               <>
                 {isSpellbookBoss && !bossDefeatedAnim && (
                   <div className="bg-[#0a1714] border-2 border-[#38d864] p-3.5 font-vt text-xl text-[#38d864]">
-                    {isFloor3Boss ? (
+                    {isFloor5Boss ? (
+                      <>
+                        ⏱ Seluruh 8 segmen waktu <strong>Raja Deadline</strong> telah dihancurkan —
+                        jam raksasa pecah berkeping-keping dan aliran waktu kembali normal! Sekarang
+                        centang daftar gabungan <strong>Tanda sudah paham</strong> (Topik 21–28)
+                        serta <strong>Tantangan Bos</strong> di bawah untuk mengklaim lencana, relik{' '}
+                        <strong>Stopwatch Perak</strong>, dan +{BOSS_XP} XP!
+                      </>
+                    ) : isFloor4Boss ? (
+                      <>
+                        ⚡ Seluruh 5 segmen inti <strong>Mecha-Core</strong> telah dilumpuhkan —
+                        percikan listrik berterbangan lalu daya padam! Sekarang centang daftar
+                        gabungan <strong>Tanda sudah paham</strong> (Topik 18–20) serta{' '}
+                        <strong>Tantangan Bos</strong> di bawah untuk mengklaim lencana, relik{' '}
+                        <strong>Chip Edge</strong>, dan +{BOSS_XP} XP!
+                      </>
+                    ) : isFloor3Boss ? (
                       <>
                         ✨ Seluruh 7 kepala <strong>Hydra Berkepala Banyak</strong> telah memudar
                         satu demi satu menjadi percikan cahaya piksel! Sekarang centang daftar
@@ -1300,18 +1579,44 @@ export const BossModal: React.FC = () => {
                       <div>
                         <div className="font-pixel text-xs text-[#38d864]">
                           ★ {bossDisplayName.toUpperCase()} DITAKLUKKAN! (+
-                          {alreadyDefeated ? 0 : BOSS_XP} XP)
+                          {claimedBossXP !== null ? claimedBossXP : alreadyDefeated ? 0 : BOSS_XP}{' '}
+                          XP)
                         </div>
                         <div className="font-vt text-xl text-[#f4f1ea] mt-1">
                           Lencana diperoleh:{' '}
                           <strong className="text-[#f5b935]">{floor.boss.badge.name}</strong>
                         </div>
                         <div className="font-vt text-lg text-[#3ac5eb]">
-                          {floor.id < 5
-                            ? `Pintu Lantai ${floor.id + 1} kini telah terbuka! (Konten Spellbook Lantai ${
-                                floor.id + 1
-                              }: Segera hadir)`
-                            : 'Menara Master (Lantai 6) kini telah terbuka!'}
+                          {floor.id === 5 ? (
+                            <div className="space-y-1">
+                              <div className="font-bold text-[#fb923c]">
+                                Boss dikalahkan: {defeatedBosses.length}/5
+                              </div>
+                              {defeatedBosses.length < 5 ? (
+                                <div className="text-[#f4f1ea]">
+                                  Menara Master (Lantai 6) baru terbuka setelah semua 5 Bos
+                                  dikalahkan. Bos yang belum dikalahkan:{' '}
+                                  <strong className="text-[#f5b935]">
+                                    {undefeatedBossFloors
+                                      .map((f) => `Lantai ${f.id} (${f.boss.name})`)
+                                      .join(', ')}
+                                  </strong>
+                                  .
+                                </div>
+                              ) : (
+                                <div className="text-[#38d864]">
+                                  Seluruh 5 Bos Lantai telah ditaklukkan! Menara Master (Lantai 6)
+                                  kini terbuka!
+                                </div>
+                              )}
+                            </div>
+                          ) : floor.id === 4 ? (
+                            `Guild Hall menunggu: 8 quest paralel · Bos ditaklukkan untuk syarat Menara Master: ${defeatedBosses.length}/5`
+                          ) : floor.id < 4 ? (
+                            `Pintu Lantai ${floor.id + 1} kini telah terbuka!`
+                          ) : (
+                            'Menara Master (Lantai 6) kini telah terbuka!'
+                          )}
                         </div>
                       </div>
 
@@ -1364,7 +1669,9 @@ export const BossModal: React.FC = () => {
                       }}
                       className="pixel-btn px-5 py-3 bg-[#38d864] text-[#0d0a1a] font-pixel text-xs"
                     >
-                      {floor.id < 5
+                      {floor.id === 4
+                        ? 'Kunjungi Guild Hall (8 Quest Paralel) →'
+                        : floor.id < 4
                         ? `Masuki Lantai ${floor.id + 1} →`
                         : 'Masuki Menara Master (Lantai 6) →'}
                     </button>

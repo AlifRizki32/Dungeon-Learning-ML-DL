@@ -5,7 +5,11 @@ import { AvatarSprite, PixelLockSprite } from './PixelSprites';
 import { useSound } from '../hooks/useSound.js';
 import { ALL_TOPICS } from '../data/roadmap.js';
 
-export const XPBar: React.FC = () => {
+export interface XPBarProps {
+  onOpen3DDungeon?: () => void;
+}
+
+export const XPBar: React.FC<XPBarProps> = ({ onOpen3DDungeon }) => {
   const playerName = useGameStore((s) => s.playerName);
   const avatarId = useGameStore((s) => s.avatarId);
   const xp = useGameStore((s) => s.xp);
@@ -56,7 +60,7 @@ export const XPBar: React.FC = () => {
     {
       id: 'grimoire',
       label: 'Grimoire & Dojo',
-      badge: `${spellsUnlocked.length}/17`,
+      badge: `${spellsUnlocked.length}/28`,
     },
     {
       id: 'camp',
@@ -142,8 +146,22 @@ export const XPBar: React.FC = () => {
             </div>
           </div>
 
-          {/* Right: Quick Sound Toggle + Guild Hall Shortcut */}
-          <div className="flex items-center gap-2 self-start lg:self-center shrink-0">
+          {/* Right: Quick Sound Toggle + Guild Hall Shortcut + Portal 3D */}
+          <div className="flex flex-wrap items-center gap-2 self-start lg:self-center shrink-0">
+            {onOpen3DDungeon && (
+              <button
+                type="button"
+                data-testid="open-dungeon-3d-btn"
+                onClick={() => {
+                  playClick();
+                  onOpen3DDungeon();
+                }}
+                className="pixel-btn px-2.5 py-1.5 bg-[#12263a] text-[#3ac5eb] border-[#3ac5eb] font-vt text-base sm:text-lg whitespace-nowrap"
+                title="Buka Portal Dimensi 3D Interaktif (Three.js)"
+              >
+                ✦ Portal Dimensi 3D
+              </button>
+            )}
             <button
               type="button"
               onClick={() => {

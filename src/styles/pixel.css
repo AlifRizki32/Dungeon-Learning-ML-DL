@@ -194,3 +194,64 @@
     animation: none;
   }
 }
+
+/* Floor 6: Menara Master Night-Sky Background (CSS-drawn pixel stars) */
+.tower-night-sky {
+  background-color: #0d0a1a;
+  background-image:
+    radial-gradient(2px 2px at 18px 26px, #f4f1ea 90%, transparent 100%),
+    radial-gradient(2px 2px at 94px 68px, #f5b935 90%, transparent 100%),
+    radial-gradient(2px 2px at 162px 34px, #3ac5eb 90%, transparent 100%),
+    radial-gradient(2px 2px at 228px 112px, #f4f1ea 90%, transparent 100%),
+    radial-gradient(3px 3px at 64px 154px, #f5b935 90%, transparent 100%),
+    radial-gradient(2px 2px at 188px 176px, #b3aad1 90%, transparent 100%),
+    radial-gradient(2px 2px at 272px 52px, #f5b935 90%, transparent 100%),
+    radial-gradient(2px 2px at 312px 144px, #f4f1ea 90%, transparent 100%),
+    linear-gradient(180deg, #080612 0%, #0d0a1a 45%, #16112b 100%);
+  background-size: 340px 210px, 340px 210px, 340px 210px, 340px 210px, 340px 210px, 340px 210px, 340px 210px, 340px 210px, 100% 100%;
+  transition: background-position 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reduce-motion .tower-night-sky {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tower-night-sky {
+    transition: none;
+  }
+}
+
+/* Print stylesheet: shows ONLY the Piagam Penyelesai Peta Belajar certificate */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .crt-overlay,
+  .no-print {
+    display: none !important;
+  }
+
+  #tower-certificate-print-area,
+  #tower-certificate-print-area * {
+    visibility: visible !important;
+  }
+
+  #tower-certificate-print-area {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 24px !important;
+    background-color: #16112b !important;
+    color: #f4f1ea !important;
+    border: 4px solid #f5b935 !important;
+    box-shadow: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+

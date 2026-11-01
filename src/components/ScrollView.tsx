@@ -3,7 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Floor1TopicContent,
   SPELL_VISUALS,
+  computeLatencyMiniLab,
   computeNeuronMiniLab,
+  computeQuantMiniLab,
   computeSoftmaxMiniLab,
   getFloor1TopicContent,
 } from '../game/spellbookEngine';
@@ -88,7 +90,7 @@ const NeuronMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion
               max={3}
               step={0.5}
               value={ctrl.value}
-              onChange={(e) => ctrl.onChange( parseFloat(e.target.value) )}
+              onChange={(e) => ctrl.onChange(parseFloat(e.target.value))}
               className="w-full accent-[#9b5de5] cursor-pointer"
             />
           </div>
@@ -256,7 +258,7 @@ const SoftmaxMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotio
                   <div
                     className={`h-full ${reduceMotion ? '' : 'transition-all duration-150'}`}
                     style={{
-                      width: `${ Math.min(100, Math.max(0, item.prob * 100)) }%`,
+                      width: `${Math.min(100, Math.max(0, item.prob * 100))}%`,
                       backgroundColor: item.color,
                     }}
                   />
@@ -273,6 +275,398 @@ const SoftmaxMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotio
           {probabilities[2].toFixed(2)})
         </span>
         <strong data-testid="softmax-sum-line">Jumlah bobot = 1</strong>
+      </div>
+    </section>
+  );
+};
+
+const QuantMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion }) => {
+  const [parameterCount, setParameterCount] = useState<number>(50000);
+  const [dataType, setDataType] = useState<'float32' | 'int8'>('float32');
+  const [flashKB, setFlashKB] = useState<number>(1000);
+  const [ramKB, setRamKB] = useState<number>(256);
+  const [arenaKB, setArenaKB] = useState<number>(50);
+
+  const {
+    bytesPerParameter,
+    modelSizeBytes,
+    modelSizeKB,
+    fitsInFlash,
+    fitsInRam,
+    flashStatus,
+    ramStatus,
+  } = computeQuantMiniLab(parameterCount, dataType, flashKB, ramKB, arenaKB);
+
+  const flashPct = flashKB > 0 ? Math.min(100, Math.max(0, (modelSizeKB / flashKB) * 100)) : 100;
+  const ramPct = ramKB > 0 ? Math.min(100, Math.max(0, (arenaKB / ramKB) * 100)) : 100;
+
+  return (
+    <section
+      aria-label="Lab Anggaran Memori"
+      data-testid="minilab-quant"
+      className="bg-[#081d26] border-2 border-[#3ac5eb] p-4 space-y-3"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#0891b2] pb-2">
+        <div className="font-pixel text-[10px] text-[#3ac5eb]">
+          ⚗ LAB ANGGARAN MEMORI (KUANTISASI &amp; MIKROKONTROLER)
+        </div>
+        <span className="font-vt text-base text-[#f5b935]">
+          Eksperimen bebas (Tanpa XP · Tidak menghalangi progres)
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {/* Parameter Count Slider */}
+        <div className="bg-[#0d1524] border border-[#0891b2] p-3 space-y-2">
+          <label
+            htmlFor="minilab-quant-params"
+            className="font-pixel text-[9px] text-[#f4f1ea] flex items-center justify-between gap-1"
+          >
+            <span>Jumlah Parameter</span>
+            <span className="text-[#3ac5eb] tabular-nums">
+              {parameterCount.toLocaleString('id-ID')}
+            </span>
+          </label>
+          <input
+            id="minilab-quant-params"
+            type="range"
+            min={1000}
+            max={200000}
+            step={1000}
+            value={parameterCount}
+            onChange={(e) => setParameterCount(Number(e.target.value))}
+            className="w-full accent-[#3ac5eb] cursor-pointer"
+          />
+          <div className="font-vt text-sm text-[#94a3b8]">
+            Rentang: 1.000 – 200.000 (langkah 1.000)
+          </div>
+        </div>
+
+        {/* Data Type Toggle (float32 = 4 byte, int8 = 1 byte) */}
+        <div className="bg-[#0d1524] border border-[#0891b2] p-3 space-y-2">
+          <div className="font-pixel text-[9px] text-[#f4f1ea] flex items-center justify-between">
+            <span>Tipe Data Bobot</span>
+            <span className="text-[#f5b935]">{bytesPerParameter} byte/param</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2" role="group" aria-label="Pilih Tipe Data Bobot">
+            <button
+              type="button"
+              data-testid="quant-dtype-float32"
+              aria-pressed={dataType === 'float32'}
+              onClick={() => setDataType('float32')}
+              className={`pixel-btn py-1.5 px-2 font-pixel text-[9px] ${
+                dataType === 'float32'
+                  ? 'bg-[#3ac5eb] text-[#0d0a1a]'
+                  : 'bg-[#16112b] text-[#b3aad1]'
+              }`}
+            >
+              float32 (4B)
+            </button>
+            <button
+              type="button"
+              data-testid="quant-dtype-int8"
+              aria-pressed={dataType === 'int8'}
+              onClick={() => setDataType('int8')}
+              className={`pixel-btn py-1.5 px-2 font-pixel text-[9px] ${
+                dataType === 'int8'
+                  ? 'bg-[#38d864] text-[#0d0a1a]'
+                  : 'bg-[#16112b] text-[#b3aad1]'
+              }`}
+            >
+              int8 (1B)
+            </button>
+          </div>
+          <div className="font-vt text-sm text-[#94a3b8]">
+            1 KB = 1.000 byte
+          </div>
+        </div>
+
+        {/* Tensor Arena Slider (0-200 KB, default 50) */}
+        <div className="bg-[#0d1524] border border-[#0891b2] p-3 space-y-2">
+          <label
+            htmlFor="minilab-quant-arena"
+            className="font-pixel text-[9px] text-[#f4f1ea] flex items-center justify-between gap-1"
+          >
+            <span>Tensor Arena (KB)</span>
+            <span className="text-[#2dd4bf] tabular-nums">{arenaKB} KB</span>
+          </label>
+          <input
+            id="minilab-quant-arena"
+            type="range"
+            min={0}
+            max={200}
+            step={5}
+            value={arenaKB}
+            onChange={(e) => setArenaKB(Number(e.target.value))}
+            className="w-full accent-[#2dd4bf] cursor-pointer"
+          />
+          <div className="font-vt text-sm text-[#94a3b8]">
+            Aktivasi kerja di RAM (0 – 200 KB)
+          </div>
+        </div>
+      </div>
+
+      {/* Device Flash KB & RAM KB Inputs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="bg-[#0d1524] border border-[#0891b2] p-3 flex items-center justify-between gap-3">
+          <label htmlFor="minilab-quant-flash" className="font-pixel text-[9px] text-[#f4f1ea]">
+            Kapasitas Flash Perangkat (KB)
+          </label>
+          <input
+            id="minilab-quant-flash"
+            type="number"
+            min={16}
+            max={8000}
+            step={16}
+            value={flashKB}
+            onChange={(e) => setFlashKB(Math.max(0, Number(e.target.value) || 0))}
+            className="w-28 bg-[#070b14] border-2 border-[#3ac5eb] px-2.5 py-1 font-mono text-sm text-[#f4f1ea] text-right"
+          />
+        </div>
+
+        <div className="bg-[#0d1524] border border-[#0891b2] p-3 flex items-center justify-between gap-3">
+          <label htmlFor="minilab-quant-ram" className="font-pixel text-[9px] text-[#f4f1ea]">
+            Kapasitas RAM Perangkat (KB)
+          </label>
+          <input
+            id="minilab-quant-ram"
+            type="number"
+            min={8}
+            max={4000}
+            step={8}
+            value={ramKB}
+            onChange={(e) => setRamKB(Math.max(0, Number(e.target.value) || 0))}
+            className="w-28 bg-[#070b14] border-2 border-[#2dd4bf] px-2.5 py-1 font-mono text-sm text-[#f4f1ea] text-right"
+          />
+        </div>
+      </div>
+
+      {/* Outputs: Model Size, Flash Fit, RAM Fit */}
+      <div className="bg-[#070b14] border-2 border-[#0891b2] p-3 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs sm:text-sm text-[#f4f1ea]">
+          <span>
+            Ukuran model = {parameterCount.toLocaleString('id-ID')} × {bytesPerParameter} byte ={' '}
+            {modelSizeBytes.toLocaleString('id-ID')} byte
+          </span>
+          <strong className="text-[#3ac5eb] text-base" data-testid="quant-model-size-kb">
+            {modelSizeKB} KB
+          </strong>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Flash status */}
+          <div
+            className={`p-2.5 border ${
+              fitsInFlash ? 'bg-[#0a1714] border-[#38d864]' : 'bg-[#291324] border-[#e83b47]'
+            }`}
+          >
+            <div className="flex items-center justify-between font-pixel text-[9px] mb-1.5">
+              <span className="text-[#f4f1ea]">
+                FLASH: {modelSizeKB} KB / {flashKB} KB
+              </span>
+              <strong
+                data-testid="quant-flash-status"
+                className={fitsInFlash ? 'text-[#38d864]' : 'text-[#e83b47]'}
+              >
+                {flashStatus}
+              </strong>
+            </div>
+            <div className="w-full h-3 bg-[#0d0a1a] border border-[#5c4e99] p-0.5">
+              <div
+                className={`h-full ${
+                  fitsInFlash ? 'bg-[#38d864]' : 'bg-[#e83b47]'
+                } ${reduceMotion ? '' : 'transition-all duration-150'}`}
+                style={{ width: `${flashPct}%` }}
+              />
+            </div>
+          </div>
+
+          {/* RAM status */}
+          <div
+            className={`p-2.5 border ${
+              fitsInRam ? 'bg-[#0a1714] border-[#38d864]' : 'bg-[#291324] border-[#e83b47]'
+            }`}
+          >
+            <div className="flex items-center justify-between font-pixel text-[9px] mb-1.5">
+              <span className="text-[#f4f1ea]">
+                RAM (ARENA): {arenaKB} KB / {ramKB} KB
+              </span>
+              <strong
+                data-testid="quant-ram-status"
+                className={fitsInRam ? 'text-[#38d864]' : 'text-[#e83b47]'}
+              >
+                {ramStatus}
+              </strong>
+            </div>
+            <div className="w-full h-3 bg-[#0d0a1a] border border-[#5c4e99] p-0.5">
+              <div
+                className={`h-full ${
+                  fitsInRam ? 'bg-[#2dd4bf]' : 'bg-[#e83b47]'
+                } ${reduceMotion ? '' : 'transition-all duration-150'}`}
+                style={{ width: `${ramPct}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <p
+          data-testid="quant-assumption-note"
+          className="font-vt text-base sm:text-lg text-[#b3aad1] border-t border-[#1e293b] pt-2"
+        >
+          Asumsi: model disimpan di flash, tensor arena di RAM. Angka perangkat hanya contoh, bukan spesifikasi chip tertentu.
+        </p>
+      </div>
+    </section>
+  );
+};
+
+const LatencyMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion }) => {
+  const [akuisisi, setAkuisisi] = useState<number>(20);
+  const [prapemrosesan, setPrapemrosesan] = useState<number>(5);
+  const [inferensi, setInferensi] = useState<number>(35);
+  const [pengiriman, setPengiriman] = useState<number>(40);
+  const [limit, setLimit] = useState<number>(120);
+
+  const { totalMs, withinBudget, statusText } = computeLatencyMiniLab(
+    akuisisi,
+    prapemrosesan,
+    inferensi,
+    pengiriman,
+    limit
+  );
+
+  const stageSliders = [
+    {
+      id: 'minilab-latency-akuisisi',
+      label: 'Akuisisi (ms)',
+      value: akuisisi,
+      onChange: setAkuisisi,
+      color: '#3ac5eb',
+    },
+    {
+      id: 'minilab-latency-prapemrosesan',
+      label: 'Pra-pemrosesan (ms)',
+      value: prapemrosesan,
+      onChange: setPrapemrosesan,
+      color: '#2dd4bf',
+    },
+    {
+      id: 'minilab-latency-inferensi',
+      label: 'Inferensi (ms)',
+      value: inferensi,
+      onChange: setInferensi,
+      color: '#f5b935',
+    },
+    {
+      id: 'minilab-latency-pengiriman',
+      label: 'Pengiriman (ms)',
+      value: pengiriman,
+      onChange: setPengiriman,
+      color: '#fb923c',
+    },
+  ];
+
+  const barRatio = limit > 0 ? Math.min(100, Math.max(0, (totalMs / limit) * 100)) : 100;
+
+  return (
+    <section
+      aria-label="Lab Anggaran Latensi"
+      data-testid="minilab-latency"
+      className="bg-[#081d26] border-2 border-[#fb923c] p-4 space-y-3"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#0891b2] pb-2">
+        <div className="font-pixel text-[10px] text-[#fb923c]">
+          ⏱ LAB ANGGARAN LATENSI (PIPA END-TO-END)
+        </div>
+        <span className="font-vt text-base text-[#b3aad1]">
+          Eksperimen bebas (Tanpa XP · Tidak menghalangi progres)
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {stageSliders.map((s) => (
+          <div
+            key={s.id}
+            className="bg-[#0d1524] border border-[#0891b2] p-2.5 flex flex-col justify-between"
+          >
+            <label
+              htmlFor={s.id}
+              className="font-pixel text-[9px] text-[#f4f1ea] flex items-center justify-between gap-1 mb-1.5"
+            >
+              <span>{s.label}</span>
+              <span style={{ color: s.color }} className="tabular-nums">
+                {s.value} ms
+              </span>
+            </label>
+            <input
+              id={s.id}
+              type="range"
+              min={0}
+              max={200}
+              step={5}
+              value={s.value}
+              onChange={(e) => s.onChange(Number(e.target.value))}
+              className="w-full accent-[#3ac5eb] cursor-pointer"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Limit Slider (0-500, step 10) */}
+      <div className="bg-[#0d1524] border border-[#f5b935] p-3 space-y-1.5">
+        <label
+          htmlFor="minilab-latency-limit"
+          className="font-pixel text-[9px] text-[#f4f1ea] flex items-center justify-between"
+        >
+          <span>Batas Waktu / Limit (ms)</span>
+          <span className="text-[#f5b935] tabular-nums">{limit} ms</span>
+        </label>
+        <input
+          id="minilab-latency-limit"
+          type="range"
+          min={0}
+          max={500}
+          step={10}
+          value={limit}
+          onChange={(e) => setLimit(Number(e.target.value))}
+          className="w-full accent-[#f5b935] cursor-pointer"
+        />
+      </div>
+
+      {/* Total & Budget Output */}
+      <div
+        className={`p-3 border-2 space-y-2 ${
+          withinBudget ? 'bg-[#0a1714] border-[#38d864]' : 'bg-[#291324] border-[#e83b47]'
+        }`}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs sm:text-sm text-[#f4f1ea]">
+          <span>
+            Total = {akuisisi} + {prapemrosesan} + {inferensi} + {pengiriman} ={' '}
+            <strong data-testid="latency-total-ms" className="text-[#3ac5eb]">
+              {totalMs} ms
+            </strong>{' '}
+            (Batas: {limit} ms)
+          </span>
+          <strong
+            data-testid="latency-status-text"
+            className={`font-pixel text-[10px] px-2 py-1 border ${
+              withinBudget
+                ? 'bg-[#0d0a1a] border-[#38d864] text-[#38d864]'
+                : 'bg-[#0d0a1a] border-[#e83b47] text-[#e83b47]'
+            }`}
+          >
+            {statusText}
+          </strong>
+        </div>
+
+        <div className="w-full h-3 bg-[#0d0a1a] border border-[#5c4e99] p-0.5">
+          <div
+            className={`h-full ${
+              withinBudget ? 'bg-[#38d864]' : 'bg-[#e83b47]'
+            } ${reduceMotion ? '' : 'transition-all duration-150'}`}
+            style={{ width: `${barRatio}%` }}
+          />
+        </div>
       </div>
     </section>
   );
@@ -448,12 +842,18 @@ export const ScrollPanel: React.FC<ScrollPanelProps> = ({
           </p>
         </section>
 
-        {/* Mini-Labs (Pure React, rendered below the worked example for Topic 12 "neuron" and Topic 16 "softmax") */}
+        {/* Mini-Labs (Pure React, rendered below the worked example for Topics 12, 16, 19, 20) */}
         {topicContent.miniLab === 'neuron' && (
           <NeuronMiniLabWidget reduceMotion={reduceMotion} />
         )}
         {topicContent.miniLab === 'softmax' && (
           <SoftmaxMiniLabWidget reduceMotion={reduceMotion} />
+        )}
+        {topicContent.miniLab === 'quant' && (
+          <QuantMiniLabWidget reduceMotion={reduceMotion} />
+        )}
+        {topicContent.miniLab === 'latency' && (
+          <LatencyMiniLabWidget reduceMotion={reduceMotion} />
         )}
 
         {/* "Jebakan Monster" (commonMistake) Callout */}

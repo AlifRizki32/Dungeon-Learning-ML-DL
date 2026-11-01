@@ -1,0 +1,165 @@
+{
+  "reviewStatus": "needs-human-review",
+  "floor": 6,
+  "stepsAreSuggestions": true,
+  "intro": "Menyelesaikan peta ini membuatmu kompeten, belum master. Level master butuh tahun-tahun tambahan, dan ukurannya adalah seberapa sering kamu membangun, merusak, dan memperbaiki sistem nyata.",
+  "specializationNote": "Untuk minat AI dan IoT, time series dan TinyML paling nyambung.",
+  "specializations": [
+    "Computer vision",
+    "NLP",
+    "Time series dan data sensor",
+    "Reinforcement learning",
+    "TinyML"
+  ],
+  "quests": [
+    {
+      "id": "m1",
+      "title": "Perdalam teori",
+      "summary": "Pelajari machine learning probabilistik, optimisasi, teori informasi, dan statistical learning theory.",
+      "xp": 150,
+      "relic": "Kitab Teori",
+      "evidenceHint": "Daftar bab yang selesai dan ringkasan satu halaman per topik",
+      "steps": [
+        { "id": "m1s1", "text": "Pilih satu buku rujukan utama dan tulis alasanmu memilihnya" },
+        { "id": "m1s2", "text": "Pilih bab untuk masing-masing dari empat topik: machine learning probabilistik, optimisasi, teori informasi, dan statistical learning theory" },
+        { "id": "m1s3", "text": "Kerjakan latihan atau lab dari buku, bukan hanya membaca" },
+        { "id": "m1s4", "text": "Tulis ringkasan satu halaman per topik dengan kata-katamu sendiri" },
+        { "id": "m1s5", "text": "Jelaskan satu konsep teori dari ingatan tanpa melihat catatan, lalu periksa bagian yang keliru" }
+      ],
+      "references": [
+        { "label": "Deep Learning (Goodfellow, Bengio, Courville), dibaca gratis online", "url": "https://www.deeplearningbook.org" },
+        { "label": "Bishop dan Bishop: Deep Learning, Foundations and Concepts (Springer), pendamping Pattern Recognition and Machine Learning", "url": "https://link.springer.com/book/10.1007/978-3-031-45468-4" },
+        { "label": "An Introduction to Statistical Learning with Python (ISLP)", "url": "https://statlearning.com" },
+        { "label": "Pattern Recognition and Machine Learning (Bishop) dan Hands-On Machine Learning (Géron): cari langsung, tautan belum diverifikasi", "url": null }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Pakai kursus dan kanal yang sudah dikenal",
+      "summary": "Kursus: Machine Learning Specialization (Andrew Ng), fast.ai, dan materi Stanford CS229, CS231n, CS224n. YouTube: StatQuest untuk statistik dan ML dasar, 3Blue1Brown untuk intuisi aljabar linear dan neural network.",
+      "xp": 150,
+      "relic": "Gulungan Kursus",
+      "evidenceHint": "Daftar tugas kursus yang selesai dan tiga hal yang kamu terapkan",
+      "steps": [
+        { "id": "m2s1", "text": "Pilih satu kursus utama dan jadwalkan tiap minggu" },
+        { "id": "m2s2", "text": "Kerjakan tugas dan latihan kursus, bukan hanya menonton" },
+        { "id": "m2s3", "text": "Pasangkan dengan satu kanal intuisi (StatQuest atau 3Blue1Brown) untuk konsep yang masih kabur" },
+        { "id": "m2s4", "text": "Terapkan tiga hal dari kursus ke proyekmu sendiri dan catat hasilnya" }
+      ],
+      "references": [
+        { "label": "fast.ai: Practical Deep Learning for Coders (gratis)", "url": "https://course.fast.ai/" },
+        { "label": "Stanford CS231n (situs kuliah)", "url": "http://cs231n.stanford.edu/" },
+        { "label": "Stanford CS224n (situs kuliah)", "url": "http://web.stanford.edu/class/cs224n/" },
+        { "label": "Machine Learning Specialization, CS229, StatQuest, 3Blue1Brown: cari langsung dan cek materinya", "url": null }
+      ]
+    },
+    {
+      "id": "m3",
+      "title": "Baca dan replikasi paper klasik",
+      "summary": "Mulai dari paper klasik: Adam, Dropout, ResNet, dan 'Attention Is All You Need'. Implementasikan ulang hasilnya sendiri, jangan hanya membaca.",
+      "xp": 150,
+      "relic": "Prasasti Paper",
+      "evidenceHint": "Tautan repositori replikasi dan laporan perbandingan dengan klaim paper",
+      "steps": [
+        { "id": "m3s1", "text": "Adam: tulis algoritmenya dalam pseudocode, implementasikan di NumPy, lalu bandingkan dengan SGD pada satu fungsi sederhana" },
+        { "id": "m3s2", "text": "Dropout: implementasikan pada MLP kecil dan bandingkan kurva latih dan uji dengan dan tanpa dropout" },
+        { "id": "m3s3", "text": "ResNet: implementasikan satu blok residual dan bandingkan dengan blok biasa pada tugas kecil" },
+        { "id": "m3s4", "text": "Attention Is All You Need: implementasikan scaled dot-product attention dan pastikan tiap baris bobot berjumlah 1" },
+        { "id": "m3s5", "text": "Tulis laporan jujur: apa yang cocok dengan klaim paper, apa yang berbeda, dan dugaan penyebabnya" }
+      ],
+      "references": [
+        { "label": "Adam: A Method for Stochastic Optimization (Kingma dan Ba, arXiv)", "url": "https://arxiv.org/abs/1412.6980" },
+        { "label": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting (JMLR 2014)", "url": "https://www.jmlr.org/papers/v15/srivastava14a.html" },
+        { "label": "Deep Residual Learning for Image Recognition (He dkk., arXiv)", "url": "https://arxiv.org/abs/1512.03385" },
+        { "label": "Attention Is All You Need (Vaswani dkk., arXiv)", "url": "https://arxiv.org/abs/1706.03762" }
+      ]
+    },
+    {
+      "id": "m4",
+      "title": "Bangun portofolio",
+      "summary": "Minimal 3 proyek end-to-end, satu di antaranya embedded/IoT. Catat keputusan teknis, kegagalan, dan alasan perbaikannya.",
+      "xp": 150,
+      "relic": "Lencana Portofolio",
+      "evidenceHint": "Tautan tiga repositori proyek dan catatan keputusan serta kegagalan",
+      "steps": [
+        { "id": "m4s1", "text": "Proyek 1: end-to-end dengan repositori Git, README, dan hasil yang bisa didemokan" },
+        { "id": "m4s2", "text": "Proyek 2: end-to-end dengan baseline, analisis kesalahan, dan hasil yang bisa diulang" },
+        { "id": "m4s3", "text": "Proyek 3: embedded/IoT yang berjalan di perangkat" },
+        { "id": "m4s4", "text": "Untuk tiap proyek, tulis catatan keputusan teknis (mengapa memilih A dan bukan B)" },
+        { "id": "m4s5", "text": "Untuk tiap proyek, tulis catatan kegagalan dan alasan perbaikannya" }
+      ],
+      "references": [
+        { "label": "Pro Git (untuk riwayat dan dokumentasi proyek)", "url": "https://git-scm.com/book/en/v2" },
+        { "label": "TinyML (Warden dan Situnayake), O'Reilly (untuk proyek embedded)", "url": "https://oreilly.com/library/view/tinyml/9781492052036" }
+      ]
+    },
+    {
+      "id": "m5",
+      "title": "Uji diri dengan tekanan nyata",
+      "summary": "Ikut kompetisi (Kaggle atau lomba kampus) dan kontribusi ke proyek open source, misalnya perbaikan dokumentasi atau bug kecil.",
+      "xp": 150,
+      "relic": "Medali Tekanan",
+      "evidenceHint": "Tautan submission atau hasil kompetisi dan tautan kontribusi open source",
+      "steps": [
+        { "id": "m5s1", "text": "Ikut satu kompetisi pemula di Kaggle (misalnya Titanic: Machine Learning from Disaster) dan kirim satu submission" },
+        { "id": "m5s2", "text": "Ikut satu kompetisi atau lomba kampus dengan tenggat nyata" },
+        { "id": "m5s3", "text": "Kirim satu kontribusi open source kecil, misalnya perbaikan dokumentasi atau bug kecil" },
+        { "id": "m5s4", "text": "Tulis refleksi: apa yang goyah saat di bawah tekanan dan apa yang kamu ubah sesudahnya" }
+      ],
+      "references": [
+        { "label": "Kaggle: Titanic - Machine Learning from Disaster (kompetisi pemula)", "url": "https://www.kaggle.com/c/titanic" },
+        { "label": "Panduan kontribusi open source: cari langsung di proyek yang kamu pakai (tautan belum diverifikasi)", "url": null }
+      ]
+    },
+    {
+      "id": "m6",
+      "title": "Pilih satu spesialisasi",
+      "summary": "Pilih satu spesialisasi setelah fondasi kuat: computer vision, NLP, time series dan data sensor, reinforcement learning, atau TinyML.",
+      "xp": 150,
+      "relic": "Kompas Spesialis",
+      "evidenceHint": "Alasan pilihan dan rencana proyek spesialisasi",
+      "steps": [
+        { "id": "m6s1", "text": "Baca gambaran kelima pilihan: computer vision, NLP, time series dan data sensor, reinforcement learning, TinyML" },
+        { "id": "m6s2", "text": "Tulis alasan pilihanmu berdasarkan minat dan proyek yang sudah kamu kerjakan" },
+        { "id": "m6s3", "text": "Pilih satu spesialisasi di aplikasi ini (tersimpan di perangkatmu)" },
+        { "id": "m6s4", "text": "Tetapkan satu proyek spesialisasi dengan batas lingkup tertulis" }
+      ],
+      "references": [
+        { "label": "Belum ada referensi terverifikasi untuk gambaran tiap bidang. Cari dari sumber yang kamu percaya.", "url": null }
+      ]
+    },
+    {
+      "id": "m7",
+      "title": "Ajarkan ke orang lain",
+      "summary": "Tulis blog, buat video singkat, atau jelaskan ke teman. Bagian yang sulit dijelaskan adalah bagian yang belum benar-benar dipahami.",
+      "xp": 150,
+      "relic": "Obor Pengajar",
+      "evidenceHint": "Tautan atau catatan penjelasan yang kamu buat dan bagian yang kamu perbaiki",
+      "steps": [
+        { "id": "m7s1", "text": "Pilih satu konsep yang menurutmu sulit dijelaskan" },
+        { "id": "m7s2", "text": "Tulis blog, rekam video singkat, atau jelaskan langsung ke temanmu" },
+        { "id": "m7s3", "text": "Minta satu orang mengajukan pertanyaan dan catat bagian yang membuatmu tersendat" },
+        { "id": "m7s4", "text": "Pelajari ulang bagian yang tersendat, lalu perbaiki penjelasanmu" }
+      ],
+      "references": [
+        { "label": "Tidak ada referensi khusus. Sumber terbaiknya adalah pertanyaan dari orang yang kamu ajar.", "url": null }
+      ]
+    }
+  ],
+  "guardian": {
+    "name": "Cermin Puncak",
+    "intro": "Aku tidak menilai jawabanmu. Aku hanya memantulkan apa yang sudah kamu lakukan. Jawablah dengan jujur.",
+    "reflectionPrompts": [
+      { "id": "r1", "text": "Sistem nyata mana yang paling sering kamu bangun, rusakkan, dan perbaiki? Apa yang kamu pelajari dari kerusakannya?" },
+      { "id": "r2", "text": "Konsep mana yang dulu kamu kira sudah paham tetapi ternyata belum, dan bagaimana kamu menyadarinya?" },
+      { "id": "r3", "text": "Keputusan teknis mana yang kamu sesali, dan apa yang akan kamu lakukan berbeda?" },
+      { "id": "r4", "text": "Apa spesialisasi pilihanmu dan apa langkah konkretmu berikutnya?" },
+      { "id": "r5", "text": "Siapa yang akan kamu ajak belajar atau kamu ajari setelah ini?" }
+    ]
+  },
+  "certificate": {
+    "title": "Piagam Penyelesai Peta Belajar",
+    "honestNote": "Menyelesaikan peta ini membuatmu kompeten, belum master. Level master butuh tahun-tahun tambahan, dan ukurannya adalah seberapa sering kamu membangun, merusak, dan memperbaiki sistem nyata.",
+    "closing": "Perjalananmu baru dimulai."
+  }
+}

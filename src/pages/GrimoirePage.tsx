@@ -50,6 +50,8 @@ export const GrimoirePage: React.FC = () => {
   const floor1Spells = useMemo(() => getSpellsByFloor(1), []);
   const floor2Spells = useMemo(() => getSpellsByFloor(2), []);
   const floor3Spells = useMemo(() => getSpellsByFloor(3), []);
+  const floor4Spells = useMemo(() => getSpellsByFloor(4), []);
+  const floor5Spells = useMemo(() => getSpellsByFloor(5), []);
   const allSpells = useMemo(() => getAllSpells(), []);
 
   const todayKey = getLocalDateKey();
@@ -112,7 +114,7 @@ export const GrimoirePage: React.FC = () => {
   };
 
   const renderSpellGroup = (
-    floorId: 1 | 2 | 3,
+    floorId: 1 | 2 | 3 | 4 | 5,
     groupTitle: string,
     groupSubtitle: string,
     accentColor: string,
@@ -285,7 +287,7 @@ export const GrimoirePage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="font-pixel text-[10px] text-[#3ac5eb] mb-1">
-              KITAB SIHIR LANTAI 1–3 · KATALOG MANTRA &amp; LATIHAN
+              KITAB SIHIR LANTAI 1–5 · KATALOG MANTRA &amp; LATIHAN
             </div>
             <h1 className="font-pixel text-sm sm:text-base text-[#f5b935]">
               GRIMOIRE MANTRA &amp; DOJO LATIHAN
@@ -317,7 +319,7 @@ export const GrimoirePage: React.FC = () => {
                   : 'bg-[#16112b] text-[#f4f1ea]'
               }`}
             >
-              📖 Kitab Grimoire (17 Mantra)
+              📖 Kitab Grimoire (28 Mantra)
             </button>
 
             <button
@@ -337,7 +339,7 @@ export const GrimoirePage: React.FC = () => {
         </div>
       </section>
 
-      {/* TAB 1: GRIMOIRE GROUPED BY FLOOR (LANTAI 1, LANTAI 2, LANTAI 3) */}
+      {/* TAB 1: GRIMOIRE GROUPED BY FLOOR (LANTAI 1, LANTAI 2, LANTAI 3, LANTAI 4, LANTAI 5) */}
       {activeTab === 'grimoire' && (
         <section aria-label="Daftar Kartu Mantra per Lantai" className="space-y-6">
           {renderSpellGroup(
@@ -361,6 +363,20 @@ export const GrimoirePage: React.FC = () => {
             '#9b5de5',
             floor3Spells
           )}
+          {renderSpellGroup(
+            4,
+            'Mantra Lantai 4: Deployment, Edge AI & Proyek Nyata (3 Mantra)',
+            'Digunakan untuk mengalahkan Mecha-Bot IoT dan Mecha-Core.',
+            '#3ac5eb',
+            floor4Spells
+          )}
+          {renderSpellGroup(
+            5,
+            'Mantra Lantai 5: Aula Guild — Kompetensi Dunia Nyata (8 Mantra)',
+            'Digunakan untuk menaklukkan Guild Quest dan Raja Deadline.',
+            '#fb923c',
+            floor5Spells
+          )}
         </section>
       )}
 
@@ -370,7 +386,7 @@ export const GrimoirePage: React.FC = () => {
           <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-[#3a306e] pb-3">
             <div>
               <div className="font-pixel text-[10px] text-[#f5b935]">
-                MODE LATIHAN TANPA KEHILANGAN HATI (LANTAI 1, 2 &amp; 3)
+                MODE LATIHAN TANPA KEHILANGAN HATI (LANTAI 1–5)
               </div>
               <h2 className="font-pixel text-xs sm:text-sm text-[#38d864] mt-1">
                 DOJO LATIHAN MANTRA (MAKSIMAL 8 SOAL TERBOBOT)

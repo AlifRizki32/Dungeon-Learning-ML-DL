@@ -1,6 +1,9 @@
 import floor1ContentRaw from '../data/floor1.content.json';
 import floor2ContentRaw from '../data/floor2.content.json';
 import floor3ContentRaw from '../data/floor3.content.json';
+import floor4ContentRaw from '../data/floor4.content.json';
+import floor5ContentRaw from '../data/floor5.content.json';
+import floor6ContentRaw from '../data/floor6.content.json';
 
 export interface Floor1Spell {
   id: string;
@@ -30,7 +33,9 @@ export interface Floor1QuizQuestion {
 
 export interface Floor1TopicContent {
   topicId: number;
-  miniLab?: 'neuron' | 'softmax';
+  relic?: string;
+  evidenceHint?: string;
+  miniLab?: 'neuron' | 'softmax' | 'quant' | 'latency';
   spell: Floor1Spell;
   scroll: Floor1Scroll;
   references: Floor1Reference[];
@@ -103,11 +108,15 @@ export interface PreparedBattleQuestion {
 export const FLOOR1_CONTENT: FloorContentFile = floor1ContentRaw as FloorContentFile;
 export const FLOOR2_CONTENT: FloorContentFile = floor2ContentRaw as FloorContentFile;
 export const FLOOR3_CONTENT: FloorContentFile = floor3ContentRaw as FloorContentFile;
+export const FLOOR4_CONTENT: FloorContentFile = floor4ContentRaw as FloorContentFile;
+export const FLOOR5_CONTENT: FloorContentFile = floor5ContentRaw as FloorContentFile;
 
 export const SPELLBOOK_FLOORS: Record<number, FloorContentFile> = {
   1: FLOOR1_CONTENT,
   2: FLOOR2_CONTENT,
   3: FLOOR3_CONTENT,
+  4: FLOOR4_CONTENT,
+  5: FLOOR5_CONTENT,
 };
 
 export const ECHO_BONUS_XP = 5;
@@ -116,10 +125,13 @@ export const DOJO_CORRECT_XP = 2;
 export const DOJO_DAILY_XP_CAP = 20;
 export const INITIAL_BOSS_POTIONS = 2;
 export const FLOOR3_BOSS_POTIONS = 3;
+export const FLOOR5_BOSS_POTIONS = 3;
 export const MAX_HEARTS = 3;
 
 export function getInitialBossPotions(floorId: number): number {
-  return floorId === 3 ? FLOOR3_BOSS_POTIONS : INITIAL_BOSS_POTIONS;
+  if (floorId === 3) return FLOOR3_BOSS_POTIONS;
+  if (floorId === 5) return FLOOR5_BOSS_POTIONS;
+  return INITIAL_BOSS_POTIONS;
 }
 
 export function getTotalBossPhases(floorId: number): number {
@@ -128,7 +140,7 @@ export function getTotalBossPhases(floorId: number): number {
 
 export interface SpellVisualTheme {
   spellId: string;
-  floorId: 1 | 2 | 3;
+  floorId: 1 | 2 | 3 | 4 | 5;
   color: string;
   bgColor: string;
   animStyle:
@@ -148,15 +160,19 @@ export interface SpellVisualTheme {
     | 'kernel'
     | 'sequence'
     | 'attention'
-    | 'schedule';
+    | 'schedule'
+    | 'pipeline'
+    | 'quantize'
+    | 'edge';
   runeSymbol: string;
 }
 
 /**
- * 17 distinct spell colors across Floors 1-3:
+ * 20 distinct spell colors across Floors 1-4:
  * Floor 1 (s1..s6): #38d864, #3ac5eb, #f5b935, #9b5de5, #e83b47, #f4f1ea
  * Floor 2 (s7..s11): #1d8a3d, #a87312, #94a3b8, #64748b, #5c4e99
  * Floor 3 (s12..s17): #b3aad1, #941923, #0284c7, #b45309, #fcd34d, #7e22ce
+ * Floor 4 (s18..s20): #0891b2, #2dd4bf, #fb923c
  */
 export const SPELL_VISUALS: Record<string, SpellVisualTheme> = {
   s1: {
@@ -295,6 +311,94 @@ export const SPELL_VISUALS: Record<string, SpellVisualTheme> = {
     animStyle: 'schedule',
     runeSymbol: 'AdamW · CosineLR',
   },
+  s18: {
+    spellId: 's18',
+    floorId: 4,
+    color: '#0891b2', // Telemetry Deep Cyan
+    bgColor: '#08202b',
+    animStyle: 'pipeline',
+    runeSymbol: 'API · Drift · RPS',
+  },
+  s19: {
+    spellId: 's19',
+    floorId: 4,
+    color: '#2dd4bf', // Silicon Quant Aqua
+    bgColor: '#092424',
+    animStyle: 'quantize',
+    runeSymbol: 'FP32 → INT8 · KB',
+  },
+  s20: {
+    spellId: 's20',
+    floorId: 4,
+    color: '#fb923c', // Sensor Beacon Orange
+    bgColor: '#281508',
+    animStyle: 'edge',
+    runeSymbol: 'Σ t_tahap ≤ batas',
+  },
+  s21: {
+    spellId: 's21',
+    floorId: 5,
+    color: '#f43f5e', // Crimson Rose Git
+    bgColor: '#280a14',
+    animStyle: 'code',
+    runeSymbol: 'git commit · pytest',
+  },
+  s22: {
+    spellId: 's22',
+    floorId: 5,
+    color: '#10b981', // Viridian Data Lens
+    bgColor: '#06241b',
+    animStyle: 'prisms',
+    runeSymbol: 'w_k = N/(K·N_k)',
+  },
+  s23: {
+    spellId: 's23',
+    floorId: 5,
+    color: '#f97316', // Tangerine Circuit Copper
+    bgColor: '#291205',
+    animStyle: 'lightning',
+    runeSymbol: 'ADC 2^N · MQTT QoS',
+  },
+  s24: {
+    spellId: 's24',
+    floorId: 5,
+    color: '#c084fc', // Amethyst Honest Scale
+    bgColor: '#1f0d2e',
+    animStyle: 'grid',
+    runeSymbol: 'Δ% Baseline · Seed',
+  },
+  s25: {
+    spellId: 's25',
+    floorId: 5,
+    color: '#eab308', // Amber Backup Shield
+    bgColor: '#261d05',
+    animStyle: 'forge',
+    runeSymbol: 'P(A∩B) = P(A)·P(B)',
+  },
+  s26: {
+    spellId: 's26',
+    floorId: 5,
+    color: '#ec4899', // Magenta Stage Mic
+    bgColor: '#290a1d',
+    animStyle: 'beam',
+    runeSymbol: '10m Pitch · Q&A',
+  },
+  s27: {
+    spellId: 's27',
+    floorId: 5,
+    color: '#38bdf8', // Sky Scope Map
+    bgColor: '#082032',
+    animStyle: 'schedule',
+    runeSymbol: 'MVP · Jam × (1−buf)',
+  },
+  s28: {
+    spellId: 's28',
+    floorId: 5,
+    color: '#84cc16', // Lime Security Lock
+    bgColor: '#162407',
+    animStyle: 'constellation',
+    runeSymbol: 'TLS · OWASP IoT',
+  },
 };
 
 export interface NeuronMiniLabResult {
@@ -340,14 +444,84 @@ export function computeSoftmaxMiniLab(
   };
 }
 
+export interface QuantMiniLabResult {
+  bytesPerParameter: 1 | 4;
+  modelSizeBytes: number;
+  modelSizeKB: number;
+  fitsInFlash: boolean;
+  fitsInRam: boolean;
+  flashStatus: string;
+  ramStatus: string;
+}
+
+/**
+ * Topic 19 ("quant") Mini-Lab: "Lab Anggaran Memori"
+ * 1 KB = 1.000 byte; float32 = 4 byte, int8 = 1 byte.
+ */
+export function computeQuantMiniLab(
+  parameterCount: number,
+  dataType: 'float32' | 'int8',
+  flashKB: number,
+  ramKB: number,
+  arenaKB: number
+): QuantMiniLabResult {
+  const bytesPerParameter: 1 | 4 = dataType === 'float32' ? 4 : 1;
+  const modelSizeBytes = parameterCount * bytesPerParameter;
+  const modelSizeKB = modelSizeBytes / 1000;
+  const fitsInFlash = modelSizeKB <= flashKB;
+  const fitsInRam = arenaKB <= ramKB;
+  return {
+    bytesPerParameter,
+    modelSizeBytes,
+    modelSizeKB,
+    fitsInFlash,
+    fitsInRam,
+    flashStatus: fitsInFlash ? 'Muat di flash' : 'Tidak muat di flash',
+    ramStatus: fitsInRam ? 'Muat di RAM' : 'Tidak muat di RAM',
+  };
+}
+
+export interface LatencyMiniLabResult {
+  totalMs: number;
+  limitMs: number;
+  withinBudget: boolean;
+  deltaMs: number;
+  statusText: string;
+}
+
+/**
+ * Topic 20 ("latency") Mini-Lab: "Lab Anggaran Latensi"
+ * total = akuisisi + pra-pemrosesan + inferensi + pengiriman
+ * Shows "Sisa X ms" when total <= limit, or "Melebihi X ms" when total > limit.
+ */
+export function computeLatencyMiniLab(
+  akuisisiMs: number,
+  prapemrosesanMs: number,
+  inferensiMs: number,
+  pengirimanMs: number,
+  limitMs: number
+): LatencyMiniLabResult {
+  const totalMs = akuisisiMs + prapemrosesanMs + inferensiMs + pengirimanMs;
+  const withinBudget = totalMs <= limitMs;
+  const deltaMs = Math.abs(limitMs - totalMs);
+  const statusText = withinBudget ? `Sisa ${deltaMs} ms` : `Melebihi ${deltaMs} ms`;
+  return {
+    totalMs,
+    limitMs,
+    withinBudget,
+    deltaMs,
+    statusText,
+  };
+}
+
 export function getNumericTopicId(topicId: string | number): number | null {
   if (typeof topicId === 'number') {
-    return topicId >= 1 && topicId <= 17 ? topicId : null;
+    return topicId >= 1 && topicId <= 28 ? topicId : null;
   }
   const match = /^topic-(\d+)$/.exec(topicId);
   if (!match) return null;
   const num = Number(match[1]);
-  return num >= 1 && num <= 17 ? num : null;
+  return num >= 1 && num <= 28 ? num : null;
 }
 
 export function getRoadmapTopicId(numericTopicId: number): string {
@@ -358,6 +532,8 @@ export function getFloorForTopicNumber(numericTopicId: number): number {
   if (numericTopicId >= 1 && numericTopicId <= 6) return 1;
   if (numericTopicId >= 7 && numericTopicId <= 11) return 2;
   if (numericTopicId >= 12 && numericTopicId <= 17) return 3;
+  if (numericTopicId >= 18 && numericTopicId <= 20) return 4;
+  if (numericTopicId >= 21 && numericTopicId <= 28) return 5;
   return 1;
 }
 
@@ -380,7 +556,7 @@ export function getTopicContent(
 }
 
 /**
- * Backward-compatible alias that returns Spellbook topic content for Floor 1-3 topics (1..17).
+ * Backward-compatible alias that returns Spellbook topic content for Floor 1-5 topics (1..28).
  */
 export function getFloor1TopicContent(
   topicId: string | number
@@ -395,7 +571,7 @@ export interface EnrichedSpell extends Floor1Spell {
   summary: string;
 }
 
-export function getSpellsByFloor(floorId: 1 | 2 | 3): EnrichedSpell[] {
+export function getSpellsByFloor(floorId: 1 | 2 | 3 | 4 | 5): EnrichedSpell[] {
   const floorData = SPELLBOOK_FLOORS[floorId];
   if (!floorData) return [];
   return floorData.topics.map((t) => ({
@@ -408,7 +584,13 @@ export function getSpellsByFloor(floorId: 1 | 2 | 3): EnrichedSpell[] {
 }
 
 export function getAllSpells(): EnrichedSpell[] {
-  return [...getSpellsByFloor(1), ...getSpellsByFloor(2), ...getSpellsByFloor(3)];
+  return [
+    ...getSpellsByFloor(1),
+    ...getSpellsByFloor(2),
+    ...getSpellsByFloor(3),
+    ...getSpellsByFloor(4),
+    ...getSpellsByFloor(5),
+  ];
 }
 
 export function getAllFloor1Spells(): EnrichedSpell[] {
@@ -539,9 +721,10 @@ export function buildBattleDeck(
     baseQuestions[j] = tmp;
   }
 
-  // Separate defeated candidate topics into earlierFloors vs currentFloor
+  // Separate defeated candidate topics into earlierFloors vs currentFloor vs allDefeatedTopics
   const earlierFloorTopics: { topic: SpellbookTopicContent; floorId: number }[] = [];
   const currentFloorTopics: { topic: SpellbookTopicContent; floorId: number }[] = [];
+  const allDefeatedTopics: { topic: SpellbookTopicContent; floorId: number }[] = [];
 
   for (const [fKey, fContent] of Object.entries(SPELLBOOK_FLOORS)) {
     const fId = Number(fKey);
@@ -550,6 +733,7 @@ export function buildBattleDeck(
       if (rId === currentRoadmapId || !completedRoomIds.includes(rId)) {
         continue;
       }
+      allDefeatedTopics.push({ topic: t, floorId: fId });
       if (fId < currentFloorId) {
         earlierFloorTopics.push({ topic: t, floorId: fId });
       } else if (fId === currentFloorId) {
@@ -559,7 +743,11 @@ export function buildBattleDeck(
   }
 
   let chosenPool: { topic: SpellbookTopicContent; floorId: number }[] = [];
-  if (currentFloorId >= 2) {
+  if (currentFloorId === 5) {
+    // Floor 5 Guild Hall echo rule: draw from ALL defeated topics of ANY floor (1-5).
+    // If nothing has been defeated yet, skip the echo (5 questions total).
+    chosenPool = allDefeatedTopics;
+  } else if (currentFloorId >= 2) {
     if (earlierFloorTopics.length > 0 && currentFloorTopics.length > 0) {
       // 60% probability earlier floors, 40% probability current floor
       chosenPool = rng() < 0.6 ? earlierFloorTopics : currentFloorTopics;
@@ -757,3 +945,200 @@ export function recoverBossAfterFaint(clearedPhases: number[]): number[] {
   if (clearedPhases.length === 0) return [];
   return clearedPhases.slice(0, clearedPhases.length - 1);
 }
+
+// ============================================================================
+// Floor 6 ("Menara Master") Types, Content & Pure Logic
+// ============================================================================
+
+export interface Floor6QuestStep {
+  id: string;
+  text: string;
+}
+
+export interface Floor6Quest {
+  id: string;
+  title: string;
+  summary: string;
+  xp: number;
+  relic: string;
+  evidenceHint: string;
+  steps: Floor6QuestStep[];
+  references: Floor1Reference[];
+}
+
+export interface Floor6ReflectionPrompt {
+  id: string;
+  text: string;
+}
+
+export interface Floor6ContentFile {
+  reviewStatus: string;
+  floor: number;
+  stepsAreSuggestions: boolean;
+  intro: string;
+  specializationNote: string;
+  specializations: string[];
+  quests: Floor6Quest[];
+  guardian: {
+    name: string;
+    intro: string;
+    reflectionPrompts: Floor6ReflectionPrompt[];
+  };
+  certificate: {
+    title: string;
+    honestNote: string;
+    closing: string;
+  };
+}
+
+export const FLOOR6_CONTENT: Floor6ContentFile = floor6ContentRaw as Floor6ContentFile;
+
+export type TowerQuestStatus = 'Belum dimulai' | 'Berjalan' | 'Selesai';
+
+export interface TowerRelicMeta {
+  id: string;
+  questId: string;
+  name: string;
+  source: string;
+  iconType: string;
+  description: string;
+}
+
+export const TOWER_RELICS: TowerRelicMeta[] = FLOOR6_CONTENT.quests.map((q, idx) => ({
+  id: `relic-${q.id}`,
+  questId: q.id,
+  name: q.relic,
+  source: `Menara Master — Lantai Menara ${idx + 1}: ${q.title}`,
+  iconType: `tower-${q.id}`,
+  description: q.summary,
+}));
+
+export function getTowerRelicId(questId: string): string {
+  return `relic-${questId}`;
+}
+
+export function getTowerQuestById(questId: string): Floor6Quest | undefined {
+  return FLOOR6_CONTENT.quests.find((q) => q.id === questId);
+}
+
+export function getTowerQuestStepProgress(
+  questId: string,
+  towerSteps: Record<string, Record<string, boolean>>
+): { ticked: number; total: number } {
+  const quest = getTowerQuestById(questId);
+  if (!quest) return { ticked: 0, total: 0 };
+  const stepMap = towerSteps[questId] || {};
+  const ticked = quest.steps.filter((s) => Boolean(stepMap[s.id])).length;
+  return { ticked, total: quest.steps.length };
+}
+
+export function getTowerQuestStatus(
+  questId: string,
+  towerSteps: Record<string, Record<string, boolean>>,
+  towerCompleted: string[]
+): TowerQuestStatus {
+  if (towerCompleted.includes(questId)) {
+    return 'Selesai';
+  }
+  const { ticked } = getTowerQuestStepProgress(questId, towerSteps);
+  if (ticked > 0) {
+    return 'Berjalan';
+  }
+  return 'Belum dimulai';
+}
+
+/**
+ * Ticking step m6s3 ("Pilih satu spesialisasi di aplikasi ini (tersimpan di perangkatmu)")
+ * is allowed only after a specialization is chosen.
+ */
+export function canTickTowerStep(
+  questId: string,
+  stepId: string,
+  specialization: string | null
+): boolean {
+  if (questId === 'm6' && stepId === 'm6s3') {
+    return Boolean(specialization && specialization.trim().length > 0);
+  }
+  return true;
+}
+
+/**
+ * Checks if a Floor 6 quest can be marked complete:
+ * - Not already completed
+ * - All steps for the quest are ticked
+ * - For m6, specialization must also be non-empty
+ */
+export function canCompleteTowerQuest(
+  questId: string,
+  towerSteps: Record<string, Record<string, boolean>>,
+  towerCompleted: string[],
+  specialization: string | null
+): boolean {
+  if (towerCompleted.includes(questId)) return false;
+  const quest = getTowerQuestById(questId);
+  if (!quest) return false;
+  if (questId === 'm6' && (!specialization || !specialization.trim())) {
+    return false;
+  }
+  const stepMap = towerSteps[questId] || {};
+  return quest.steps.every((s) => Boolean(stepMap[s.id]));
+}
+
+/**
+ * Cermin Puncak unlocks when all 7 Floor 6 quests are completed.
+ */
+export function canUnlockCerminPuncak(towerCompleted: string[]): boolean {
+  return FLOOR6_CONTENT.quests.every((q) => towerCompleted.includes(q.id));
+}
+
+/**
+ * Checks whether all 5 reflection prompts have non-empty answers.
+ */
+export function areAllReflectionsAnswered(reflections: Record<string, string>): boolean {
+  return FLOOR6_CONTENT.guardian.reflectionPrompts.every(
+    (p) => typeof reflections[p.id] === 'string' && reflections[p.id].trim().length > 0
+  );
+}
+
+export interface CertificateSummaryInput {
+  playerName: string;
+  level: number;
+  levelTitle: string;
+  roomsDefeated: number;
+  totalRooms: number;
+  bossesDefeated: number;
+  totalBosses: number;
+  relicsCount: number;
+  totalRelics: number;
+  towerQuestsCompleted: number;
+  totalTowerQuests: number;
+  specialization: string | null;
+  issuedDateFormatted: string;
+}
+
+/**
+ * Builds the plain-text summary for "Salin ringkasan" on the Certificate ("Piagam").
+ * Uses exact certificate.title, certificate.honestNote, and certificate.closing from floor6.content.json.
+ */
+export function formatCertificateSummaryText(input: CertificateSummaryInput): string {
+  const cert = FLOOR6_CONTENT.certificate;
+  const specText =
+    input.specialization && input.specialization.trim()
+      ? input.specialization.trim()
+      : 'Belum dipilih';
+  return [
+    `=== ${cert.title.toUpperCase()} ===`,
+    `Nama Petualang: ${input.playerName}`,
+    `Level & Gelar: Level ${input.level} — ${input.levelTitle}`,
+    `Ruang/Quest Dikalahkan: ${input.roomsDefeated}/${input.totalRooms}`,
+    `Boss Dikalahkan: ${input.bossesDefeated}/${input.totalBosses}`,
+    `Jumlah Relik: ${input.relicsCount}/${input.totalRelics}`,
+    `Quest Menara Selesai: ${input.towerQuestsCompleted}/${input.totalTowerQuests}`,
+    `Spesialisasi Pilihan: ${specText}`,
+    `Tanggal Terbit: ${input.issuedDateFormatted}`,
+    '',
+    cert.honestNote,
+    cert.closing,
+  ].join('\n');
+}
+

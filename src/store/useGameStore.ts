@@ -24,13 +24,18 @@ import {
   DOJO_CORRECT_XP,
   DOJO_DAILY_XP_CAP,
   ECHO_BONUS_XP,
+  FLOOR6_CONTENT,
   INITIAL_BOSS_POTIONS,
   QuestionStat,
   calculateQuestionWeight,
   calculateRoomCritBonusXP,
+  canCompleteTowerQuest,
+  canTickTowerStep,
   getInitialBossPotions,
   getTotalBossPhases,
   getTopicContent,
+  getTowerQuestById,
+  getTowerRelicId,
   getNextBossVariantIndex,
   recoverBossAfterFaint,
   updateQuestionStat,
@@ -72,6 +77,11 @@ export interface GameState {
   completedRooms: string[];
   defeatedBosses: string[];
   completedTowerQuests: string[];
+  towerSteps: Record<string, Record<string, boolean>>;
+  towerCompleted: string[];
+  reflections: Record<string, string>;
+  specialization: string | null;
+  certificateIssuedAt: string | null;
   relics: string[];
   badges: string[];
   quizBestScores: Record<string, number>;
@@ -82,6 +92,7 @@ export interface GameState {
   questionStats: Record<string, QuestionStat>;
   bossProgress: Record<number, BossProgressState>;
   dojoDailyXP: { date: string; xp: number };
+  evidenceNotes: Record<string | number, string>;
   studySessions: StudySession[];
   weeklyTargetHours: number;
   claimedWeeklyBonusWeeks: string[];
@@ -109,6 +120,7 @@ export interface GameState {
   closeScrollViewer: () => void;
   openBossBattle: (floorId: number) => void;
   closeBossBattle: () => void;
+  setEvidenceNote: (topicId: string | number, note: string) => void;
   recordQuizAttempt: (topicId: string, scorePercent: number) => void;
   recordQuestionAnswer: (questionId: string, isCorrect: boolean) => QuestionStat;
   awardDojoAnswerXP: (
@@ -141,6 +153,17 @@ export interface GameState {
   faintBossFight: (floorId: number) => void;
   resetBossFightProgress: (floorId?: number) => void;
   defeatBoss: (floorId: number) => { xpGained: number; leveledUp: boolean; newLevel: number };
+  toggleTowerStep: (questId: string, stepId: string) => boolean;
+  setSpecialization: (specialization: string | null) => void;
+  completeTowerQuest: (questId: string) => {
+    xpGained: number;
+    relicName: string | null;
+    relicId: string | null;
+    leveledUp: boolean;
+    newLevel: number;
+  };
+  setReflectionAnswer: (promptId: string, answer: string) => void;
+  issueCertificate: () => string;
   toggleTowerQuest: (questId: string) => { xpGained: number; leveledUp: boolean; newLevel: number };
   logStudySession: (input: LogSessionInput) => {
     session: StudySession;
@@ -185,6 +208,8 @@ function createInitialBossProgressMap(): Record<number, BossProgressState> {
     1: createDefaultBossProgressForFloor(1),
     2: createDefaultBossProgressForFloor(2),
     3: createDefaultBossProgressForFloor(3),
+    4: createDefaultBossProgressForFloor(4),
+    5: createDefaultBossProgressForFloor(5),
   };
 }
 
@@ -199,6 +224,11 @@ const INITIAL_PERSISTED_STATE = {
   completedRooms: [] as string[],
   defeatedBosses: [] as string[],
   completedTowerQuests: [] as string[],
+  towerSteps: {} as Record<string, Record<string, boolean>>,
+  towerCompleted: [] as string[],
+  reflections: {} as Record<string, string>,
+  specialization: null as string | null,
+  certificateIssuedAt: null as string | null,
   relics: [] as string[],
   badges: [] as string[],
   quizBestScores: {} as Record<string, number>,
@@ -209,6 +239,7 @@ const INITIAL_PERSISTED_STATE = {
   questionStats: {} as Record<string, QuestionStat>,
   bossProgress: createInitialBossProgressMap(),
   dojoDailyXP: { date: '', xp: 0 },
+  evidenceNotes: {} as Record<string | number, string>,
   studySessions: [] as StudySession[],
   weeklyTargetHours: DEFAULT_WEEKLY_TARGET_HOURS,
   claimedWeeklyBonusWeeks: [] as string[],
@@ -283,11 +314,13 @@ export function migrateStateToV3(rawState: Record<string, unknown>) {
     typeof rawBoss === 'object' &&
     ('clearedPhases' in rawBoss || 'potions' in rawBoss)
   ) {
-    // v2 flat BossProgressState -> move to floor 1 and initialize floor 2 & floor 3
+    // v2 flat BossProgressState -> move to floor 1 and initialize floors 2, 3, 4 & 5
     bossProgressMap = {
       1: normalizeSingleBossProgress(rawBoss, 1),
       2: normalizeSingleBossProgress(undefined, 2),
       3: normalizeSingleBossProgress(undefined, 3),
+      4: normalizeSingleBossProgress(undefined, 4),
+      5: normalizeSingleBossProgress(undefined, 5),
     };
   } else if (rawBoss && typeof rawBoss === 'object') {
     const rec = rawBoss as Record<string, unknown>;
@@ -295,16 +328,114 @@ export function migrateStateToV3(rawState: Record<string, unknown>) {
       1: normalizeSingleBossProgress(rec['1'] ?? rec[1], 1),
       2: normalizeSingleBossProgress(rec['2'] ?? rec[2], 2),
       3: normalizeSingleBossProgress(rec['3'] ?? rec[3], 3),
+      4: normalizeSingleBossProgress(rec['4'] ?? rec[4], 4),
+      5: normalizeSingleBossProgress(rec['5'] ?? rec[5], 5),
     };
   } else {
     bossProgressMap = createInitialBossProgressMap();
   }
+
+  const normalizedNotes: Record<string, string> = {};
+  if (
+    rawState.evidenceNotes &&
+    typeof rawState.evidenceNotes === 'object' &&
+    !Array.isArray(rawState.evidenceNotes)
+  ) {
+    for (const [k, v] of Object.entries(rawState.evidenceNotes as Record<string, unknown>)) {
+      if (typeof v === 'string') {
+        normalizedNotes[String(k)] = v.slice(0, 300);
+      }
+    }
+  }
+
+  // Normalize Floor 6 towerSteps
+  const normalizedTowerSteps: Record<string, Record<string, boolean>> = {};
+  if (
+    rawState.towerSteps &&
+    typeof rawState.towerSteps === 'object' &&
+    !Array.isArray(rawState.towerSteps)
+  ) {
+    for (const [qId, stepObj] of Object.entries(rawState.towerSteps as Record<string, unknown>)) {
+      if (stepObj && typeof stepObj === 'object' && !Array.isArray(stepObj)) {
+        normalizedTowerSteps[qId] = {};
+        for (const [sId, val] of Object.entries(stepObj as Record<string, unknown>)) {
+          if (val === true) {
+            normalizedTowerSteps[qId][sId] = true;
+          }
+        }
+      }
+    }
+  }
+
+  // Normalize towerCompleted and completedTowerQuests (also map legacy 'tower-1'..'tower-7' -> 'm1'..'m7')
+  const rawTowerList = [
+    ...(Array.isArray(rawState.towerCompleted) ? rawState.towerCompleted : []),
+    ...(Array.isArray(rawState.completedTowerQuests) ? rawState.completedTowerQuests : []),
+  ];
+  const towerSet = new Set<string>();
+  for (const item of rawTowerList) {
+    if (typeof item !== 'string') continue;
+    const legacyMatch = /^tower-(\d+)$/.exec(item);
+    const qId = legacyMatch ? `m${legacyMatch[1]}` : item;
+    if (FLOOR6_CONTENT.quests.some((q) => q.id === qId)) {
+      towerSet.add(qId);
+    }
+  }
+  const normalizedTowerCompleted = Array.from(towerSet);
+
+  // Ensure completed quests have all their steps ticked and their relics granted
+  const existingRelics = Array.isArray(rawState.relics)
+    ? (rawState.relics.filter((x) => typeof x === 'string') as string[])
+    : [];
+  const relicSet = new Set<string>(existingRelics);
+
+  for (const qId of normalizedTowerCompleted) {
+    const quest = getTowerQuestById(qId);
+    if (quest) {
+      normalizedTowerSteps[qId] = normalizedTowerSteps[qId] || {};
+      for (const s of quest.steps) {
+        normalizedTowerSteps[qId][s.id] = true;
+      }
+      relicSet.add(getTowerRelicId(qId));
+    }
+  }
+
+  // Normalize reflections
+  const normalizedReflections: Record<string, string> = {};
+  if (
+    rawState.reflections &&
+    typeof rawState.reflections === 'object' &&
+    !Array.isArray(rawState.reflections)
+  ) {
+    for (const [pId, val] of Object.entries(rawState.reflections as Record<string, unknown>)) {
+      if (typeof val === 'string') {
+        normalizedReflections[pId] = val.slice(0, 500);
+      }
+    }
+  }
+
+  const normalizedSpecialization =
+    typeof rawState.specialization === 'string' && rawState.specialization.trim().length > 0
+      ? rawState.specialization.trim()
+      : null;
+
+  const normalizedCertificateIssuedAt =
+    typeof rawState.certificateIssuedAt === 'string' && rawState.certificateIssuedAt.trim().length > 0
+      ? rawState.certificateIssuedAt
+      : null;
 
   return {
     ...INITIAL_PERSISTED_STATE,
     ...rawState,
     completedRooms,
     spellsUnlocked: Array.from(derivedSpells),
+    relics: Array.from(relicSet),
+    completedTowerQuests: normalizedTowerCompleted,
+    towerCompleted: normalizedTowerCompleted,
+    towerSteps: normalizedTowerSteps,
+    reflections: normalizedReflections,
+    specialization: normalizedSpecialization,
+    certificateIssuedAt: normalizedCertificateIssuedAt,
     quizBestScores: { ...prevBestScores },
     bestScoreByTopic: { ...prevBestScores },
     questionStats:
@@ -312,6 +443,7 @@ export function migrateStateToV3(rawState: Record<string, unknown>) {
         ? (rawState.questionStats as Record<string, QuestionStat>)
         : {},
     bossProgress: bossProgressMap,
+    evidenceNotes: normalizedNotes,
     version: CURRENT_VERSION,
   };
 }
@@ -463,6 +595,25 @@ export const useGameStore = create<GameState>()(
 
       closeBossBattle: () => {
         set({ selectedBossFloorId: null });
+      },
+
+      setEvidenceNote: (topicId: string | number, note: string) => {
+        const state = get();
+        const safeNote = String(note ?? '').slice(0, 300);
+        const keyStr = String(topicId);
+        const nextNotes: Record<string | number, string> = {
+          ...state.evidenceNotes,
+          [keyStr]: safeNote,
+        };
+        if (typeof topicId === 'number') {
+          nextNotes[`topic-${topicId}`] = safeNote;
+        } else if (/^topic-(\d+)$/.test(keyStr)) {
+          const numPart = keyStr.replace('topic-', '');
+          nextNotes[numPart] = safeNote;
+        }
+        set({
+          evidenceNotes: nextNotes,
+        });
       },
 
       recordQuizAttempt: (topicId: string, scorePercent: number) => {
@@ -836,7 +987,7 @@ export const useGameStore = create<GameState>()(
           badges: nextBadges,
           relics: nextRelics,
           bossProgress:
-            floorId === 1 || floorId === 2 || floorId === 3
+            floorId >= 1 && floorId <= 5
               ? {
                   ...state.bossProgress,
                   [floorId]: {
@@ -860,14 +1011,161 @@ export const useGameStore = create<GameState>()(
         return { xpGained, leveledUp, newLevel };
       },
 
+      toggleTowerStep: (questId: string, stepId: string) => {
+        const state = get();
+        if (state.towerCompleted.includes(questId)) {
+          return false;
+        }
+        const quest = getTowerQuestById(questId);
+        if (!quest || !quest.steps.some((s) => s.id === stepId)) {
+          return false;
+        }
+        const currentQuestSteps = state.towerSteps[questId] || {};
+        const isCurrentlyTicked = Boolean(currentQuestSteps[stepId]);
+
+        if (!isCurrentlyTicked && !canTickTowerStep(questId, stepId, state.specialization)) {
+          return false;
+        }
+
+        const nextQuestSteps = { ...currentQuestSteps };
+        if (isCurrentlyTicked) {
+          delete nextQuestSteps[stepId];
+        } else {
+          nextQuestSteps[stepId] = true;
+        }
+
+        set({
+          towerSteps: {
+            ...state.towerSteps,
+            [questId]: nextQuestSteps,
+          },
+        });
+        return !isCurrentlyTicked;
+      },
+
+      setSpecialization: (specialization: string | null) => {
+        const state = get();
+        const cleanSpec =
+          typeof specialization === 'string' && specialization.trim().length > 0
+            ? specialization.trim()
+            : null;
+
+        // If specialization is cleared while m6 is not yet completed, untick m6s3
+        let nextTowerSteps = state.towerSteps;
+        if (!cleanSpec && !state.towerCompleted.includes('m6') && state.towerSteps.m6?.m6s3) {
+          const m6Steps = { ...state.towerSteps.m6 };
+          delete m6Steps.m6s3;
+          nextTowerSteps = {
+            ...state.towerSteps,
+            m6: m6Steps,
+          };
+        }
+
+        set({
+          specialization: cleanSpec,
+          towerSteps: nextTowerSteps,
+        });
+      },
+
+      completeTowerQuest: (questId: string) => {
+        const state = get();
+        const quest = getTowerQuestById(questId);
+        if (
+          !quest ||
+          !canCompleteTowerQuest(
+            questId,
+            state.towerSteps,
+            state.towerCompleted,
+            state.specialization
+          )
+        ) {
+          return {
+            xpGained: 0,
+            relicName: null,
+            relicId: null,
+            leveledUp: false,
+            newLevel: calculateLevelFromXP(state.xp),
+          };
+        }
+
+        const xpGained = quest.xp || TOWER_QUEST_XP;
+        const oldLevel = calculateLevelFromXP(state.xp);
+        const newXP = state.xp + xpGained;
+        const newLevel = calculateLevelFromXP(newXP);
+        const leveledUp = newLevel > oldLevel;
+        const nextStreakInfo = computeNextStreak(state.streak, state.lastActiveDate);
+
+        const relicId = getTowerRelicId(quest.id);
+        const nextRelics = state.relics.includes(relicId)
+          ? state.relics
+          : [...state.relics, relicId];
+
+        const nextCompleted = state.towerCompleted.includes(quest.id)
+          ? state.towerCompleted
+          : [...state.towerCompleted, quest.id];
+
+        set({
+          xp: newXP,
+          towerCompleted: nextCompleted,
+          completedTowerQuests: nextCompleted,
+          relics: nextRelics,
+          streak: nextStreakInfo.streak,
+          lastActiveDate: nextStreakInfo.lastActiveDate,
+          levelUpModal: leveledUp
+            ? {
+                isOpen: true,
+                oldLevel,
+                newLevel,
+                newTitle: getTitleForLevel(newLevel),
+              }
+            : state.levelUpModal,
+        });
+
+        return {
+          xpGained,
+          relicName: quest.relic,
+          relicId,
+          leveledUp,
+          newLevel,
+        };
+      },
+
+      setReflectionAnswer: (promptId: string, answer: string) => {
+        const state = get();
+        const safeAnswer = String(answer ?? '').slice(0, 500);
+        set({
+          reflections: {
+            ...state.reflections,
+            [promptId]: safeAnswer,
+          },
+        });
+      },
+
+      issueCertificate: () => {
+        const state = get();
+        if (state.certificateIssuedAt) {
+          return state.certificateIssuedAt;
+        }
+        const nowIso = new Date().toISOString();
+        set({
+          certificateIssuedAt: nowIso,
+        });
+        return nowIso;
+      },
+
       toggleTowerQuest: (questId: string) => {
         const state = get();
-        const quest = TOWER_FLOOR.quests.find((q) => q.id === questId);
+        const legacyMatch = /^tower-(\d+)$/.exec(questId);
+        const normalizedId = legacyMatch ? `m${legacyMatch[1]}` : questId;
+        const quest =
+          getTowerQuestById(normalizedId) || TOWER_FLOOR.quests.find((q) => q.id === questId);
         if (!quest) {
           return { xpGained: 0, leveledUp: false, newLevel: calculateLevelFromXP(state.xp) };
         }
 
-        const alreadyDone = state.completedTowerQuests.includes(questId);
+        const alreadyDone =
+          state.towerCompleted.includes(normalizedId) ||
+          state.completedTowerQuests.includes(questId);
         if (alreadyDone) {
           return { xpGained: 0, leveledUp: false, newLevel: calculateLevelFromXP(state.xp) };
         }
@@ -879,9 +1177,17 @@ export const useGameStore = create<GameState>()(
         const leveledUp = newLevel > oldLevel;
         const nextStreakInfo = computeNextStreak(state.streak, state.lastActiveDate);
 
+        const nextCompleted = [...state.towerCompleted, normalizedId];
+        const relicId = getTowerRelicId(normalizedId);
+        const nextRelics = state.relics.includes(relicId)
+          ? state.relics
+          : [...state.relics, relicId];
+
         set({
           xp: newXP,
-          completedTowerQuests: [...state.completedTowerQuests, questId],
+          completedTowerQuests: nextCompleted,
+          towerCompleted: nextCompleted,
+          relics: nextRelics,
           streak: nextStreakInfo.streak,
           lastActiveDate: nextStreakInfo.lastActiveDate,
           levelUpModal: leveledUp
@@ -1021,6 +1327,11 @@ export const useGameStore = create<GameState>()(
             completedRooms: s.completedRooms,
             defeatedBosses: s.defeatedBosses,
             completedTowerQuests: s.completedTowerQuests,
+            towerSteps: s.towerSteps,
+            towerCompleted: s.towerCompleted,
+            reflections: s.reflections,
+            specialization: s.specialization,
+            certificateIssuedAt: s.certificateIssuedAt,
             relics: s.relics,
             badges: s.badges,
             quizBestScores: s.quizBestScores,
@@ -1031,6 +1342,7 @@ export const useGameStore = create<GameState>()(
             questionStats: s.questionStats,
             bossProgress: s.bossProgress,
             dojoDailyXP: s.dojoDailyXP,
+            evidenceNotes: s.evidenceNotes,
             studySessions: s.studySessions,
             weeklyTargetHours: s.weeklyTargetHours,
             claimedWeeklyBonusWeeks: s.claimedWeeklyBonusWeeks,
@@ -1104,6 +1416,11 @@ export const useGameStore = create<GameState>()(
         completedRooms: state.completedRooms,
         defeatedBosses: state.defeatedBosses,
         completedTowerQuests: state.completedTowerQuests,
+        towerSteps: state.towerSteps,
+        towerCompleted: state.towerCompleted,
+        reflections: state.reflections,
+        specialization: state.specialization,
+        certificateIssuedAt: state.certificateIssuedAt,
         relics: state.relics,
         badges: state.badges,
         quizBestScores: state.quizBestScores,
@@ -1114,6 +1431,7 @@ export const useGameStore = create<GameState>()(
         questionStats: state.questionStats,
         bossProgress: state.bossProgress,
         dojoDailyXP: state.dojoDailyXP,
+        evidenceNotes: state.evidenceNotes,
         studySessions: state.studySessions,
         weeklyTargetHours: state.weeklyTargetHours,
         claimedWeeklyBonusWeeks: state.claimedWeeklyBonusWeeks,
@@ -1137,6 +1455,16 @@ export const useGameStore = create<GameState>()(
             bossProgress: createInitialBossProgressMap(),
           };
         }
+      },
+      merge: (persistedState: unknown, currentState: GameState) => {
+        if (!persistedState || typeof persistedState !== 'object') {
+          return currentState;
+        }
+        const normalized = migrateStateToV3(persistedState as Record<string, unknown>);
+        return {
+          ...currentState,
+          ...normalized,
+        };
       },
     }
   )

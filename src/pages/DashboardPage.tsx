@@ -15,6 +15,7 @@ import {
   isFloorUnlocked,
 } from '../game/formulas';
 import { getWeakestTopics } from '../game/quizEngine';
+import { FLOOR6_CONTENT, getTopicContent, TOWER_RELICS } from '../game/spellbookEngine';
 import { AvatarSprite, BadgeSprite, RelicSprite } from '../components/PixelSprites';
 import { useSound } from '../hooks/useSound.js';
 
@@ -26,10 +27,13 @@ export const DashboardPage: React.FC = () => {
   const lastActiveDate = useGameStore((s) => s.lastActiveDate);
   const completedRooms = useGameStore((s) => s.completedRooms);
   const defeatedBosses = useGameStore((s) => s.defeatedBosses);
-  const completedTowerQuests = useGameStore((s) => s.completedTowerQuests);
+  const towerCompleted = useGameStore((s) => s.towerCompleted);
+  const specialization = useGameStore((s) => s.specialization);
+  const certificateIssuedAt = useGameStore((s) => s.certificateIssuedAt);
   const quizBestScores = useGameStore((s) => s.quizBestScores);
   const badges = useGameStore((s) => s.badges);
   const relics = useGameStore((s) => s.relics);
+  const evidenceNotes = useGameStore((s) => s.evidenceNotes);
   const selectFloor = useGameStore((s) => s.selectFloor);
   const openRoomBattle = useGameStore((s) => s.openRoomBattle);
   const setView = useGameStore((s) => s.setView);
@@ -39,6 +43,8 @@ export const DashboardPage: React.FC = () => {
   const activeStreak = getDisplayStreak(streak, lastActiveDate);
   const weeksStats = calculateWeeksConquered(completedRooms);
   const weakestTopics = getWeakestTopics(quizBestScores, 6);
+  const guildFloor = FLOORS.find((f) => f.id === 5);
+  const totalRelicsAvailable = ALL_RELICS.length + TOWER_RELICS.length;
 
   return (
     <div className="w-full max-w-6xl mx-auto px-3 pb-14 space-y-6">
@@ -58,6 +64,15 @@ export const DashboardPage: React.FC = () => {
               </div>
               <div className="font-vt text-lg text-[#b3aad1] tabular-nums">
                 Total EXP: {xp} XP · Target Lv.{levelInfo.level + 1}: {levelInfo.nextLevelXP} XP
+              </div>
+              <div className="font-vt text-lg text-[#f5b935] mt-0.5">
+                Spesialisasi Pilihan:{' '}
+                <strong className="text-[#f4f1ea]">
+                  {specialization || 'Belum dipilih (Pilih di Quest #6 Menara Master)'}
+                </strong>
+                {certificateIssuedAt ? (
+                  <span className="ml-2 text-[#38d864]">· ★ Piagam Diterbitkan</span>
+                ) : null}
               </div>
             </div>
           </div>
@@ -84,7 +99,7 @@ export const DashboardPage: React.FC = () => {
             <div className="bg-[#120d26] border-2 border-[#5c4e99] px-3 py-2 text-center">
               <div className="font-pixel text-[9px] text-[#b3aad1]">RELIK PIXEL</div>
               <div className="font-pixel text-sm text-[#3ac5eb] mt-1 tabular-nums">
-                {relics.length}/{ALL_RELICS.length}
+                {relics.length}/{totalRelicsAvailable}
               </div>
             </div>
           </div>
@@ -294,25 +309,37 @@ export const DashboardPage: React.FC = () => {
           })}
 
           {/* Floor 6: Menara Master Progress */}
-          <div className="bg-[#120d26] border-2 border-[#9b5de5] p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="bg-[#120d26] border-2 border-[#f5b935] p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div className="flex-1">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
                 <span className="font-pixel text-xs text-[#f4f1ea]">
                   {TOWER_FLOOR.title} (Road to Master)
                 </span>
                 <span className="font-vt text-lg text-[#38d864] tabular-nums">
-                  {completedTowerQuests.length}/{TOWER_FLOOR.quests.length} Quest Selesai
+                  {towerCompleted.length}/{FLOOR6_CONTENT.quests.length} Quest Selesai
                 </span>
               </div>
-              <div className="w-full h-3.5 bg-[#0d0a1a] border border-[#9b5de5] p-0.5">
+              <div className="w-full h-3.5 bg-[#0d0a1a] border border-[#f5b935] p-0.5">
                 <div
-                  className="h-full bg-[#9b5de5] transition-all duration-300"
+                  className="h-full bg-[#f5b935] transition-all duration-300"
                   style={{
                     width: `${Math.round(
-                      (completedTowerQuests.length / TOWER_FLOOR.quests.length) * 100
+                      (towerCompleted.length / FLOOR6_CONTENT.quests.length) * 100
                     )}%`,
                   }}
                 />
+              </div>
+              <div className="font-vt text-base text-[#b3aad1] mt-1">
+                Status Pintu Menara:{' '}
+                <span
+                  className={
+                    defeatedBosses.length >= 5 ? 'text-[#38d864]' : 'text-[#f5b935]'
+                  }
+                >
+                  {defeatedBosses.length >= 5
+                    ? 'Terbuka ✓ (5/5 Boss Dikalahkan)'
+                    : `Terkunci — Boss dikalahkan: ${defeatedBosses.length}/5`}
+                </span>
               </div>
             </div>
             <button
@@ -321,7 +348,7 @@ export const DashboardPage: React.FC = () => {
                 playClick();
                 selectFloor(6);
               }}
-              className="pixel-btn px-3 py-1.5 bg-[#9b5de5] text-[#0d0a1a] font-pixel text-[10px] self-start md:self-center whitespace-nowrap"
+              className="pixel-btn px-3 py-1.5 bg-[#f5b935] text-[#0d0a1a] font-pixel text-[10px] self-start md:self-center whitespace-nowrap"
             >
               KE MENARA
             </button>
@@ -382,7 +409,163 @@ export const DashboardPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Section 5: Quick Badges & Relics Preview */}
+      {/* Section 5: Portofolio Bukti (Floor 5 Guild Quests & Floor 6 Menara Master Evidence Notes) */}
+      {guildFloor && (
+        <section
+          aria-label="Portofolio bukti"
+          className="pixel-box p-4 sm:p-6 border-[#fb923c]"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-[#fb923c] pb-3 mb-4">
+            <div>
+              <h2 className="font-pixel text-sm text-[#fb923c]">
+                PORTOFOLIO BUKTI (GUILD HALL LANTAI 5 &amp; MENARA MASTER LANTAI 6)
+              </h2>
+              <p className="font-vt text-xl text-[#f4f1ea]">
+                Catatan bukti nyata dari 8 Guild Quest (Topik #21–#28) dan 7 Quest Menara Master (m1–m7).
+              </p>
+            </div>
+            <span className="font-vt text-base text-[#b3aad1] bg-[#120d26] border border-[#fb923c] px-2.5 py-1">
+              Catatan ini hanya tersimpan di browser ini.
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {guildFloor.topics.map((topic) => {
+              const isCompleted = completedRooms.includes(topic.id);
+              const note = (
+                evidenceNotes[topic.id] ||
+                evidenceNotes[String(topic.number)] ||
+                ''
+              ).trim();
+              const topicContent = getTopicContent(topic.id);
+              const relicName = topicContent?.relic || topic.relic?.name || 'Relik Guild';
+
+              return (
+                <div
+                  key={topic.id}
+                  className={`p-3.5 border-2 flex flex-col justify-between gap-2.5 ${
+                    isCompleted
+                      ? 'bg-[#132924] border-[#38d864]'
+                      : 'bg-[#120d26] border-[#fb923c]'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="font-pixel text-[9px] text-[#fb923c]">
+                        QUEST #{topic.number} · RELIK: {relicName.toUpperCase()}
+                      </span>
+                      <span
+                        className={`font-pixel text-[8px] px-1.5 py-0.5 border ${
+                          isCompleted
+                            ? 'bg-[#0a1714] text-[#38d864] border-[#38d864]'
+                            : 'bg-[#0d0a1a] text-[#f5b935] border-[#f5b935]'
+                        }`}
+                      >
+                        {isCompleted ? 'SELESAI ✓' : 'TERBUKA'}
+                      </span>
+                    </div>
+
+                    <div className="font-pixel text-xs text-[#f4f1ea] leading-snug">
+                      {topic.name}
+                    </div>
+
+                    <div className="mt-2 bg-[#0d0a1a] border border-[#5c4e99] p-2.5">
+                      <div className="font-pixel text-[8px] text-[#f5b935] mb-1">
+                        CATATAN BUKTI:
+                      </div>
+                      {note ? (
+                        <p className="font-vt text-lg text-[#f4f1ea] break-words leading-snug">
+                          {note}
+                        </p>
+                      ) : (
+                        <p className="font-vt text-base text-[#64748b] italic">
+                          Belum ada catatan bukti ({topicContent?.evidenceHint || 'opsional'}).
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playClick();
+                      selectFloor(5);
+                      openRoomBattle(topic.id);
+                    }}
+                    className="pixel-btn w-full py-1.5 bg-[#1f193d] text-[#f4f1ea] font-pixel text-[9px]"
+                  >
+                    {note ? 'UBAH CATATAN / BUKA QUEST →' : 'ISI CATATAN BUKTI DI GUILD HALL →'}
+                  </button>
+                </div>
+              );
+            })}
+
+            {FLOOR6_CONTENT.quests.map((quest, idx) => {
+              const isCompleted = towerCompleted.includes(quest.id);
+              const note = (evidenceNotes[quest.id] || '').trim();
+              return (
+                <div
+                  key={quest.id}
+                  className={`p-3.5 border-2 flex flex-col justify-between gap-2.5 ${
+                    isCompleted
+                      ? 'bg-[#132924] border-[#38d864]'
+                      : 'bg-[#120d26] border-[#f5b935]'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="font-pixel text-[9px] text-[#f5b935]">
+                        MENARA #{idx + 1} ({quest.id.toUpperCase()}) · RELIK: {quest.relic.toUpperCase()}
+                      </span>
+                      <span
+                        className={`font-pixel text-[8px] px-1.5 py-0.5 border ${
+                          isCompleted
+                            ? 'bg-[#0a1714] text-[#38d864] border-[#38d864]'
+                            : 'bg-[#0d0a1a] text-[#f5b935] border-[#f5b935]'
+                        }`}
+                      >
+                        {isCompleted ? 'SELESAI ✓' : 'MENARA'}
+                      </span>
+                    </div>
+
+                    <div className="font-pixel text-xs text-[#f4f1ea] leading-snug">
+                      {quest.title}
+                    </div>
+
+                    <div className="mt-2 bg-[#0d0a1a] border border-[#5c4e99] p-2.5">
+                      <div className="font-pixel text-[8px] text-[#f5b935] mb-1">
+                        CATATAN BUKTI:
+                      </div>
+                      {note ? (
+                        <p className="font-vt text-lg text-[#f4f1ea] break-words leading-snug">
+                          {note}
+                        </p>
+                      ) : (
+                        <p className="font-vt text-base text-[#64748b] italic">
+                          Belum ada catatan bukti ({quest.evidenceHint}).
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playClick();
+                      selectFloor(6);
+                    }}
+                    className="pixel-btn w-full py-1.5 bg-[#1f193d] text-[#f5b935] font-pixel text-[9px]"
+                  >
+                    {note ? 'UBAH CATATAN DI MENARA MASTER →' : 'BUKA MENARA MASTER →'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Section 6: Quick Badges & Relics Preview */}
       <section aria-label="Koleksi Lencana dan Relik Singkat" className="pixel-box p-4 sm:p-6">
         <div className="flex items-center justify-between gap-2 mb-4">
           <h2 className="font-pixel text-xs sm:text-sm text-[#f5b935]">
@@ -417,10 +600,36 @@ export const DashboardPage: React.FC = () => {
               </div>
             );
           })}
-          {ALL_RELICS.filter((r) => relics.includes(r.id)).map((r) => (
+          {ALL_RELICS.filter((r) => relics.includes(r.id)).map((r) => {
+            const gqNum = r.id.startsWith('relic-gq-')
+              ? Number(r.id.replace('relic-gq-', ''))
+              : null;
+            const gqRelicName = gqNum ? getTopicContent(`topic-${gqNum}`)?.relic : undefined;
+            const displayRelicName =
+              r.id === 'relic-boss-2'
+                ? 'Daun Emas'
+                : r.id === 'relic-boss-3'
+                ? 'Inti Neuron'
+                : r.id === 'relic-boss-4'
+                ? 'Chip Edge'
+                : r.id === 'relic-boss-5'
+                ? 'Stopwatch Perak'
+                : gqRelicName || r.name;
+
+            return (
+              <div
+                key={r.id}
+                className="flex items-center gap-2 px-3 py-2 border-2 bg-[#132924] border-[#38d864] text-[#f4f1ea]"
+              >
+                <RelicSprite iconType={r.iconType} size={24} />
+                <span className="font-vt text-lg">{displayRelicName}</span>
+              </div>
+            );
+          })}
+          {TOWER_RELICS.filter((r) => relics.includes(r.id)).map((r) => (
             <div
               key={r.id}
-              className="flex items-center gap-2 px-3 py-2 border-2 bg-[#132924] border-[#38d864] text-[#f4f1ea]"
+              className="flex items-center gap-2 px-3 py-2 border-2 bg-[#241b2f] border-[#f5b935] text-[#f4f1ea]"
             >
               <RelicSprite iconType={r.iconType} size={24} />
               <span className="font-vt text-lg">{r.name}</span>

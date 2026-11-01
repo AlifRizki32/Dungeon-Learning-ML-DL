@@ -1,0 +1,322 @@
+{
+  "reviewStatus": "needs-human-review",
+  "floor": 4,
+  "topics": [
+    {
+      "topicId": 18,
+      "spell": {
+        "id": "s18",
+        "name": "Mantra Pengiriman",
+        "formulas": [
+          "reproduksibilitas: catat versi kode + versi data + versi model + lingkungan + seed",
+          "pengemasan: simpan bobot model DAN langkah preprocessing dalam satu paket",
+          "throughput ≈ 1.000 ÷ latensi rata-rata (ms) permintaan per detik (1 pekerja sekuensial)",
+          "data drift: distribusi masukan di produksi bergeser dari distribusi data latih",
+          "concept drift: hubungan antara masukan dan target berubah seiring waktu"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Model yang bekerja di notebook belum tentu siap produksi. Agar hasil eksperimen bisa direproduksi, catat versi kode, versi dataset, versi bobot model, dependensi lingkungan, dan random seed.",
+          "Saat men-deploy model sebagai layanan (misalnya lewat REST API di dalam kontainer), kemas langkah preprocessing (scaler, encoder) bersama bobot model. Jika preprocessing di produksi berbeda dari saat pelatihan, terjadi training-serving skew.",
+          "Untuk satu pekerja yang memproses satu permintaan per waktu secara sekuensial, throughput maksimum sekitar 1.000 dibagi latensi rata-rata dalam milidetik.",
+          "Setelah model berjalan, pantau latensi, tingkat galat, serta pergeseran data. Data drift terjadi saat distribusi fitur masukan berubah; concept drift terjadi saat hubungan antara fitur dan label yang benar berubah."
+        ],
+        "workedExample": "Satu pekerja API membutuhkan rata-rata 50 ms untuk menyelesaikan satu prediksi. Throughput maksimum satu pekerja sekuensial ≈ 1.000 ÷ 50 = 20 permintaan per detik.",
+        "commonMistake": "Hanya menyimpan bobot model tanpa menyimpan parameter scaler atau encoder dari data latih, sehingga masukan di produksi diproses dengan cara yang berbeda (training-serving skew)."
+      },
+      "references": [
+        { "label": "Made With ML: MLOps Course (Goku Mohandas)", "url": "https://madewithml.com" },
+        { "label": "Google Developers: Machine Learning Crash Course — Production ML Systems (cari di developers.google.com/machine-learning)", "url": null }
+      ],
+      "quiz": [
+        {
+          "id": "t18q1",
+          "difficulty": "mudah",
+          "question": "Satu pekerja layanan model membutuhkan waktu rata-rata 50 ms per permintaan (diproses satu per satu). Berapa throughput maksimum pekerja tersebut?",
+          "options": ["10 permintaan/detik", "20 permintaan/detik", "50 permintaan/detik", "200 permintaan/detik"],
+          "correctIndex": 1,
+          "explanation": "1 detik = 1.000 ms. Dalam 1.000 ms, satu pekerja sekuensial dapat menyelesaikan 1.000 ÷ 50 = 20 permintaan."
+        },
+        {
+          "id": "t18q2",
+          "difficulty": "sedang",
+          "question": "Saat pelatihan, fitur dinormalisasi dengan rata-rata dan simpangan baku data latih. Saat deployment, API langsung memasukkan angka mentah ke model tanpa normalisasi. Masalah ini disebut...",
+          "options": ["Overfitting", "Training-serving skew (ketidakcocokan antara pelatihan dan penyajian)", "Vanishing gradient", "Underfitting"],
+          "correctIndex": 1,
+          "explanation": "Masukan saat inferensi tidak melewati transformasi yang sama dengan saat pelatihan. Solusinya adalah mengemas scaler dan model dalam satu pipeline."
+        },
+        {
+          "id": "t18q3",
+          "difficulty": "sedang",
+          "question": "Sensor suhu pabrik diganti dengan merek baru yang memiliki offset kalibrasi berbeda, sehingga sebaran nilai masukan ke model bergeser meski kondisi mesin sebenarnya sama. Ini contoh dari...",
+          "options": ["Data drift (pergeseran distribusi masukan)", "Exploding gradient", "Data leakage", "Overfitting pada data uji"],
+          "correctIndex": 0,
+          "explanation": "Distribusi fitur masukan P(X) berubah dibanding saat pelatihan walaupun hubungan fisik sebenarnya belum berubah."
+        },
+        {
+          "id": "t18q4",
+          "difficulty": "mudah",
+          "question": "Apa yang perlu dicatat agar sebuah model hasil eksperimen dapat direproduksi kembali dengan tepat?",
+          "options": ["Hanya nilai akurasi akhirnya", "Hanya nama file bobot model", "Versi kode, versi data, konfigurasi/hyperparameter, dependensi lingkungan, dan seed", "Hanya ukuran layar komputer"],
+          "correctIndex": 2,
+          "explanation": "Kode yang sama pada data atau versi pustaka yang berbeda dapat menghasilkan model yang berbeda."
+        },
+        {
+          "id": "t18q5",
+          "difficulty": "sedang",
+          "question": "Mengapa memantau latensi dan tingkat galat HTTP saja belum cukup untuk layanan ML di produksi?",
+          "options": ["Karena layanan ML bisa tetap merespons cepat dengan kode 200 OK sambil mengeluarkan prediksi yang makin meleset akibat drift", "Karena model ML tidak pernah menggunakan jaringan", "Karena latensi selalu nol di produksi", "Karena kode 200 OK berarti akurasi pasti 100%"],
+          "correctIndex": 0,
+          "explanation": "Kesehatan sistem (uptime, latensi) tidak menjamin kualitas prediksi; distribusi masukan dan keluaran model juga harus dipantau."
+        }
+      ]
+    },
+    {
+      "topicId": 19,
+      "miniLab": "quant",
+      "spell": {
+        "id": "s19",
+        "name": "Mantra Kuantisasi",
+        "formulas": [
+          "ukuran bobot = jumlah parameter × byte per parameter (1 KB = 1.000 byte)",
+          "float32 = 4 byte per parameter; int8 = 1 byte per parameter (hemat 4×)",
+          "pruning: memangkas bobot atau kanal yang kontribusinya kecil",
+          "mikrokontroler: bobot model disimpan di flash, tensor arena (aktivasi kerja) di RAM"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Perangkat embedded dan mikrokontroler memiliki memori (flash dan RAM) serta anggaran daya yang sangat ketat. Model harus dikecilkan agar muat dan berjalan cepat di perangkat.",
+          "Kuantisasi mengubah representasi angka dari presisi tinggi (misalnya float32, 4 byte) ke presisi lebih rendah (misalnya int8, 1 byte). Langkah ini memangkas ukuran bobot menjadi seperempatnya dan mempercepat komputasi integer.",
+          "Pruning memangkas bobot atau filter yang kurang penting. Mengurangi jumlah kanal/filter (structured pruning) langsung mengecilkan ukuran tensor dan jumlah operasi.",
+          "Pada runtime seperti TensorFlow Lite Micro, bobot model yang bersifat tetap disimpan di memori flash, sedangkan tensor arena untuk menampung aktivasi sementara saat inferensi dialokasikan di RAM."
+        ],
+        "workedExample": "Model dengan 50.000 parameter dalam float32 membutuhkan 50.000 × 4 = 200.000 byte = 200 KB. Setelah kuantisasi ke int8 (1 byte), ukurannya menjadi 50.000 × 1 = 50.000 byte = 50 KB.",
+        "commonMistake": "Hanya memeriksa apakah ukuran file model muat di memori flash, tetapi lupa memeriksa apakah tensor arena (aktivasi saat inferensi) muat di RAM."
+      },
+      "references": [
+        { "label": "Harvard TinyML & Efficient Deep Learning Computing (mit-han-lab / tinyml.org)", "url": "https://tinyml.org" },
+        { "label": "Dokumentasi LiteRT / TensorFlow Lite Micro (cari 'LiteRT for Microcontrollers')", "url": null }
+      ],
+      "quiz": [
+        {
+          "id": "t19q1",
+          "difficulty": "mudah",
+          "question": "Sebuah model memiliki 50.000 parameter dalam format float32 (4 byte per parameter). Berapa ukuran bobotnya dalam KB (1 KB = 1.000 byte)?",
+          "options": ["50 KB", "100 KB", "200 KB", "400 KB"],
+          "correctIndex": 2,
+          "explanation": "50.000 × 4 byte = 200.000 byte = 200 KB."
+        },
+        {
+          "id": "t19q2",
+          "difficulty": "mudah",
+          "question": "Model 50.000 parameter tadi dikuantisasi dari float32 (4 byte) menjadi int8 (1 byte). Berapa ukuran bobotnya sekarang?",
+          "options": ["25 KB", "50 KB", "100 KB", "200 KB"],
+          "correctIndex": 1,
+          "explanation": "50.000 × 1 byte = 50.000 byte = 50 KB (seperempat dari 200 KB)."
+        },
+        {
+          "id": "t19q3",
+          "difficulty": "sedang",
+          "question": "Perangkat mikrokontroler memiliki 256 KB flash dan 64 KB RAM. Model int8 berukuran 80 KB dan membutuhkan tensor arena 48 KB saat inferensi. Apakah model dapat dijalankan?",
+          "options": ["Ya: bobot 80 KB muat di flash (256 KB) dan arena 48 KB muat di RAM (64 KB)", "Tidak: bobot 80 KB melebihi RAM 64 KB", "Tidak: flash harus lebih kecil dari model", "Ya, tetapi hanya jika RAM dikosongkan dari tensor arena"],
+          "correctIndex": 0,
+          "explanation": "Bobot model disimpan di flash (80 KB ≤ 256 KB) dan tensor arena dialokasikan di RAM (48 KB ≤ 64 KB)."
+        },
+        {
+          "id": "t19q4",
+          "difficulty": "sedang",
+          "question": "Apa tujuan utama post-training quantization ke int8 pada perangkat edge?",
+          "options": ["Menambah jumlah lapisan jaringan", "Mengurangi ukuran model sekitar 4× dan mempercepat inferensi dengan operasi integer, dengan sedikit kompromi akurasi", "Menghapus kebutuhan data validasi", "Mengubah masalah klasifikasi menjadi clustering"],
+          "correctIndex": 1,
+          "explanation": "Mengganti float32 (4 byte) menjadi int8 (1 byte) menghemat memori 4× dan memanfaatkan instruksi integer yang lebih ringan di chip embedded."
+        },
+        {
+          "id": "t19q5",
+          "difficulty": "sedang",
+          "question": "Mengapa kita perlu menguji ulang akurasi model pada data validasi/uji setelah melakukan kuantisasi atau pruning?",
+          "options": ["Karena kompresi dapat menurunkan presisi representasi sehingga akurasi pada kelas tertentu bisa turun", "Karena kuantisasi selalu membuat akurasi naik menjadi 100%", "Karena ukuran file hanya bisa dihitung lewat data uji", "Karena model terkuantisasi tidak bisa melakukan inferensi"],
+          "correctIndex": 0,
+          "explanation": "Pembulatan bobot/aktivasi ke int8 atau pemangkasan kanal dapat menggeser batas keputusan; evaluasi memastikan penurunan akurasi tetap dalam batas yang dapat diterima."
+        }
+      ]
+    },
+    {
+      "topicId": 20,
+      "miniLab": "latency",
+      "spell": {
+        "id": "s20",
+        "name": "Mantra Proyek",
+        "formulas": [
+          "latensi total = t_akuisisi + t_prapemrosesan + t_inferensi + t_pengiriman",
+          "syarat waktu nyata (real-time): latensi total ≤ batas waktu (deadline)",
+          "siklus iterasi proyek: mulai dari baseline sederhana ujung-ke-ujung → ukur bottleneck → perbaiki bagian terlemah",
+          "ketahanan sistem: tangani sensor gagal / nilai hilang / koneksi putus dengan fallback aman"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Proyek AI/IoT end-to-end menghubungkan pembacaan sensor, pra-pemrosesan sinyal, inferensi model, hingga pengiriman atau aksi aktuator. Keberhasilan sistem ditentukan oleh keseluruhan rantai, bukan hanya skor model di kertas.",
+          "Anggaran latensi (latency budget) menjumlahkan waktu setiap tahap: akuisisi sensor + pra-pemrosesan + inferensi + pengiriman/aksi. Sistem memenuhi syarat waktu nyata jika totalnya tidak melebihi batas waktu aplikasi.",
+          "Bangun sistem ujung-ke-ujung paling sederhana (baseline) lebih dulu agar seluruh pipa berjalan dari sensor sampai layar/aktuator, baru tingkatkan bagian yang terbukti menjadi penghambat (bottleneck).",
+          "Di dunia nyata, sensor bisa mengirim noise dan jaringan bisa terputus. Siapkan validasi rentang masukan, log yang jelas, dan mode fallback agar perangkat tidak macet."
+        ],
+        "workedExample": "Akuisisi sensor 20 ms, pra-pemrosesan 5 ms, inferensi 35 ms, pengiriman 40 ms. Latensi total = 20 + 5 + 35 + 40 = 100 ms. Jika batas waktu 120 ms, sistem aman dengan sisa 20 ms.",
+        "commonMistake": "Menghabiskan berminggu-minggu memperbesar model di laptop tanpa pernah mengukur latensi total dan konsumsi memori di perangkat target."
+      },
+      "references": [
+        { "label": "Designing Machine Learning Systems (Chip Huyen — ringkasan konsep di chiphuyen.com)", "url": "https://huyenchip.com" },
+        { "label": "Harvard TinyML: Deploying TinyML (edX / tinyml.org)", "url": "https://tinyml.org" }
+      ],
+      "quiz": [
+        {
+          "id": "t20q1",
+          "difficulty": "mudah",
+          "question": "Dalam satu siklus deteksi: akuisisi sensor 20 ms, pra-pemrosesan 5 ms, inferensi 35 ms, dan pengiriman 40 ms. Berapa latensi total ujung-ke-ujung?",
+          "options": ["60 ms", "80 ms", "100 ms", "120 ms"],
+          "correctIndex": 2,
+          "explanation": "20 + 5 + 35 + 40 = 100 ms."
+        },
+        {
+          "id": "t20q2",
+          "difficulty": "sedang",
+          "question": "Batas waktu respons sistem adalah 100 ms. Saat diukur: akuisisi 30 ms, pra-pemrosesan 10 ms, inferensi 45 ms, pengiriman 35 ms. Bagaimana status anggaran latensinya?",
+          "options": ["Aman, sisa 20 ms", "Tepat 100 ms", "Melebihi batas 20 ms (total 120 ms)", "Melebihi batas 45 ms"],
+          "correctIndex": 2,
+          "explanation": "Total = 30 + 10 + 45 + 35 = 120 ms, sehingga melebihi batas 100 ms sebesar 20 ms."
+        },
+        {
+          "id": "t20q3",
+          "difficulty": "sedang",
+          "question": "Pada sistem dengan akuisisi 15 ms, pra-pemrosesan 5 ms, inferensi 10 ms, dan pengiriman jaringan 170 ms (total 200 ms), langkah mana yang paling berdampak untuk memangkas latensi ke bawah 80 ms?",
+          "options": ["Mengurangi waktu pra-pemrosesan dari 5 ms menjadi 4 ms", "Menjalankan keputusan di perangkat (edge) atau memangkas beban pengiriman jaringan yang memakan 170 ms", "Mengganti model 10 ms dengan model 9 ms", "Menghapus pembacaan sensor"],
+          "correctIndex": 1,
+          "explanation": "Tahap pengiriman (170 ms) adalah bottleneck utama. Sekalipun inferensi menjadi 0 ms, totalnya masih 190 ms jika pengiriman tidak dioptimalkan."
+        },
+        {
+          "id": "t20q4",
+          "difficulty": "mudah",
+          "question": "Urutan kerja paling sehat saat membangun proyek AI + IoT end-to-end pertama kali adalah...",
+          "options": ["Melatih model raksasa selama 2 bulan sebelum menyentuh sensor", "Membangun pipa ujung-ke-ujung sederhana (sensor → baseline → tampilan/aksi) lebih dulu, lalu mengiterasi bagian yang kurang", "Membeli server terbesar tanpa menguji format data sensor", "Menulis laporan akhir sebelum ada kode yang berjalan"],
+          "correctIndex": 1,
+          "explanation": "Pipa ujung-ke-ujung awal mengungkap masalah integrasi, format data, dan latensi sejak dini."
+        },
+        {
+          "id": "t20q5",
+          "difficulty": "sedang",
+          "question": "Mengapa model yang dilatih pada rekaman sensor di ruangan ber-AC tenang sering turun performanya saat dipasang di bengkel nyata?",
+          "options": ["Karena jumlah byte int8 berubah karena suhu", "Karena kondisi dunia nyata memiliki getaran, derau (noise), dan distribusi data yang berbeda dari kondisi laboratorium", "Karena mikrokontroler tidak bisa menghitung penjumlahan", "Karena Python otomatis menghapus bobot model"],
+          "correctIndex": 1,
+          "explanation": "Perbedaan lingkungan nyata menyebabkan pergeseran distribusi sinyal sensor; data latih dan pengujian harus mencakup kondisi operasional nyata."
+        }
+      ]
+    }
+  ],
+  "boss": {
+    "name": "Mecha-Core",
+    "phases": [
+      {
+        "phase": 1,
+        "topicId": 18,
+        "spellId": "s18",
+        "variants": [
+          {
+            "scenario": "Server Mecha-Core memproses permintaan inferensi satu per satu dengan latensi rata-rata 40 ms per permintaan. Berapa throughput maksimum satu pekerja sekuensial itu?",
+            "options": ["20 permintaan/detik", "25 permintaan/detik", "40 permintaan/detik", "250 permintaan/detik"],
+            "correctIndex": 1,
+            "explanation": "1.000 ms ÷ 40 ms = 25 permintaan per detik."
+          },
+          {
+            "scenario": "Pekerja cadangan Mecha-Core membutuhkan rata-rata 25 ms untuk satu permintaan sekuensial. Berapa throughput maksimumnya?",
+            "options": ["25 permintaan/detik", "40 permintaan/detik", "50 permintaan/detik", "100 permintaan/detik"],
+            "correctIndex": 1,
+            "explanation": "1.000 ms ÷ 25 ms = 40 permintaan per detik."
+          }
+        ]
+      },
+      {
+        "phase": 2,
+        "topicId": 19,
+        "spellId": "s19",
+        "variants": [
+          {
+            "scenario": "Modul pelindung Mecha-Core memuat model 80.000 parameter. Jika dikuantisasi dari float32 (4 byte) ke int8 (1 byte), ukuran bobotnya turun dari 320 KB menjadi...",
+            "options": ["40 KB", "80 KB", "160 KB", "320 KB"],
+            "correctIndex": 1,
+            "explanation": "80.000 × 1 byte = 80.000 byte = 80 KB (1 KB = 1.000 byte)."
+          },
+          {
+            "scenario": "Sub-inti Mecha-Core memiliki 120.000 parameter dalam format float32 (4 byte per parameter). Berapa ukuran bobotnya dalam KB (1 KB = 1.000 byte)?",
+            "options": ["120 KB", "240 KB", "360 KB", "480 KB"],
+            "correctIndex": 3,
+            "explanation": "120.000 × 4 byte = 480.000 byte = 480 KB."
+          }
+        ]
+      },
+      {
+        "phase": 3,
+        "topicId": 20,
+        "spellId": "s20",
+        "variants": [
+          {
+            "scenario": "Rantai sensor Mecha-Core mencatat: akuisisi 15 ms, pra-pemrosesan 10 ms, inferensi 45 ms, dan pengiriman 20 ms. Jika batas waktu 100 ms, berapa total latensi dan sisanya?",
+            "options": ["Total 90 ms, sisa 10 ms", "Total 80 ms, sisa 20 ms", "Total 100 ms, sisa 0 ms", "Total 110 ms, melebihi 10 ms"],
+            "correctIndex": 0,
+            "explanation": "Total = 15 + 10 + 45 + 20 = 90 ms. Terhadap batas 100 ms, masih tersisa 10 ms."
+          },
+          {
+            "scenario": "Pada mode darurat, batas waktu Mecha-Core adalah 80 ms. Tahap-tahapnya: akuisisi 25 ms, pra-pemrosesan 10 ms, inferensi 35 ms, pengiriman 25 ms. Bagaimana statusnya?",
+            "options": ["Total 75 ms, sisa 5 ms", "Total 80 ms, sisa 0 ms", "Total 95 ms, melebihi 15 ms", "Total 90 ms, melebihi 10 ms"],
+            "correctIndex": 2,
+            "explanation": "Total = 25 + 10 + 35 + 25 = 95 ms, sehingga melebihi batas 80 ms sebesar 15 ms."
+          }
+        ]
+      },
+      {
+        "phase": 4,
+        "topicId": 14,
+        "spellId": "s14",
+        "title": "Gema Lantai 2-3",
+        "variants": [
+          {
+            "spellId": "s14",
+            "scenario": "Gema dari Lantai 3: kamera pengawas Mecha-Core memakai konvolusi pada citra 28×28 dengan kernel 3×3, padding 0, stride 1. Berapa ukuran keluaran per sisi?",
+            "options": ["25", "26", "27", "28"],
+            "correctIndex": 1,
+            "explanation": "(28 − 3 + 0) ÷ 1 + 1 = 26."
+          },
+          {
+            "spellId": "s9",
+            "scenario": "Gema dari Lantai 2: alarm anomali Mecha-Core menghasilkan TP = 40, FP = 10, FN = 30. Berapa precision-nya?",
+            "options": ["0,57", "0,80", "0,70", "0,40"],
+            "correctIndex": 1,
+            "explanation": "Precision = TP ÷ (TP + FP) = 40 ÷ (40 + 10) = 0,80."
+          }
+        ]
+      },
+      {
+        "phase": 5,
+        "topicId": 2,
+        "spellId": "s2",
+        "title": "Gema Lantai 1 dan 3",
+        "variants": [
+          {
+            "spellId": "s2",
+            "scenario": "Gema dari Lantai 1: 10% paket jaringan ke Mecha-Core adalah serangan berbahaya. Detektor menandai 80% serangan berbahaya dan juga 10% paket normal. Sebuah paket ditandai. Berapa peluang paket itu benar-benar berbahaya?",
+            "options": ["80%", "10%", "Sekitar 47%", "Sekitar 8%"],
+            "correctIndex": 2,
+            "explanation": "0,8×0,1 ÷ (0,8×0,1 + 0,1×0,9) = 0,08 ÷ 0,17 ≈ 0,47 (47%)."
+          },
+          {
+            "spellId": "s15",
+            "scenario": "Gema dari Lantai 3: sensor suhu Mecha-Core mencatat deret [20, 22, 21, 23, 25, 24] dan dibentuk menjadi pasangan (X → y) dengan jendela 4. Berapa pasangan yang dihasilkan?",
+            "options": ["1", "2", "3", "4"],
+            "correctIndex": 1,
+            "explanation": "Pasangan yang terbentuk: ([20, 22, 21, 23] → 25) dan ([22, 21, 23, 25] → 24), jadi 2 pasangan."
+          }
+        ]
+      }
+    ]
+  }
+}

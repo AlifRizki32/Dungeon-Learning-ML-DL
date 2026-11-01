@@ -1,0 +1,359 @@
+{
+  "reviewStatus": "needs-human-review",
+  "floor": 5,
+  "topics": [
+    {
+      "topicId": 21,
+      "relic": "Kompas Git",
+      "evidenceHint": "Tautan repositori Git dan hasil tes dasar",
+      "spell": {
+        "id": "s21",
+        "name": "Mantra Git & Tes",
+        "formulas": [
+          "git add lalu git commit: simpan perubahan sebagai commit dengan pesan yang jelas",
+          "cabang (branch) untuk fitur; gabungkan lewat merge atau pull request",
+          ".gitignore: jangan commit data mentah besar, kunci rahasia, atau berkas sementara",
+          "tes otomatis: tes gagal bila perilaku fungsi berubah",
+          "persentase tes lulus = tes lulus ÷ total tes × 100"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Git mencatat riwayat proyekmu. Commit kecil dengan pesan yang menjelaskan perubahan membuat riwayat mudah dibaca dan dikembalikan.",
+          "Cabang (branch) memisahkan pekerjaan percobaan dari cabang utama yang stabil sampai siap digabung.",
+          "Kunci API, kata sandi, dan data mentah besar tidak boleh masuk repositori. Gunakan .gitignore. Jika kunci terlanjur ter-commit, cabut dan buat yang baru, karena riwayat masih menyimpannya.",
+          "Tes otomatis untuk fungsi kecil (misalnya pra-pemrosesan data) membuat perubahan yang merusak perilaku langsung ketahuan."
+        ],
+        "workedExample": "Dari 20 tes, 18 lulus: 18 ÷ 20 × 100 = 90%.",
+        "commonMistake": "Satu commit raksasa berpesan 'update', atau meng-commit kata sandi dan kunci API."
+      },
+      "references": [
+        { "label": "Pro Git (Scott Chacon dan Ben Straub), gratis online", "url": "https://git-scm.com/book/en/v2" }
+      ],
+      "quiz": [
+        { "id": "t21q1", "difficulty": "mudah", "question": "Manakah pesan commit yang paling baik?", "options": ["update", "Tambah normalisasi z-score pada pra-pemrosesan sensor suhu", "asdf", "fix semua"], "correctIndex": 1, "explanation": "Pesan yang spesifik menjelaskan apa yang berubah dan memudahkan penelusuran riwayat." },
+        { "id": "t21q2", "difficulty": "sedang", "question": "Berkas .env berisi kunci API. Cara yang tepat?", "options": ["Commit saja, repositorinya privat", "Ganti nama berkas lalu commit", "Hapus setelah commit dan anggap beres", "Masukkan ke .gitignore dan jangan pernah commit; jika terlanjur, cabut kunci lalu buat yang baru"], "correctIndex": 3, "explanation": "Riwayat Git tetap menyimpan isi lama, jadi kunci yang pernah ter-commit harus dianggap bocor dan diganti." },
+        { "id": "t21q3", "difficulty": "mudah", "question": "Mengapa memakai cabang (branch) untuk fitur baru?", "options": ["Agar pekerjaan percobaan terpisah dari cabang utama yang stabil sampai siap digabung", "Agar kode lebih cepat", "Agar commit tidak perlu pesan", "Agar tes tidak diperlukan"], "correctIndex": 0, "explanation": "Cabang menjaga cabang utama tetap stabil selama fitur dikembangkan." },
+        { "id": "t21q4", "difficulty": "mudah", "question": "Dari 20 tes, 18 lulus. Berapa persentase lulus?", "options": ["80%", "85%", "90%", "95%"], "correctIndex": 2, "explanation": "18 ÷ 20 = 0,9 = 90%." },
+        { "id": "t21q5", "difficulty": "sedang", "question": "Mengapa menulis tes otomatis untuk fungsi pra-pemrosesan data?", "options": ["Agar program tidak perlu dijalankan", "Agar perubahan kode yang tidak sengaja mengubah perilaku langsung ketahuan", "Agar akurasi model naik otomatis", "Agar Git tidak diperlukan"], "correctIndex": 1, "explanation": "Tes bertindak sebagai jaring pengaman saat kode diubah." }
+      ]
+    },
+    {
+      "topicId": 22,
+      "relic": "Lensa Data",
+      "evidenceHint": "Dataset sensor sendiri beserta catatan kualitas",
+      "spell": {
+        "id": "s22",
+        "name": "Mantra Data Nyata",
+        "formulas": [
+          "catat kualitas data: sensor, waktu, kondisi pengambilan, versi firmware",
+          "label konsisten: pedoman pelabelan tertulis, cek kesepakatan antar pelabel",
+          "data kotor: nilai hilang, outlier, duplikat, sensor macet (nilai konstan)",
+          "bobot kelas balanced = n_sampel ÷ (n_kelas × n_sampel_kelas_k)",
+          "akurasi menyesatkan pada data tidak seimbang; lihat precision, recall, F1"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Data nyata itu kotor: ada nilai hilang, duplikat, outlier, dan sensor yang macet. Selidiki penyebabnya sebelum membuang atau memperbaiki apa pun, karena outlier bisa jadi kejadian nyata.",
+          "Label harus konsisten. Tulis pedoman pelabelan dan bahas contoh yang tidak disepakati.",
+          "Kelas yang tidak seimbang membuat akurasi menyesatkan. Salah satu cara menanganinya adalah bobot kelas 'balanced' = n_sampel ÷ (n_kelas × n_sampel_kelas).",
+          "Catat kualitas dataset (kondisi pengambilan, jumlah data hilang, versi firmware) agar keterbatasan data diketahui."
+        ],
+        "workedExample": "1.000 sampel: 950 normal dan 50 anomali. Bobot anomali = 1.000 ÷ (2 × 50) = 10. Bobot normal = 1.000 ÷ (2 × 950) ≈ 0,53.",
+        "commonMistake": "Membuang outlier tanpa mencari tahu penyebabnya."
+      },
+      "references": [
+        { "label": "scikit-learn: compute_sample_weight (rumus bobot 'balanced')", "url": "https://scikit-learn.org/stable/modules/generated/sklearn.utils.class_weight.compute_sample_weight.html" },
+        { "label": "scikit-learn: Common pitfalls", "url": "https://scikit-learn.org/stable/common_pitfalls.html" }
+      ],
+      "quiz": [
+        { "id": "t22q1", "difficulty": "sedang", "question": "Sensor suhu mengirim 25,0 selama 3 jam tanpa berubah sama sekali. Dugaan paling masuk akal?", "options": ["Suhu ruang memang konstan sempurna", "Model pasti salah", "Sensor macet atau datanya tersangkut; tandai dan selidiki sebelum dipakai melatih", "Datanya paling bagus"], "correctIndex": 2, "explanation": "Nilai yang persis konstan dalam waktu lama adalah tanda khas sensor macet." },
+        { "id": "t22q2", "difficulty": "sedang", "question": "Dataset 1.000 sampel: 950 normal dan 50 anomali. Berapa bobot kelas balanced untuk anomali?", "options": ["10", "20", "0,53", "1"], "correctIndex": 0, "explanation": "1.000 ÷ (2 × 50) = 10. Bobot normal = 1.000 ÷ (2 × 950) ≈ 0,53." },
+        { "id": "t22q3", "difficulty": "sedang", "question": "Pada data itu, model yang selalu memprediksi 'normal' mendapat...", "options": ["Akurasi 50%, recall 50%", "Akurasi 5%, recall 100%", "Akurasi 95%, recall 100%", "Akurasi 95%, tetapi recall anomali 0%"], "correctIndex": 3, "explanation": "950 dari 1.000 tebakan benar (95%), tetapi tidak satu pun anomali tertangkap." },
+        { "id": "t22q4", "difficulty": "mudah", "question": "Dua pelabel sering berbeda untuk contoh yang sama. Langkah terbaik?", "options": ["Abaikan dan pilih acak", "Tulis pedoman pelabelan yang jelas, bahas contoh yang tidak disepakati, lalu ukur kesepakatan lagi", "Hapus semua label", "Pakai pelabel yang paling cepat"], "correctIndex": 1, "explanation": "Pedoman tertulis dan diskusi kasus sulit meningkatkan konsistensi label." },
+        { "id": "t22q5", "difficulty": "mudah", "question": "Mengapa mencatat kualitas dataset (data hilang, kondisi pengambilan, versi firmware)?", "options": ["Agar dataset terlihat besar", "Agar tidak perlu menguji", "Agar keterbatasan data diketahui dan hasil model bisa ditafsirkan dengan benar", "Agar sensor lebih murah"], "correctIndex": 2, "explanation": "Catatan kualitas membantu menilai kapan model bisa dipercaya dan kapan tidak." }
+      ]
+    },
+    {
+      "topicId": 23,
+      "relic": "Papan Sirkuit",
+      "evidenceHint": "Log atau grafik sensor terkirim stabil 24 jam",
+      "spell": {
+        "id": "s23",
+        "name": "Mantra Sirkuit",
+        "formulas": [
+          "ADC N-bit: jumlah level = 2^N; tegangan = bacaan ÷ 2^N × V_ref",
+          "kalibrasi dua titik: y = a·x + b dengan a = (y2 − y1) ÷ (x2 − x1) dan b = y1 − a·x1",
+          "MQTT: QoS 0 = paling banyak sekali; QoS 1 = minimal sekali (bisa duplikat); QoS 2 = tepat sekali",
+          "I²C: dua jalur (SDA dan SCL), tiap perangkat punya alamat, jalur butuh resistor pull-up",
+          "waktu baterai (jam) ≈ kapasitas (mAh) ÷ arus rata-rata (mA)",
+          "Nyquist: laju sampling ≥ 2 × frekuensi tertinggi sinyal"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Sensor analog dibaca lewat ADC. ADC N-bit membagi rentang tegangan menjadi 2^N level. Bacaan mentah diubah menjadi tegangan dengan membaginya dengan 2^N lalu mengalikannya dengan V_ref.",
+          "Sensor perlu kalibrasi. Kalibrasi dua titik memetakan bacaan ke nilai sebenarnya dengan garis lurus y = a·x + b.",
+          "MQTT memakai tiga tingkat QoS: 0 (paling banyak sekali, tanpa jaminan), 1 (minimal sekali, duplikat mungkin), dan 2 (tepat sekali, paling berat). Perintah yang tidak boleh dijalankan dua kali butuh QoS 2.",
+          "Pada I²C, banyak perangkat berbagi dua jalur (SDA dan SCL) dan dibedakan lewat alamat. Daya baterai diperkirakan dari kapasitas dibagi arus rata-rata."
+        ],
+        "workedExample": "ADC 12-bit, V_ref 3,3 V, bacaan 2048: 2048 ÷ 4096 × 3,3 = 1,65 V.",
+        "commonMistake": "Mengirim data penting dengan QoS 0 lewat jaringan yang tidak stabil, atau melewatkan kalibrasi sensor."
+      },
+      "references": [
+        { "label": "HiveMQ: MQTT Essentials, Part 6 (Quality of Service)", "url": "https://www.hivemq.com/mqtt-essentials-part-6-mqtt-quality-of-service-levels" },
+        { "label": "Datasheet sensor dan mikrokontroler yang kamu pakai (sumber utama spesifikasi)", "url": null }
+      ],
+      "quiz": [
+        { "id": "t23q1", "difficulty": "mudah", "question": "Berapa jumlah level yang dimiliki ADC 12-bit?", "options": ["1.024", "4.096", "2.048", "12"], "correctIndex": 1, "explanation": "2^12 = 4.096." },
+        { "id": "t23q2", "difficulty": "sedang", "question": "ADC 12-bit, V_ref 3,3 V, bacaan 1024. Berapa tegangannya?", "options": ["0,825 V", "1,65 V", "0,33 V", "3,3 V"], "correctIndex": 0, "explanation": "1024 ÷ 4096 × 3,3 = 0,825 V." },
+        { "id": "t23q3", "difficulty": "sulit", "question": "Kalibrasi dua titik: sensor membaca 10 saat suhu sebenarnya 0 °C, dan membaca 110 saat 50 °C. Berapa suhu sebenarnya saat sensor membaca 60?", "options": ["30 °C", "20 °C", "60 °C", "25 °C"], "correctIndex": 3, "explanation": "a = (50 − 0) ÷ (110 − 10) = 0,5; b = 0 − 0,5 × 10 = −5. Untuk x = 60: 0,5 × 60 − 5 = 25 °C." },
+        { "id": "t23q4", "difficulty": "sedang", "question": "Perintah 'buka katup' tidak boleh dijalankan dua kali. QoS MQTT yang tepat?", "options": ["QoS 0", "QoS 1", "QoS 2 (tepat sekali)", "Tidak perlu QoS"], "correctIndex": 2, "explanation": "QoS 1 bisa menghasilkan duplikat, sedangkan QoS 2 menjamin pengiriman tepat sekali." },
+        { "id": "t23q5", "difficulty": "mudah", "question": "Baterai 2.000 mAh dengan arus rata-rata 50 mA. Perkiraan waktu hidup?", "options": ["40 jam", "100 jam", "25 jam", "4 jam"], "correctIndex": 0, "explanation": "2.000 ÷ 50 = 40 jam (perkiraan kasar)." }
+      ]
+    },
+    {
+      "topicId": 24,
+      "relic": "Neraca Jujur",
+      "evidenceHint": "Baseline sederhana dan daftar kesalahan terbesar tiap proyek",
+      "spell": {
+        "id": "s24",
+        "name": "Mantra Evaluasi Jujur",
+        "formulas": [
+          "baseline: tebakan kelas mayoritas, nilai terakhir (persistence), atau aturan sederhana",
+          "peningkatan relatif = (galat baseline − galat model) ÷ galat baseline × 100",
+          "analisis kesalahan: kelompokkan kesalahan terbesar dan cari polanya",
+          "reproduksibilitas: catat seed acak, versi data, versi kode, dan lingkungan",
+          "laporkan metrik akhir pada data uji yang tidak dipakai untuk tuning"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Setiap proyek butuh baseline sederhana agar kamu tahu apakah model rumit benar-benar memberi nilai tambah. Contoh: tebakan kelas mayoritas, atau memprediksi nilai terakhir pada time series.",
+          "Analisis kesalahan mengelompokkan kesalahan terbesar (misalnya pada kondisi sensor tertentu) supaya perbaikan diarahkan ke tempat yang paling berdampak.",
+          "Agar hasil bisa diulang, catat seed acak, versi data, versi kode, dan lingkungan. Laporkan juga seberapa besar hasil bervariasi antar seed.",
+          "Jika data uji dipakai untuk memilih model, skor akhir menjadi terlalu optimistis."
+        ],
+        "workedExample": "MAE baseline 1,0 dan MAE model 0,8: peningkatan relatif = (1,0 − 0,8) ÷ 1,0 × 100 = 20%.",
+        "commonMistake": "Melaporkan akurasi tanpa baseline dan tanpa daftar kesalahan terbesar."
+      },
+      "references": [
+        { "label": "scikit-learn: Common pitfalls (termasuk kontrol keacakan)", "url": "https://scikit-learn.org/stable/common_pitfalls.html" },
+        { "label": "An Introduction to Statistical Learning with Python (ISLP)", "url": "https://statlearning.com" }
+      ],
+      "quiz": [
+        { "id": "t24q1", "difficulty": "mudah", "question": "Dataset berisi 90% kelas A. Berapa akurasi baseline yang selalu menebak kelas mayoritas?", "options": ["10%", "50%", "90%", "100%"], "correctIndex": 2, "explanation": "Selalu menebak A benar pada 90% contoh." },
+        { "id": "t24q2", "difficulty": "sedang", "question": "MAE baseline 2,0 dan MAE model 1,5. Berapa peningkatan relatifnya?", "options": ["15%", "25%", "33%", "50%"], "correctIndex": 1, "explanation": "(2,0 − 1,5) ÷ 2,0 = 0,25 = 25%." },
+        { "id": "t24q3", "difficulty": "sedang", "question": "Apa tujuan analisis kesalahan?", "options": ["Menemukan pola kesalahan terbesar (misalnya kondisi sensor tertentu) untuk menentukan perbaikan paling berdampak", "Menghapus data uji", "Menaikkan learning rate", "Menyembunyikan hasil buruk"], "correctIndex": 0, "explanation": "Mengetahui di mana model paling sering salah mengarahkan usaha perbaikan." },
+        { "id": "t24q4", "difficulty": "sedang", "question": "Hasil eksperimenmu tidak bisa diulang karena angka acak berbeda tiap run. Langkah yang tepat?", "options": ["Jalankan sampai hasilnya bagus", "Hapus data validasi", "Naikkan jumlah epoch", "Tetapkan dan catat seed acak, versi data, dan versi kode, serta laporkan variasi antar seed"], "correctIndex": 3, "explanation": "Mencatat seed dan versi membuat hasil bisa diulang, dan melaporkan variasi antar seed menunjukkan stabilitas hasil." },
+        { "id": "t24q5", "difficulty": "sedang", "question": "Skor data uji dipakai untuk memilih hyperparameter terbaik, lalu dilaporkan sebagai performa akhir. Masalahnya?", "options": ["Tidak ada masalah", "Skor menjadi terlalu optimistis karena data uji ikut memengaruhi pemilihan model", "Skor menjadi terlalu pesimistis", "Model pasti underfit"], "correctIndex": 1, "explanation": "Data uji harus tetap 'belum terlihat' sampai penilaian akhir." }
+      ]
+    },
+    {
+      "topicId": 25,
+      "relic": "Tameng Cadangan",
+      "evidenceHint": "Video demo cadangan dan catatan uji kegagalan jaringan atau sensor",
+      "spell": {
+        "id": "s25",
+        "name": "Mantra Ketahanan",
+        "formulas": [
+          "log dengan level (INFO, WARNING, ERROR), waktu, dan konteks; baca log, jangan menebak",
+          "reproduksi bug dengan langkah minimal sebelum memperbaiki",
+          "peluang semua komponen berhasil = hasil kali peluang tiap komponen (jika independen)",
+          "rencana cadangan: video demo, data rekaman, mode offline",
+          "latih dengan tenggat dan simulasikan kegagalan jaringan dan sensor"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Debugging yang baik dimulai dari log: catat waktu, level, dan konteks. Setelah itu, reproduksi bug dengan langkah sekecil mungkin sebelum mengubah kode.",
+          "Demo melibatkan banyak komponen. Jika komponennya independen, peluang semuanya berhasil adalah hasil kali peluang masing-masing, sehingga makin banyak komponen, makin besar risikonya.",
+          "Siapkan rencana cadangan: video demo, rekaman data sensor yang bisa diputar ulang, dan mode offline.",
+          "Latih demo beberapa kali dengan tenggat, dan sengaja simulasikan kegagalan jaringan atau sensor."
+        ],
+        "workedExample": "Jaringan berhasil 90% dan sensor 95% (independen): peluang keduanya berhasil = 0,9 × 0,95 = 0,855 = 85,5%.",
+        "commonMistake": "Mencoba demo pertama kali pada hari-H."
+      },
+      "references": [
+        { "label": "TinyML (Warden dan Situnayake), bab Debugging", "url": "https://oreilly.com/library/view/tinyml/9781492052036" }
+      ],
+      "quiz": [
+        { "id": "t25q1", "difficulty": "sedang", "question": "Jaringan berhasil 90% dan sensor berhasil 95% (independen). Berapa peluang keduanya berhasil?", "options": ["95%", "92,5%", "90%", "85,5%"], "correctIndex": 3, "explanation": "0,9 × 0,95 = 0,855. Angka 92,5% adalah rata-rata, bukan hasil kali." },
+        { "id": "t25q2", "difficulty": "mudah", "question": "Aplikasimu sesekali berhenti tanpa pesan. Langkah pertama yang tepat?", "options": ["Tambahkan log yang cukup (waktu, konteks) lalu reproduksi dengan langkah minimal", "Ganti seluruh kode", "Abaikan", "Matikan sensor"], "correctIndex": 0, "explanation": "Log dan reproduksi minimal mempersempit penyebab sebelum kode diubah." },
+        { "id": "t25q3", "difficulty": "mudah", "question": "Rencana cadangan demo terbaik jika sensor bisa gagal?", "options": ["Berdoa", "Mengurangi waktu demo", "Menyiapkan rekaman data sensor untuk diputar ulang dan video demo cadangan", "Mematikan log"], "correctIndex": 2, "explanation": "Rekaman dan video menjaga demo tetap berjalan meski sensor atau jaringan gagal." },
+        { "id": "t25q4", "difficulty": "mudah", "question": "Kapan sebaiknya demo dilatih?", "options": ["Hanya di hari-H", "Beberapa kali sebelum hari-H, dengan tenggat dan simulasi kegagalan jaringan atau sensor", "Tidak perlu dilatih", "Setelah acara selesai"], "correctIndex": 1, "explanation": "Latihan dengan tekanan dan kegagalan simulasi mengungkap masalah lebih awal." },
+        { "id": "t25q5", "difficulty": "sedang", "question": "Log menunjukkan sensor sesekali mengirim NaN. Tindakan defensif yang baik di kode?", "options": ["Validasi masukan, tandai atau buang NaN, catat peringatan, dan lanjut dengan nilai cadangan yang aman", "Biarkan program crash", "Ubah NaN menjadi 9999 tanpa mencatat", "Hentikan semua aliran data"], "correctIndex": 0, "explanation": "Validasi dan pencatatan membuat sistem tetap berjalan sambil meninggalkan jejak untuk diselidiki." }
+      ]
+    },
+    {
+      "topicId": 26,
+      "relic": "Mikrofon Emas",
+      "evidenceHint": "Tautan slide atau rekaman presentasi 10 menit dan daftar 5 pertanyaan sulit",
+      "spell": {
+        "id": "s26",
+        "name": "Mantra Panggung",
+        "formulas": [
+          "struktur 10 menit: masalah → data → metode → hasil → demo → batasan dan langkah berikutnya",
+          "satu slide = satu pesan; tunjukkan grafik perbandingan, bukan tabel mentah",
+          "pertanyaan sulit: akui batas pengetahuan, tunjukkan data atau analisis kesalahan, tawarkan langkah lanjutan",
+          "anggaran waktu: jumlah semua bagian ≤ total menit"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Presentasi yang baik punya alur: masalah, data, metode, hasil, demo, lalu batasan dan langkah berikutnya.",
+          "Satu slide membawa satu pesan. Grafik perbandingan (model vs baseline) lebih mudah dipahami daripada tabel metrik yang panjang.",
+          "Untuk pertanyaan sulit: akui apa yang belum kamu ketahui, tunjukkan data atau analisis kesalahan yang ada, lalu jelaskan bagaimana kamu akan menyelidikinya. Jangan mengarang jawaban.",
+          "Hitung anggaran waktu agar bagian demo dan hasil tidak terpotong."
+        ],
+        "workedExample": "Presentasi 10 menit: masalah 1 + data 1,5 + metode 2 + hasil 2,5 + demo 2 + penutup 1 = 10 menit.",
+        "commonMistake": "Menjelaskan semua detail teknis sampai kehabisan waktu sebelum hasil dan demo."
+      },
+      "references": [
+        { "label": "Belum ada referensi terverifikasi. Cari panduan menyusun presentasi teknis dari sumber yang kamu percaya.", "url": null }
+      ],
+      "quiz": [
+        { "id": "t26q1", "difficulty": "mudah", "question": "Slot sesi 15 menit dan presentasimu 10 menit. Berapa sisa untuk tanya jawab?", "options": ["5 menit", "10 menit", "3 menit", "0 menit"], "correctIndex": 0, "explanation": "15 − 10 = 5 menit." },
+        { "id": "t26q2", "difficulty": "sedang", "question": "Penguji bertanya mengapa model gagal pada malam hari dan kamu belum tahu. Jawaban terbaik?", "options": ["Mengarang penjelasan", "Mengatakan pertanyaannya tidak relevan", "Mengakui belum diketahui, menunjukkan analisis kesalahan yang ada, dan menjelaskan langkah untuk menyelidikinya", "Berganti topik"], "correctIndex": 2, "explanation": "Kejujuran yang disertai data dan rencana tindak lanjut membangun kepercayaan." },
+        { "id": "t26q3", "difficulty": "mudah", "question": "Manakah slide hasil yang paling baik?", "options": ["Tabel 40 baris metrik", "Paragraf panjang", "Seluruh kode program", "Satu pesan jelas dengan grafik perbandingan model vs baseline"], "correctIndex": 3, "explanation": "Satu pesan dan visual yang mudah dibandingkan membantu audiens menangkap hasil dengan cepat." },
+        { "id": "t26q4", "difficulty": "mudah", "question": "Urutan presentasi yang masuk akal?", "options": ["Demo → kesimpulan → data", "Masalah → data → metode → hasil → demo → batasan dan langkah berikutnya", "Metode → penutup → masalah", "Batasan → data → demo"], "correctIndex": 1, "explanation": "Alur itu membawa audiens dari konteks ke bukti hingga batasan." },
+        { "id": "t26q5", "difficulty": "mudah", "question": "Mengapa menyebut batasan sistem secara terbuka?", "options": ["Membangun kepercayaan dan menunjukkan kamu paham kapan model bisa gagal", "Membuat penguji bosan", "Pasti menurunkan nilai", "Tidak ada manfaatnya"], "correctIndex": 0, "explanation": "Menyebut batasan menunjukkan pemahaman dan kejujuran ilmiah." }
+      ]
+    },
+    {
+      "topicId": 27,
+      "relic": "Peta Lingkup",
+      "evidenceHint": "Rencana satu halaman dengan batas lingkup",
+      "spell": {
+        "id": "s27",
+        "name": "Mantra Lingkup",
+        "formulas": [
+          "jam efektif = jam per minggu × jumlah minggu × (1 − buffer)",
+          "MVP: versi terkecil yang sudah menjalankan alur utama dari awal sampai akhir",
+          "batas lingkup tertulis: apa yang masuk dan apa yang TIDAK masuk",
+          "rencana satu halaman: tujuan, MVP, tonggak mingguan, risiko, rencana cadangan",
+          "dokumentasi berjalan: catat keputusan dan alasannya saat terjadi"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Proyek solo gagal karena lingkup membengkak diam-diam. Tulis batas lingkup, termasuk apa yang TIDAK akan dikerjakan.",
+          "MVP adalah versi terkecil yang sudah menjalankan alur utama dari awal sampai akhir. Fitur tambahan dikerjakan sesudahnya.",
+          "Hitung jam efektif dengan memasukkan buffer, lalu cocokkan dengan perkiraan jam tugas. Jika tugas lebih besar dari jam efektif, potong lingkup, bukan tidur.",
+          "Rencana satu halaman memuat tujuan, MVP, tonggak mingguan, risiko, dan rencana cadangan. Dokumentasikan keputusan penting saat itu juga."
+        ],
+        "workedExample": "8 jam/minggu × 6 minggu = 48 jam. Dengan buffer 20%: 48 × 0,8 = 38,4 jam efektif.",
+        "commonMistake": "Menambah fitur baru tanpa mengurangi apa pun dari rencana."
+      },
+      "references": [
+        { "label": "Belum ada referensi terverifikasi. Cari contoh rencana proyek satu halaman dari sumber yang kamu percaya.", "url": null }
+      ],
+      "quiz": [
+        { "id": "t27q1", "difficulty": "mudah", "question": "10 jam/minggu selama 5 minggu dengan buffer 20%. Berapa jam efektif?", "options": ["50", "45", "40", "30"], "correctIndex": 2, "explanation": "10 × 5 = 50 jam, dikali 0,8 = 40 jam." },
+        { "id": "t27q2", "difficulty": "mudah", "question": "Tugas membutuhkan 70 jam sedangkan jam efektifmu 40. Langkah yang tepat?", "options": ["Potong lingkup ke MVP dan pindahkan sisanya ke daftar 'nanti'", "Kurangi tidur", "Abaikan tes", "Tambahkan tugas baru"], "correctIndex": 0, "explanation": "Lingkup harus disesuaikan dengan waktu yang realistis." },
+        { "id": "t27q3", "difficulty": "mudah", "question": "Apa itu MVP dalam proyek ini?", "options": ["Versi paling lengkap", "Versi dengan semua fitur", "Versi tanpa data", "Versi terkecil yang sudah menjalankan alur utama dari awal sampai akhir"], "correctIndex": 3, "explanation": "MVP membuktikan alur utama berjalan sebelum menambah fitur." },
+        { "id": "t27q4", "difficulty": "sedang", "question": "Mengapa menuliskan apa yang TIDAK masuk lingkup?", "options": ["Agar proyek terlihat kecil", "Mencegah lingkup membengkak diam-diam dan menjaga fokus", "Agar tidak perlu dokumentasi", "Agar tidak perlu jadwal"], "correctIndex": 1, "explanation": "Batas yang tertulis membantu menolak tambahan yang tidak muat." },
+        { "id": "t27q5", "difficulty": "mudah", "question": "Dokumentasi yang paling berguna saat proyek berjalan?", "options": ["Menunggu sampai akhir proyek", "Hanya komentar kode", "Catatan singkat tiap keputusan penting beserta alasannya, ditulis saat terjadi", "Tidak ada"], "correctIndex": 2, "explanation": "Alasan keputusan mudah terlupa jika tidak ditulis saat itu juga." }
+      ]
+    },
+    {
+      "topicId": 28,
+      "relic": "Kunci Perisai",
+      "evidenceHint": "Jawaban singkat tiap proyek tentang data dan keamanan",
+      "spell": {
+        "id": "s28",
+        "name": "Mantra Perisai",
+        "formulas": [
+          "ganti kata sandi bawaan; jangan simpan kredensial di kode atau repositori",
+          "lindungi data saat transit (misalnya TLS) dan terapkan autentikasi pada broker",
+          "firmware: pembaruan aman dan bertanda tangan; hindari komponen usang",
+          "minimisasi data: kumpulkan hanya yang perlu, simpan sesingkat mungkin, beri tahu pemilik data",
+          "jawaban singkat tiap proyek: data apa, disimpan di mana, siapa yang bisa mengakses, risiko apa"
+        ]
+      },
+      "scroll": {
+        "paragraphs": [
+          "Daftar OWASP IoT Top 10 menyoroti masalah umum: kata sandi lemah atau hardcoded, layanan jaringan tidak aman, mekanisme pembaruan yang tidak aman, komponen usang, perlindungan privasi yang kurang, dan pengaturan bawaan yang tidak aman.",
+          "Ganti kredensial bawaan, jangan menaruh kunci di kode, dan lindungi data yang dikirim (misalnya dengan TLS dan autentikasi pada broker).",
+          "Firmware harus bisa diperbarui dengan aman. Pembaruan yang tidak terverifikasi bisa dipakai penyerang untuk memasang firmware palsu.",
+          "Dari sisi privasi dan etika: kumpulkan hanya data yang perlu, simpan sesingkat mungkin, dan beri tahu pemilik data. Siapkan jawaban singkat untuk tiap proyek: data apa, disimpan di mana, siapa yang bisa mengakses."
+        ],
+        "workedExample": "Proyek sensor suhu ruangan: data = suhu dan waktu (tanpa data pribadi), disimpan lokal, akses hanya pemilik, risiko utama = akses jaringan, sehingga dipakai kredensial unik dan broker beraudensi.",
+        "commonMistake": "Membiarkan kata sandi bawaan atau broker terbuka karena 'cuma proyek kecil'."
+      },
+      "references": [
+        { "label": "Ringkasan OWASP IoT Top 10 (pihak ketiga); sumber utama: proyek OWASP Internet of Things di owasp.org", "url": "https://www.wattlecorp.com/owasp-iot-top-10/" },
+        { "label": "TinyML (Warden dan Situnayake), bab Privacy, Security, and Deployment", "url": "https://oreilly.com/library/view/tinyml/9781492052036" }
+      ],
+      "quiz": [
+        { "id": "t28q1", "difficulty": "mudah", "question": "Perangkat IoT-mu masih memakai kata sandi bawaan admin/admin. Risikonya?", "options": ["Tidak ada risiko", "Mudah ditebak penyerang; ganti dengan kredensial unik per perangkat", "Perangkat lebih cepat", "Model lebih akurat"], "correctIndex": 1, "explanation": "Kata sandi bawaan yang mudah ditebak adalah salah satu risiko IoT paling umum." },
+        { "id": "t28q2", "difficulty": "sedang", "question": "Mengapa data sensor lewat MQTT sebaiknya dilindungi TLS dan autentikasi?", "options": ["Agar baterai hemat", "Agar data lebih kecil", "Agar QoS tidak diperlukan", "Agar pihak lain di jaringan tidak bisa membaca atau mengubah data, dan hanya klien sah yang boleh terhubung"], "correctIndex": 3, "explanation": "Enkripsi melindungi data saat transit, dan autentikasi membatasi siapa yang boleh terhubung." },
+        { "id": "t28q3", "difficulty": "mudah", "question": "Prinsip minimisasi data berarti...", "options": ["Mengumpulkan hanya data yang benar-benar diperlukan dan menyimpannya sesingkat mungkin", "Mengumpulkan sebanyak mungkin", "Menyimpan selamanya", "Menjual data"], "correctIndex": 0, "explanation": "Semakin sedikit data yang disimpan, semakin kecil risiko jika terjadi kebocoran." },
+        { "id": "t28q4", "difficulty": "sedang", "question": "Mengapa mekanisme pembaruan firmware yang aman penting?", "options": ["Agar perangkat lebih lambat", "Agar tidak ada perubahan sama sekali", "Agar celah keamanan bisa ditambal tanpa memberi jalan bagi firmware palsu (pembaruan harus terverifikasi dan lewat kanal terenkripsi)", "Agar pengguna tidak perlu tahu"], "correctIndex": 2, "explanation": "Pembaruan tanpa verifikasi bisa disalahgunakan untuk memasang kode berbahaya." },
+        { "id": "t28q5", "difficulty": "sedang", "question": "Proyek perekam suara untuk mendeteksi anomali mesin ternyata ikut merekam percakapan karyawan. Tindakan etis?", "options": ["Simpan semua rekaman", "Hentikan perekaman percakapan, kurangi data (misalnya hanya fitur frekuensi), beri tahu dan minta persetujuan", "Jual datanya", "Tidak ada tindakan"], "correctIndex": 1, "explanation": "Kurangi data pribadi seminimal mungkin, transparan, dan minta persetujuan." }
+      ]
+    }
+  ],
+  "boss": {
+    "name": "Raja Deadline",
+    "phases": [
+      {
+        "phase": 1, "topicId": 21, "spellId": "s21",
+        "variants": [
+          { "scenario": "Raja Deadline menjatuhkan 40 tes. 34 lulus. Berapa persentase lulus?", "options": ["80%", "85%", "90%", "34%"], "correctIndex": 1, "explanation": "34 ÷ 40 × 100 = 85%." },
+          { "scenario": "Sekarang ada 25 tes dan 20 lulus. Berapa persentase lulus?", "options": ["75%", "85%", "80%", "20%"], "correctIndex": 2, "explanation": "20 ÷ 25 × 100 = 80%." }
+        ]
+      },
+      {
+        "phase": 2, "topicId": 22, "spellId": "s22",
+        "variants": [
+          { "scenario": "Dataset 600 sampel: 540 normal dan 60 anomali. Berapa bobot kelas balanced untuk anomali?", "options": ["5", "10", "0,56", "9"], "correctIndex": 0, "explanation": "600 ÷ (2 × 60) = 5. Angka 10 muncul jika lupa membagi dengan jumlah kelas (2)." },
+          { "scenario": "Dataset 2.000 sampel: 1.900 normal dan 100 anomali. Berapa bobot kelas balanced untuk anomali?", "options": ["19", "10", "0,53", "20"], "correctIndex": 1, "explanation": "2.000 ÷ (2 × 100) = 10." }
+        ]
+      },
+      {
+        "phase": 3, "topicId": 23, "spellId": "s23",
+        "variants": [
+          { "scenario": "ADC 10-bit dengan V_ref 5 V membaca 512. Berapa tegangannya?", "options": ["5 V", "1,25 V", "2,5 V", "0,5 V"], "correctIndex": 2, "explanation": "512 ÷ 1024 × 5 = 2,5 V." },
+          { "scenario": "Baterai 3.000 mAh dengan arus rata-rata 100 mA. Perkiraan waktu hidup?", "options": ["300 jam", "30 jam", "3 jam", "60 jam"], "correctIndex": 1, "explanation": "3.000 ÷ 100 = 30 jam." }
+        ]
+      },
+      {
+        "phase": 4, "topicId": 24, "spellId": "s24",
+        "variants": [
+          { "scenario": "MAE baseline 4,0 dan MAE model 3,0. Berapa peningkatan relatifnya?", "options": ["33%", "20%", "25%", "75%"], "correctIndex": 2, "explanation": "(4,0 − 3,0) ÷ 4,0 = 0,25 = 25%." },
+          { "scenario": "MAE baseline 0,5 dan MAE model 0,4. Berapa peningkatan relatifnya?", "options": ["20%", "25%", "10%", "80%"], "correctIndex": 0, "explanation": "(0,5 − 0,4) ÷ 0,5 = 0,2 = 20%." }
+        ]
+      },
+      {
+        "phase": 5, "topicId": 25, "spellId": "s25",
+        "variants": [
+          { "scenario": "Jaringan berhasil 80% dan sensor 90% (independen). Berapa peluang demo berjalan tanpa cadangan?", "options": ["85%", "72%", "90%", "70%"], "correctIndex": 1, "explanation": "0,8 × 0,9 = 0,72 = 72%." },
+          { "scenario": "Tiga komponen independen masing-masing berhasil 90% (jaringan, sensor, perangkat). Berapa peluang semuanya berhasil?", "options": ["90%", "81%", "72,9%", "27%"], "correctIndex": 2, "explanation": "0,9 × 0,9 × 0,9 = 0,729 = 72,9%." }
+        ]
+      },
+      {
+        "phase": 6, "topicId": 26, "spellId": "s26",
+        "variants": [
+          { "scenario": "Slot sesi 20 menit dan presentasimu 12 menit. Berapa sisa untuk tanya jawab?", "options": ["8 menit", "12 menit", "6 menit", "20 menit"], "correctIndex": 0, "explanation": "20 − 12 = 8 menit." },
+          { "scenario": "Presentasi 10 menit dan demo memakai 40% dari waktu. Berapa menit untuk demo?", "options": ["2 menit", "6 menit", "4 menit", "40 menit"], "correctIndex": 2, "explanation": "40% × 10 menit = 4 menit." }
+        ]
+      },
+      {
+        "phase": 7, "topicId": 27, "spellId": "s27",
+        "variants": [
+          { "scenario": "8 jam/minggu selama 4 minggu dengan buffer 25%. Berapa jam efektif?", "options": ["32", "28", "24", "6"], "correctIndex": 2, "explanation": "8 × 4 = 32 jam, dikali 0,75 = 24 jam." },
+          { "scenario": "12 jam/minggu selama 3 minggu dengan buffer 10%. Berapa jam efektif?", "options": ["32,4", "36", "30", "3,6"], "correctIndex": 0, "explanation": "12 × 3 = 36 jam, dikali 0,9 = 32,4 jam." }
+        ]
+      },
+      {
+        "phase": 8, "topicId": 28, "spellId": "s28",
+        "variants": [
+          { "scenario": "Broker MQTT proyekmu terbuka tanpa kata sandi dan tanpa enkripsi. Langkah paling mendesak?", "options": ["Aktifkan autentikasi dan TLS, lalu ganti kredensial bawaan", "Tambahkan lebih banyak topik", "Naikkan QoS", "Biarkan saja"], "correctIndex": 0, "explanation": "Broker terbuka memungkinkan siapa pun membaca dan mengirim data. Autentikasi dan enkripsi adalah langkah pertama." },
+          { "scenario": "Kamu menemukan kunci API di riwayat Git publik. Langkah yang tepat?", "options": ["Hapus berkasnya saja; riwayat masih menyimpannya", "Cabut dan buat kunci baru, lalu hapus dari repositori dan tambahkan ke .gitignore", "Biarkan saja", "Ganti nama repositori"], "correctIndex": 1, "explanation": "Kunci yang pernah publik harus dianggap bocor, jadi cabut dan ganti, lalu cegah terulang." }
+        ]
+      }
+    ]
+  }
+}

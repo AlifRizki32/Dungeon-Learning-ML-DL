@@ -1,6 +1,7 @@
 import React from 'react';
 import { ALL_BADGES, ALL_RELICS } from '../data/roadmap.js';
 import { useGameStore } from '../store/useGameStore';
+import { getTopicContent, TOWER_RELICS } from '../game/spellbookEngine';
 import { BadgeSprite, PixelLockSprite, RelicSprite } from './PixelSprites';
 
 export const Inventory: React.FC = () => {
@@ -100,6 +101,10 @@ export const Inventory: React.FC = () => {
                       ? `Daun Emas (${relic.name})`
                       : relic.id === 'relic-boss-3'
                       ? `Inti Neuron (${relic.name})`
+                      : relic.id === 'relic-boss-4'
+                      ? `Chip Edge (${relic.name})`
+                      : relic.id === 'relic-boss-5'
+                      ? `Stopwatch Perak (${relic.name})`
                       : relic.name}
                   </div>
                   <div className="font-vt text-base text-[#f5b935] mt-0.5">
@@ -107,6 +112,10 @@ export const Inventory: React.FC = () => {
                       ? 'Bos Lantai 2: Golem Pohon Purba'
                       : relic.id === 'relic-boss-3'
                       ? 'Bos Lantai 3: Hydra Berkepala Banyak'
+                      : relic.id === 'relic-boss-4'
+                      ? 'Bos Lantai 4: Mecha-Core'
+                      : relic.id === 'relic-boss-5'
+                      ? 'Bos Lantai 5: Raja Deadline'
                       : relic.source}
                   </div>
                   <p className="font-vt text-lg text-[#b3aad1] mt-1 leading-snug">
@@ -136,6 +145,8 @@ export const Inventory: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
           {guildRelics.map((relic) => {
             const owned = relics.includes(relic.id);
+            const gqNum = Number(relic.id.replace('relic-gq-', ''));
+            const contentRelicName = getTopicContent(`topic-${gqNum}`)?.relic;
             return (
               <div
                 key={relic.id}
@@ -144,7 +155,7 @@ export const Inventory: React.FC = () => {
                 }`}
               >
                 <div className="flex items-start gap-3 mb-2">
-                  <div className="w-12 h-12 bg-[#120d26] border-2 border-[#3ac5eb] flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 bg-[#120d26] border-2 border-[#fb923c] flex items-center justify-center shrink-0">
                     {owned ? (
                       <RelicSprite iconType={relic.iconType} size={36} />
                     ) : (
@@ -153,9 +164,9 @@ export const Inventory: React.FC = () => {
                   </div>
                   <div>
                     <div className="font-pixel text-[10px] text-[#f4f1ea] leading-snug">
-                      {relic.name}
+                      {contentRelicName ? `${contentRelicName} (${relic.name})` : relic.name}
                     </div>
-                    <div className="font-vt text-base text-[#3ac5eb]">{relic.source}</div>
+                    <div className="font-vt text-base text-[#fb923c]">{relic.source}</div>
                   </div>
                 </div>
                 <p className="font-vt text-lg text-[#b3aad1] leading-snug">
@@ -168,6 +179,55 @@ export const Inventory: React.FC = () => {
           })}
         </div>
       </section>
+
+      {/* Section 4: 7 Menara Master Relics (Floor 6) */}
+      <section aria-label="Relik Menara Master Lantai 6" className="pixel-box p-4 sm:p-6">
+        <div className="border-b-2 border-[#3a306e] pb-3 mb-4">
+          <h2 className="font-pixel text-sm sm:text-base text-[#f5b935]">
+            RELIK MENARA MASTER LANTAI 6 (
+            {TOWER_RELICS.filter((r) => relics.includes(r.id)).length}/{TOWER_RELICS.length})
+          </h2>
+          <p className="font-vt text-xl text-[#b3aad1]">
+            Dijatuhkan oleh 7 Quest Menara Master (Road to Master) di Lantai 6.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {TOWER_RELICS.map((relic) => {
+            const owned = relics.includes(relic.id);
+            return (
+              <div
+                key={relic.id}
+                className={`p-3.5 flex flex-col justify-between ${
+                  owned ? 'pixel-box-gold' : 'pixel-box opacity-65'
+                }`}
+              >
+                <div className="flex items-start gap-3 mb-2">
+                  <div className="w-12 h-12 bg-[#120d26] border-2 border-[#f5b935] flex items-center justify-center shrink-0">
+                    {owned ? (
+                      <RelicSprite iconType={relic.iconType} size={36} />
+                    ) : (
+                      <PixelLockSprite size={24} />
+                    )}
+                  </div>
+                  <div>
+                    <div className="font-pixel text-[10px] text-[#f4f1ea] leading-snug">
+                      {relic.name}
+                    </div>
+                    <div className="font-vt text-base text-[#f5b935]">{relic.source}</div>
+                  </div>
+                </div>
+                <p className="font-vt text-lg text-[#b3aad1] leading-snug">
+                  {owned
+                    ? relic.description
+                    : 'Selesaikan Quest Menara Master terkait di Lantai 6 untuk memperoleh relik ini.'}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 };
+
