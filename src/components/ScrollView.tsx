@@ -9,6 +9,8 @@ import {
   computeSoftmaxMiniLab,
   getFloor1TopicContent,
 } from '../game/spellbookEngine';
+import { getLessonChunksForTopic } from '../game/lessonEngine';
+import { LessonChunkPlayer } from './LessonChunkPlayer';
 import { FLOORS } from '../data/roadmap.js';
 import { useGameStore } from '../store/useGameStore';
 import { useSound } from '../hooks/useSound.js';
@@ -693,6 +695,7 @@ export const ScrollPanel: React.FC<ScrollPanelProps> = ({
   const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
   const { playClick } = useSound();
 
+  const lessonChunks = getLessonChunksForTopic(topicContent.topicId);
   const spellTheme = SPELL_VISUALS[topicContent.spell.id] || SPELL_VISUALS.s1;
 
   const checkScrollReachedEnd = useCallback(() => {
@@ -708,6 +711,7 @@ export const ScrollPanel: React.FC<ScrollPanelProps> = ({
   }, []);
 
   useEffect(() => {
+    if (lessonChunks.length > 0) return undefined;
     setHasScrolledToEnd(false);
     const timer = window.setTimeout(() => {
       checkScrollReachedEnd();
@@ -717,7 +721,21 @@ export const ScrollPanel: React.FC<ScrollPanelProps> = ({
       window.clearTimeout(timer);
       window.removeEventListener('resize', checkScrollReachedEnd);
     };
-  }, [topicContent.topicId, checkScrollReachedEnd]);
+  }, [topicContent.topicId, lessonChunks.length, checkScrollReachedEnd]);
+
+  if (lessonChunks.length > 0) {
+    return (
+      <LessonChunkPlayer
+        topicContent={topicContent}
+        topicTitle={topicTitle}
+        chunks={lessonChunks}
+        reduceMotion={reduceMotion}
+        mode={mode}
+        onReadyToFight={onReadyToFight}
+        onClose={onClose}
+      />
+    );
+  }
 
   return (
     <div className="relative flex flex-col max-h-[85vh] overflow-hidden">

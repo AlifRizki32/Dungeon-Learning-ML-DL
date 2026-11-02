@@ -1,0 +1,813 @@
+{
+  "reviewStatus": "needs-human-review",
+  "floor": 2,
+  "lessonVersion": 3,
+  "guide": { "name": "Rune", "role": "Pemandu dungeon" },
+  "topics": [
+    {
+      "topicId": 7,
+      "chunks": [
+        {
+          "chunkId": "t7c1",
+          "title": "Membagi data: latih dan uji",
+          "goal": "Setelah ini kamu bisa membagi data menjadi data latih dan data uji.",
+          "terms": [
+            { "term": "data latih", "plain": "data yang dipakai model untuk belajar" },
+            { "term": "data uji", "plain": "data yang disimpan untuk menguji model dengan jujur" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Di akademi, ada soal latihan dan soal ujian." },
+            { "who": "Rune", "text": "Kalau soal ujian bocor sebelum ujian, nilainya tidak jujur." },
+            { "who": "Kamu", "text": "Jadi data juga dibagi dua?" }
+          ],
+          "guess": { "question": "Dari 500 data, kamu simpan 20% untuk uji. Berapa data uji?", "options": ["20", "50", "100", "400"], "correctIndex": 2, "reveal": "Mari kita lihat caranya." },
+          "visual": { "type": "dotGrid", "total": 100, "columns": 10, "groups": [ { "id": "latih", "count": 80, "label": "Data latih (80%)" }, { "id": "uji", "count": 20, "label": "Data uji (20%)" } ] },
+          "steps": [
+            { "text": "Bayangkan 100 data. Tiap kotak adalah satu data.", "highlight": ["latih", "uji"] },
+            { "text": "Sebagian besar, misalnya 80, dipakai model untuk belajar. Ini data latih.", "highlight": ["latih"] },
+            { "text": "Sisanya 20 disimpan dan tidak boleh dilihat model saat belajar. Ini data uji.", "highlight": ["uji"] },
+            { "text": "Setelah model selesai belajar, kita mengujinya dengan data uji.", "highlight": ["uji"] },
+            { "text": "Jadi data uji harus tetap baru. Model yang sudah melihatnya tidak bisa diuji dengan jujur.", "highlight": ["uji"] },
+            { "text": "Jika 10% data adalah kelas B, data uji sebaiknya juga berisi sekitar 10% kelas B. Itu namanya stratify.", "highlight": [] },
+            { "text": "Dari 200 data uji, sekitar 20 data adalah kelas B, karena 10% × 200 = 20.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t7c1p1", "type": "fillNumber", "question": "Dari 500 data, 30% menjadi data uji. Berapa data latih?", "answer": 350, "tolerance": 0, "unit": "", "why": "30% × 500 = 150 data uji. Data latih = 500 − 150 = 350." },
+            { "id": "t7c1p2", "type": "fillNumber", "question": "Di 1.000 data, 10% adalah kelas B. Data uji 200 data dibuat dengan stratify. Berapa data kelas B yang diharapkan di data uji?", "answer": 20, "tolerance": 0, "unit": "", "why": "10% × 200 = 20." },
+            { "id": "t7c1p3", "type": "choice", "question": "Mengapa data uji tidak boleh dipakai saat model belajar?", "options": ["Agar hasil uji jujur, karena model belum pernah melihatnya", "Agar data latih lebih besar", "Agar model lebih cepat", "Agar tidak perlu stratify"], "correctIndex": 0, "why": "Data yang sudah dilihat model tidak bisa menguji kemampuannya pada hal yang baru." }
+          ],
+          "formula": { "lines": ["train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)"], "readAloud": "Bagi data: dua puluh persen untuk uji, jaga proporsi kelas tetap sama, dan pakai angka acak tetap agar pembagiannya bisa diulang." },
+          "commonMistake": "Menguji model memakai data yang juga dipakai untuk melatihnya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa data uji harus tetap baru bagi model?",
+          "reviewItems": [
+            { "id": "t7c1r1", "front": "Mengapa data dibagi menjadi latih dan uji?", "back": "Agar model diuji pada data yang belum pernah dilihatnya." },
+            { "id": "t7c1r2", "front": "Apa itu stratify?", "back": "Menjaga proporsi kelas di data latih dan uji tetap mirip." }
+          ]
+        },
+        {
+          "chunkId": "t7c2",
+          "title": "Kebocoran data",
+          "goal": "Setelah ini kamu bisa mengenali dan mencegah kebocoran data.",
+          "terms": [
+            { "term": "kebocoran data", "plain": "informasi dari data uji ikut masuk ke proses belajar" },
+            { "term": "imputasi", "plain": "mengisi nilai kosong dengan nilai pengganti" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Seorang murid mengintip kunci jawaban sebelum ujian." },
+            { "who": "Rune", "text": "Nilainya bagus, tetapi bukan karena ia pandai." },
+            { "who": "Kamu", "text": "Apakah model bisa begitu juga?" },
+            { "who": "Rune", "text": "Bisa, tanpa sengaja. Namanya kebocoran data." }
+          ],
+          "guess": { "question": "Kolom suhu punya nilai kosong dan kamu mengisinya dengan rata-rata. Rata-rata itu dihitung dari data apa?", "options": ["Seluruh data, termasuk data uji", "Hanya data latih", "Hanya data uji", "Tebakan saja"], "correctIndex": 1, "reveal": "Kita buktikan alasannya." },
+          "visual": { "type": "codeBlock", "lines": ["# SALAH: scaler melihat seluruh data, termasuk data uji", "scaler = StandardScaler().fit(X)", "X_latih, X_uji = train_test_split(scaler.transform(X), ...)", "", "# BENAR: bagi dulu, pelajari hanya dari data latih", "X_latih, X_uji = train_test_split(X, ...)", "scaler = StandardScaler().fit(X_latih)", "X_latih_s = scaler.transform(X_latih)", "X_uji_s = scaler.transform(X_uji)"] },
+          "steps": [
+            { "text": "Suhu di data latih: 20, 22, dan 24. Suhu di data uji: 40.", "highlight": [] },
+            { "text": "Rata-rata dari data latih saja: (20 + 22 + 24) ÷ 3 = 22.", "highlight": [] },
+            { "text": "Jika salah menghitung dari semua data: (20 + 22 + 24 + 40) ÷ 4 = 26,5.", "highlight": ["l1", "l2", "l3"] },
+            { "text": "Angka 26,5 sudah dipengaruhi suhu 40 dari data uji. Padahal model tidak boleh tahu apa pun tentang data uji.", "highlight": ["l2"] },
+            { "text": "Itulah kebocoran data. Hasil ujinya jadi terlihat lebih bagus daripada kenyataannya.", "highlight": [] },
+            { "text": "Aturannya: bagi data dulu. Semua yang belajar dari data, seperti rata-rata atau scaler, hanya dipelajari dari data latih.", "highlight": ["l5", "l6", "l7", "l8", "l9"] }
+          ],
+          "practice": [
+            { "id": "t7c2p1", "type": "fillNumber", "question": "Data latih: 10, 14, 18. Data uji: 40. Berapa rata-rata yang benar untuk mengisi nilai kosong?", "answer": 14, "tolerance": 0, "unit": "", "why": "Hanya data latih: (10 + 14 + 18) ÷ 3 = 42 ÷ 3 = 14." },
+            { "id": "t7c2p2", "type": "choice", "question": "Urutan mana yang benar?", "options": ["Hitung rata-rata dari seluruh data, lalu bagi data", "Bagi data dulu, lalu hitung rata-rata hanya dari data latih", "Hitung rata-rata dari data uji", "Tidak perlu membagi data"], "correctIndex": 1, "why": "Membagi dulu menjaga data uji tetap tidak terlihat." },
+            { "id": "t7c2p3", "type": "order", "question": "Urutkan langkah pipeline yang benar.", "items": ["Bagi data menjadi latih dan uji", "Pelajari scaler hanya dari data latih", "Terapkan scaler pada data latih", "Terapkan scaler yang sama pada data uji"], "why": "Bagi dulu, pelajari dari data latih, lalu terapkan ke keduanya." }
+          ],
+          "formula": { "lines": ["fit hanya pada data latih", "transform pada data latih dan data uji"], "readAloud": "Pelajari dari data latih saja, lalu terapkan ke data latih dan data uji." },
+          "commonMistake": "Menghitung rata-rata atau scaler dari seluruh dataset sebelum membagi data.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa rata-rata 26,5 itu bocor?",
+          "reviewItems": [
+            { "id": "t7c2r1", "front": "Apa itu kebocoran data?", "back": "Informasi dari data uji ikut masuk ke proses belajar, sehingga skor tampak terlalu bagus." },
+            { "id": "t7c2r2", "front": "Pada data apa scaler dipelajari (fit)?", "back": "Hanya pada data latih." }
+          ]
+        },
+        {
+          "chunkId": "t7c3",
+          "title": "Menyamakan skala fitur",
+          "goal": "Setelah ini kamu bisa menyamakan skala fitur dengan min-max dan standarisasi.",
+          "terms": [
+            { "term": "fitur", "plain": "satu kolom informasi tentang data" },
+            { "term": "skala", "plain": "rentang angka yang dipakai sebuah fitur" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Dua petualang. Satu berumur 25 tahun bergaji 5.000.000. Satunya 30 tahun bergaji 5.100.000." },
+            { "who": "Kamu", "text": "Aku ingin mengukur seberapa dekat mereka." },
+            { "who": "Rune", "text": "Selisih umur 5. Selisih gaji 100.000. Siapa yang menang dalam jarak?" }
+          ],
+          "guess": { "question": "Selisih mana yang akan mendominasi jarak antara keduanya?", "options": ["Umur (5)", "Gaji (100.000)", "Sama kuat", "Tidak ada"], "correctIndex": 1, "reveal": "Mari kita lihat akibatnya." },
+          "visual": { "type": "bars", "items": [ { "id": "umur", "label": "Selisih umur (tahun)", "value": 5 }, { "id": "gaji", "label": "Selisih gaji (rupiah)", "value": 100000 } ] },
+          "steps": [
+            { "text": "Jarak memakai selisih angka. Umur berselisih 5 dan gaji berselisih 100.000.", "highlight": ["umur", "gaji"] },
+            { "text": "Angka 100.000 jauh lebih besar dari 5, jadi gaji hampir sendirian menentukan jarak.", "highlight": ["gaji"] },
+            { "text": "Umur nyaris tidak berpengaruh, padahal mungkin penting. Solusinya: samakan skala semua fitur.", "highlight": ["umur"] },
+            { "text": "Cara 1, min-max: x' = (x − min) ÷ (max − min). Dengan min 0 dan max 50, x = 10 menjadi 10 ÷ 50 = 0,2.", "highlight": [] },
+            { "text": "Cara 2, standarisasi: z = (x − rata-rata) ÷ simpangan baku. Dengan rata-rata 5 dan simpangan baku 2, x = 9 menjadi (9 − 5) ÷ 2 = 2.", "highlight": [] },
+            { "text": "Kedua cara membuat fitur berskala sebanding, jadi tidak ada fitur yang mendominasi hanya karena angkanya besar.", "highlight": [] },
+            { "text": "Ingat aturan sebelumnya: min, max, rata-rata, dan simpangan baku dihitung dari data latih saja.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t7c3p1", "type": "fillNumber", "question": "Data latih punya min 0 dan max 50. Berapa nilai min-max untuk x = 20?", "answer": 0.4, "tolerance": 0.001, "unit": "", "why": "(20 − 0) ÷ (50 − 0) = 0,4." },
+            { "id": "t7c3p2", "type": "fillNumber", "question": "Data latih punya rata-rata 5 dan simpangan baku 2. Berapa nilai z untuk x = 11?", "answer": 3, "tolerance": 0, "unit": "", "why": "(11 − 5) ÷ 2 = 3." },
+            { "id": "t7c3p3", "type": "choice", "question": "Data latih punya min 0 dan max 50. Berapa nilai min-max untuk x = 60 di data uji?", "options": ["1,2", "1,0", "0,6", "Error"], "correctIndex": 0, "why": "60 ÷ 50 = 1,2. Nilai uji boleh melewati rentang 0 sampai 1, karena parameternya dari data latih." }
+          ],
+          "formula": { "lines": ["x' = (x − min) ÷ (max − min)", "z = (x − rata-rata) ÷ simpangan baku"], "readAloud": "Min-max: kurangi min, bagi rentang. Standarisasi: kurangi rata-rata, bagi simpangan baku." },
+          "commonMistake": "Menghitung min, max, atau rata-rata dari data uji.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa fitur dengan angka besar bisa mengacaukan jarak?",
+          "reviewItems": [
+            { "id": "t7c3r1", "front": "Rumus min-max?", "back": "x' = (x − min) ÷ (max − min)" },
+            { "id": "t7c3r2", "front": "Rumus standarisasi?", "back": "z = (x − rata-rata) ÷ simpangan baku" }
+          ]
+        },
+        {
+          "chunkId": "t7c4",
+          "title": "Kategori jadi angka dan fitur baru",
+          "goal": "Setelah ini kamu bisa mengubah kategori menjadi angka dan membuat fitur baru.",
+          "terms": [
+            { "term": "one-hot encoding", "plain": "mengubah satu kolom kategori menjadi beberapa kolom berisi 0 dan 1" },
+            { "term": "feature engineering", "plain": "membuat fitur baru dari fitur yang sudah ada" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Monster punya kolom warna: merah, biru, atau hijau. Model hanya mengerti angka." },
+            { "who": "Kamu", "text": "Aku beri nomor saja: merah 1, biru 2, hijau 3." },
+            { "who": "Rune", "text": "Hati-hati. Nomor itu menyiratkan hijau lebih besar dari merah." }
+          ],
+          "guess": { "question": "Mengapa memberi nomor 1, 2, 3 pada warna bisa menyesatkan model?", "options": ["Model menganggap ada urutan atau jarak antar warna", "Angkanya terlalu kecil", "Warna tidak bisa dihitung", "Model suka huruf"], "correctIndex": 0, "reveal": "Ada cara yang lebih adil." },
+          "visual": { "type": "matrixGrid", "matrices": [ { "id": "A", "rows": [[1, 0, 0], [0, 1, 0], [0, 0, 1]], "rowLabels": ["merah", "biru", "hijau"], "colLabels": ["is_merah", "is_biru", "is_hijau"] } ] },
+          "steps": [
+            { "text": "Warna punya 3 kategori. Kita buat 3 kolom baru: is_merah, is_biru, is_hijau.", "highlight": [] },
+            { "text": "Monster merah menjadi [1, 0, 0]. Satu kolom bernilai 1 dan sisanya 0.", "highlight": ["A:r1"] },
+            { "text": "Monster biru menjadi [0, 1, 0]. Monster hijau menjadi [0, 0, 1].", "highlight": ["A:r2", "A:r3"] },
+            { "text": "Sekarang tidak ada kategori yang lebih besar dari yang lain. Ini disebut one-hot encoding.", "highlight": [] },
+            { "text": "Feature engineering: membuat fitur baru dari yang ada. Panjang 5 dan lebar 4 menghasilkan luas 5 × 4 = 20.", "highlight": [] },
+            { "text": "Fitur baru bisa membuat pola lebih mudah ditemukan, misalnya luas lebih bermakna daripada panjang dan lebar terpisah.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t7c4p1", "type": "fillNumber", "question": "Kolom 'kota' punya 4 kategori. Berapa kolom hasil one-hot encoding?", "answer": 4, "tolerance": 0, "unit": "kolom", "why": "Satu kolom untuk tiap kategori: 4 kolom." },
+            { "id": "t7c4p2", "type": "choice", "question": "Dengan urutan kolom [merah, biru, hijau], monster biru menjadi...", "options": ["[0, 1, 0]", "[1, 0, 0]", "[2]", "[0, 0, 1]"], "correctIndex": 0, "why": "Hanya kolom biru yang bernilai 1." },
+            { "id": "t7c4p3", "type": "fillNumber", "question": "Panjang 6 dan lebar 3. Berapa nilai fitur luas?", "answer": 18, "tolerance": 0, "unit": "", "why": "6 × 3 = 18." }
+          ],
+          "formula": { "lines": ["one-hot: satu kolom 0 atau 1 untuk tiap kategori", "fitur baru, misalnya luas = panjang × lebar"], "readAloud": "Tiap kategori punya kolomnya sendiri berisi nol atau satu. Fitur baru bisa dibuat dari hitungan fitur lama." },
+          "commonMistake": "Memberi nomor 1, 2, 3 pada kategori yang sebenarnya tidak berurutan.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa one-hot lebih adil daripada nomor 1, 2, 3?",
+          "reviewItems": [
+            { "id": "t7c4r1", "front": "Mengapa memakai one-hot encoding?", "back": "Agar tidak ada urutan atau jarak palsu antar kategori." },
+            { "id": "t7c4r2", "front": "Apa itu feature engineering?", "back": "Membuat fitur baru dari fitur yang sudah ada." }
+          ]
+        }
+      ]
+    },
+    {
+      "topicId": 8,
+      "chunks": [
+        {
+          "chunkId": "t8c1",
+          "title": "Garis prediksi dan galat (MSE)",
+          "goal": "Setelah ini kamu bisa menghitung galat dan MSE.",
+          "terms": [
+            { "term": "galat", "plain": "selisih antara jawaban sebenarnya dan tebakan" },
+            { "term": "ŷ", "plain": "tebakan model, dibaca 'y topi'" },
+            { "term": "MSE", "plain": "rata-rata dari kuadrat galat" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Model regresi menebak angka, misalnya harga ramuan." },
+            { "who": "Kamu", "text": "Bagaimana tahu tebakannya bagus?" },
+            { "who": "Rune", "text": "Kita ukur galatnya." }
+          ],
+          "guess": { "question": "Jawaban asli: 3, 5, 7, 9. Tebakan: 4, 5, 5, 9. Tebakan mana yang paling meleset?", "options": ["Tebakan ke-1", "Tebakan ke-2", "Tebakan ke-3", "Tebakan ke-4"], "correctIndex": 2, "reveal": "Mari kita ukur dengan angka." },
+          "visual": { "type": "bars", "items": [ { "id": "g1", "label": "Kuadrat galat 1", "value": 1 }, { "id": "g2", "label": "Kuadrat galat 2", "value": 0 }, { "id": "g3", "label": "Kuadrat galat 3", "value": 4 }, { "id": "g4", "label": "Kuadrat galat 4", "value": 0 } ] },
+          "steps": [
+            { "text": "Jawaban asli y = 3, 5, 7, 9. Tebakan ŷ = 4, 5, 5, 9.", "highlight": [] },
+            { "text": "Galat = y − ŷ, jadi: −1, 0, 2, 0.", "highlight": [] },
+            { "text": "Kuadratkan agar tidak saling menghapus: 1, 0, 4, 0.", "highlight": ["g1", "g2", "g3", "g4"] },
+            { "text": "Rata-ratakan: (1 + 0 + 4 + 0) ÷ 4 = 1,25. Itu MSE.", "highlight": ["g3"] },
+            { "text": "Makin kecil MSE, makin bagus tebakannya. MSE 0 berarti semua tebakan tepat.", "highlight": [] },
+            { "text": "Model linear menebak dengan ŷ = w·x + b. Belajar berarti mencari w dan b yang membuat MSE sekecil mungkin.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t8c1p1", "type": "fillNumber", "question": "y = 1, 3 dan ŷ = 3, 3. Berapa MSE?", "answer": 2, "tolerance": 0, "unit": "", "why": "Galat: −2 dan 0. Kuadrat: 4 dan 0. Rata-rata: 4 ÷ 2 = 2." },
+            { "id": "t8c1p2", "type": "fillNumber", "question": "y = 0, 2, 4, 6 dan ŷ = 1, 1, 4, 8. Berapa MSE?", "answer": 1.5, "tolerance": 0.001, "unit": "", "why": "Galat: −1, 1, 0, −2. Kuadrat: 1, 1, 0, 4. Rata-rata: 6 ÷ 4 = 1,5." },
+            { "id": "t8c1p3", "type": "choice", "question": "Mengapa galat dikuadratkan?", "options": ["Agar galat positif dan negatif tidak saling menghapus, dan galat besar dihukum lebih berat", "Agar galat selalu nol", "Agar model lebih besar", "Agar data terurut"], "correctIndex": 0, "why": "Tanpa kuadrat, galat −2 dan +2 akan menjumlah menjadi 0." }
+          ],
+          "formula": { "lines": ["ŷ = w·x + b", "MSE = rata-rata dari (y − ŷ)²"], "readAloud": "Tebakan sama dengan w kali x tambah b. MSE adalah rata-rata kuadrat galat." },
+          "commonMistake": "Merata-ratakan galat tanpa mengkuadratkannya, sehingga galat positif dan negatif saling menghapus.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa arti MSE yang kecil?",
+          "reviewItems": [ { "id": "t8c1r1", "front": "Rumus MSE?", "back": "Rata-rata dari (y − ŷ)²" } ]
+        },
+        {
+          "chunkId": "t8c2",
+          "title": "Gradient descent untuk regresi",
+          "goal": "Setelah ini kamu bisa menghitung satu langkah gradient descent pada model sederhana.",
+          "terms": [
+            { "term": "bobot (w)", "plain": "angka yang diatur model agar tebakannya bagus" },
+            { "term": "learning rate (η)", "plain": "besar langkah yang diambil tiap kali memperbarui bobot" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Model sederhana: ŷ = w·x. Hanya satu bobot, yaitu w." },
+            { "who": "Kamu", "text": "Bagaimana mencari w yang pas?" },
+            { "who": "Rune", "text": "Kita melangkah pelan-pelan mengikuti kemiringan loss." }
+          ],
+          "guess": { "question": "Data: x = 1, 2 dan y = 2, 4. Kamu mulai dari w = 0. Menurutmu w sebaiknya naik atau turun?", "options": ["Naik", "Turun", "Tetap", "Tidak bisa diketahui"], "correctIndex": 0, "reveal": "Kita hitung dan buktikan." },
+          "visual": { "type": "bars", "items": [ { "id": "w0", "label": "MSE saat w = 0", "value": 10 }, { "id": "w1", "label": "MSE saat w = 1", "value": 2.5 }, { "id": "w15", "label": "MSE saat w = 1,5", "value": 0.625 }, { "id": "w2", "label": "MSE saat w = 2", "value": 0 } ] },
+          "steps": [
+            { "text": "Data: x = 1, 2 dan y = 2, 4. Model ŷ = w·x. Mulai dari w = 0.", "highlight": [] },
+            { "text": "Tebakan: 0 dan 0. Galat: 2 dan 4. Kuadrat: 4 dan 16. MSE = (4 + 16) ÷ 2 = 10.", "highlight": ["w0"] },
+            { "text": "Kemiringan loss terhadap w: rata-rata dari −2·x·galat = (−2·1·2 + −2·2·4) ÷ 2 = −10.", "highlight": [] },
+            { "text": "Kemiringan negatif berarti loss turun jika w dinaikkan.", "highlight": [] },
+            { "text": "Langkah: w baru = w − η × kemiringan. Dengan η = 0,1: 0 − 0,1 × (−10) = 1.", "highlight": ["w1"] },
+            { "text": "Di w = 1, MSE = 2,5. Ulangi: kemiringan = −5, jadi w baru = 1 + 0,5 = 1,5 dan MSE = 0,625.", "highlight": ["w15"] },
+            { "text": "Jika terus diulang, w mendekati 2 dan MSE mendekati 0. Gradient descent bekerja karena tiap langkah melawan arah kemiringan loss.", "highlight": ["w2"] }
+          ],
+          "practice": [
+            { "id": "t8c2p1", "type": "fillNumber", "question": "x = 1, 2 dan y = 3, 6. Mulai dari w = 0, kemiringan loss = −15, η = 0,1. Berapa w baru?", "answer": 1.5, "tolerance": 0.001, "unit": "", "why": "w baru = 0 − 0,1 × (−15) = 1,5." },
+            { "id": "t8c2p2", "type": "fillNumber", "question": "Soal yang sama, tetapi η = 0,05. Berapa w baru?", "answer": 0.75, "tolerance": 0.001, "unit": "", "why": "w baru = 0 − 0,05 × (−15) = 0,75." },
+            { "id": "t8c2p3", "type": "choice", "question": "Kemiringan loss bernilai positif. Ke arah mana w harus bergerak?", "options": ["Turun (berkurang)", "Naik", "Tetap", "Tidak tahu"], "correctIndex": 0, "why": "w baru = w − η × kemiringan. Dengan kemiringan positif, w berkurang." }
+          ],
+          "formula": { "lines": ["w baru = w − η · kemiringan loss"], "readAloud": "Bobot baru sama dengan bobot lama dikurangi learning rate dikali kemiringan loss." },
+          "commonMistake": "Salah tanda: menambah kemiringan sehingga loss malah naik.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa w dinaikkan saat kemiringan loss negatif?",
+          "reviewItems": [ { "id": "t8c2r1", "front": "Rumus pembaruan bobot?", "back": "w baru = w − η · kemiringan loss" } ]
+        },
+        {
+          "chunkId": "t8c3",
+          "title": "Regresi logistik: dari angka ke peluang",
+          "goal": "Setelah ini kamu bisa mengubah angka z menjadi peluang dengan sigmoid.",
+          "terms": [
+            { "term": "sigmoid", "plain": "fungsi yang mengubah angka apa pun menjadi angka di antara 0 dan 1" },
+            { "term": "ambang", "plain": "batas peluang untuk memutuskan ya atau tidak" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Kadang kita menebak ya atau tidak, misalnya apakah ini monster siluman." },
+            { "who": "Kamu", "text": "Jadi hasilnya cuma ya atau tidak?" },
+            { "who": "Rune", "text": "Pertama model menghitung peluang antara 0 dan 1." }
+          ],
+          "guess": { "question": "Model menghitung angka z = 2. Menurutmu angka itu diubah menjadi peluang yang...", "options": ["Lebih dari 0,5", "Sama dengan 0,5", "Kurang dari 0,5", "Negatif"], "correctIndex": 0, "reveal": "Kita hitung langkahnya." },
+          "visual": { "type": "linePlot", "points": [[-4, 0.018], [-2, 0.119], [0, 0.5], [2, 0.881], [4, 0.982]] },
+          "steps": [
+            { "text": "Model menghitung z = w·x + b. Misalnya w = 1,5, b = −1, x = 2. Maka z = 1,5×2 − 1 = 2.", "highlight": [] },
+            { "text": "Angka z bisa berapa saja, tetapi peluang harus berada antara 0 dan 1.", "highlight": [] },
+            { "text": "Fungsi sigmoid mengubahnya: σ(z) = 1 ÷ (1 + e^(−z)).", "highlight": [] },
+            { "text": "Untuk z = 2: e^(−2) ≈ 0,135. Jadi σ(2) = 1 ÷ 1,135 ≈ 0,88.", "highlight": ["x2"] },
+            { "text": "Artinya model memperkirakan peluang kelas positif sekitar 88%.", "highlight": ["x2"] },
+            { "text": "Ambang yang umum adalah 0,5. Karena 0,88 lebih besar dari 0,5, tebakannya adalah positif.", "highlight": [] },
+            { "text": "Makin besar z, peluang makin dekat 1. Makin kecil (negatif) z, peluang makin dekat 0.", "highlight": ["x4", "x-4"] }
+          ],
+          "practice": [
+            { "id": "t8c3p1", "type": "fillNumber", "question": "w = 2, b = −3, x = 2. Berapa z?", "answer": 1, "tolerance": 0, "unit": "", "why": "z = 2×2 − 3 = 1." },
+            { "id": "t8c3p2", "type": "choice", "question": "Peluang kelas positif 0,3 dan ambang 0,5. Tebakan model?", "options": ["Positif", "Negatif", "Tidak bisa ditentukan", "Acak"], "correctIndex": 1, "why": "0,3 lebih kecil dari 0,5, jadi tebakannya negatif." },
+            { "id": "t8c3p3", "type": "choice", "question": "Sigmoid selalu menghasilkan angka...", "options": ["Antara 0 dan 1", "Antara −1 dan 1", "Lebih dari 1", "Persis 0,5"], "correctIndex": 0, "why": "Itu sebabnya hasilnya bisa dibaca sebagai peluang." }
+          ],
+          "formula": { "lines": ["z = w·x + b", "σ(z) = 1 ÷ (1 + e^(−z))"], "readAloud": "z sama dengan w kali x tambah b. Sigmoid z adalah satu dibagi satu tambah e pangkat min z." },
+          "commonMistake": "Mengira keluaran sigmoid adalah kepastian. Ia hanya perkiraan peluang.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa sigmoid dibutuhkan untuk menebak ya atau tidak?",
+          "reviewItems": [
+            { "id": "t8c3r1", "front": "Rumus sigmoid?", "back": "σ(z) = 1 ÷ (1 + e^(−z))" },
+            { "id": "t8c3r2", "front": "Apa arti keluaran regresi logistik 0,8?", "back": "Perkiraan peluang kelas positif sekitar 80%." }
+          ]
+        },
+        {
+          "chunkId": "t8c4",
+          "title": "Log loss: hukuman untuk yakin tapi salah",
+          "goal": "Setelah ini kamu bisa menghitung log loss dan menjelaskan mengapa ia menghukum tebakan yang yakin tapi salah.",
+          "terms": [
+            { "term": "log loss", "plain": "loss untuk klasifikasi; hukumannya sangat besar jika model yakin tetapi salah" },
+            { "term": "ln", "plain": "logaritma natural, tersedia di kalkulator" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Dua penebak, dan keduanya salah." },
+            { "who": "Rune", "text": "A bilang 'mungkin 60% ini siluman'. B bilang 'pasti 99% bukan siluman'. Ternyata ini siluman." },
+            { "who": "Kamu", "text": "B lebih salah, karena ia sangat yakin." }
+          ],
+          "guess": { "question": "Siapa yang seharusnya dihukum lebih berat?", "options": ["A", "B", "Sama", "Tidak ada"], "correctIndex": 1, "reveal": "Kita hitung hukumannya." },
+          "visual": { "type": "bars", "items": [ { "id": "p9", "label": "p = 0,9", "value": 0.105 }, { "id": "p25", "label": "p = 0,25", "value": 1.386 }, { "id": "p1", "label": "p = 0,1", "value": 2.303 }, { "id": "p01", "label": "p = 0,01", "value": 4.605 } ] },
+          "steps": [
+            { "text": "Misalkan jawaban benar adalah y = 1 (siluman). Model memberi peluang p untuk jawaban itu.", "highlight": [] },
+            { "text": "Loss untuk y = 1 adalah −ln(p).", "highlight": [] },
+            { "text": "p = 0,9 (yakin dan benar): −ln(0,9) ≈ 0,105. Hukuman kecil.", "highlight": ["p9"] },
+            { "text": "p = 0,25: −ln(0,25) ≈ 1,386. Hukuman sedang.", "highlight": ["p25"] },
+            { "text": "p = 0,1: −ln(0,1) ≈ 2,303.", "highlight": ["p1"] },
+            { "text": "p = 0,01 (sangat yakin tetapi salah): −ln(0,01) ≈ 4,605. Hukuman sangat besar.", "highlight": ["p01"] },
+            { "text": "Untuk y = 0, hukumannya −ln(1 − p). Jadi model yang yakin pada jawaban salah selalu dihukum berat.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t8c4p1", "type": "fillNumber", "question": "y = 1 dan p = 0,25. Berapa log loss? (tiga angka desimal)", "answer": 1.386, "tolerance": 0.002, "unit": "", "why": "−ln(0,25) ≈ 1,386." },
+            { "id": "t8c4p2", "type": "fillNumber", "question": "y = 0 dan p = 0,7. Berapa log loss? (tiga angka desimal)", "answer": 1.204, "tolerance": 0.002, "unit": "", "why": "−ln(1 − 0,7) = −ln(0,3) ≈ 1,204." },
+            { "id": "t8c4p3", "type": "choice", "question": "Untuk y = 1, manakah yang dihukum paling berat?", "options": ["p = 0,9", "p = 0,5", "p = 0,1", "p = 0,99"], "correctIndex": 2, "why": "Makin kecil peluang yang diberikan pada jawaban benar, makin besar −ln(p)." }
+          ],
+          "formula": { "lines": ["y = 1: loss = −ln(p)", "y = 0: loss = −ln(1 − p)"], "readAloud": "Jika jawaban benar satu, loss adalah min ln p. Jika nol, loss adalah min ln satu kurang p." },
+          "commonMistake": "Menganggap semua tebakan salah sama buruknya, padahal yang yakin tetapi salah dihukum paling berat.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa p = 0,01 pada jawaban benar dihukum sangat berat?",
+          "reviewItems": [ { "id": "t8c4r1", "front": "Loss untuk y = 1 pada regresi logistik?", "back": "−ln(p)" } ]
+        },
+        {
+          "chunkId": "t8c5",
+          "title": "Membaca koefisien",
+          "goal": "Setelah ini kamu bisa menafsirkan koefisien regresi linear dan logistik.",
+          "terms": [
+            { "term": "koefisien", "plain": "angka di depan sebuah fitur dalam model" },
+            { "term": "odds", "plain": "peluang ya dibagi peluang tidak" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Model sudah dilatih. Kamu ingin tahu fitur mana yang berpengaruh." },
+            { "who": "Kamu", "text": "Aku lihat koefisiennya?" },
+            { "who": "Rune", "text": "Betul. Tapi cara membacanya berbeda untuk regresi linear dan logistik." }
+          ],
+          "guess": { "question": "Pada y = 5 + 2·x1 + 3·x2, jika x1 naik 1 dan x2 tetap, y berubah...", "options": ["Naik 2", "Naik 3", "Naik 5", "Tetap"], "correctIndex": 0, "reveal": "Itu kasus yang mudah. Sekarang kasus logistik." },
+          "steps": [
+            { "text": "Regresi linear: koefisien 2 pada x1 berarti y naik rata-rata 2 setiap x1 naik 1, jika fitur lain tetap.", "highlight": [] },
+            { "text": "Regresi logistik lebih rumit. Koefisiennya bekerja pada skala log-odds.", "highlight": [] },
+            { "text": "Odds = peluang ya ÷ peluang tidak. Peluang 0,5 → odds 1. Peluang 0,75 → odds 0,75 ÷ 0,25 = 3.", "highlight": [] },
+            { "text": "Jika koefisien b, setiap fitur naik 1 membuat odds dikali e^b.", "highlight": [] },
+            { "text": "Misalkan b = 0,693. Maka e^0,693 ≈ 2, jadi odds menjadi dua kali lipat.", "highlight": [] },
+            { "text": "Mulai dari peluang 0,5 (odds 1). Odds menjadi 2, maka peluang = 2 ÷ (1 + 2) ≈ 0,67.", "highlight": [] },
+            { "text": "Jadi koefisien logistik bukan perubahan peluang langsung, karena yang berubah adalah odds.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t8c5p1", "type": "fillNumber", "question": "Odds = 4. Berapa peluangnya? (tulis desimal)", "answer": 0.8, "tolerance": 0.001, "unit": "", "why": "peluang = odds ÷ (1 + odds) = 4 ÷ 5 = 0,8." },
+            { "id": "t8c5p2", "type": "choice", "question": "Koefisien logistik 0 pada sebuah fitur berarti...", "options": ["Fitur itu tidak mengubah odds", "Peluang selalu 0", "Peluang selalu 1", "Fitur menyebabkan kelas positif"], "correctIndex": 0, "why": "e^0 = 1, jadi odds dikali 1 dan tidak berubah." },
+            { "id": "t8c5p3", "type": "fillNumber", "question": "Pada y = 1 + 4·x1, jika x1 naik 3, berapa y naik?", "answer": 12, "tolerance": 0, "unit": "", "why": "4 × 3 = 12." }
+          ],
+          "formula": { "lines": ["linear: y naik b setiap x naik 1", "logistik: odds dikali e^b setiap x naik 1", "odds = p ÷ (1 − p)"], "readAloud": "Pada regresi linear, y naik b. Pada logistik, odds dikali e pangkat b." },
+          "commonMistake": "Menafsirkan koefisien logistik sebagai perubahan peluang langsung.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa bedanya membaca koefisien linear dan logistik?",
+          "reviewItems": [
+            { "id": "t8c5r1", "front": "Arti koefisien b pada regresi logistik?", "back": "Setiap fitur naik 1, odds dikali e^b." },
+            { "id": "t8c5r2", "front": "Rumus odds?", "back": "peluang ÷ (1 − peluang)" }
+          ]
+        }
+      ]
+    },
+    {
+      "topicId": 9,
+      "chunks": [
+        {
+          "chunkId": "t9c1",
+          "title": "Confusion matrix",
+          "goal": "Setelah ini kamu bisa membaca empat kotak confusion matrix.",
+          "terms": [
+            { "term": "TP", "plain": "benar positif: aslinya positif dan ditebak positif" },
+            { "term": "FN", "plain": "negatif palsu: aslinya positif tetapi ditebak negatif" },
+            { "term": "FP", "plain": "positif palsu: aslinya negatif tetapi ditebak positif" },
+            { "term": "TN", "plain": "negatif benar: aslinya negatif dan ditebak negatif" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Detektor siluman menebak 100 monster." },
+            { "who": "Rune", "text": "Ada tebakan yang benar dan ada yang salah." },
+            { "who": "Kamu", "text": "Salahnya ada beberapa jenis?" },
+            { "who": "Rune", "text": "Ya. Kita sortir ke dalam tabel empat kotak." }
+          ],
+          "guess": { "question": "Detektor menebak 'siluman' padahal monster itu biasa. Jenis kesalahan apa itu?", "options": ["Positif palsu (FP)", "Negatif palsu (FN)", "Benar positif (TP)", "Negatif benar (TN)"], "correctIndex": 0, "reveal": "Mari kita lihat tabelnya." },
+          "visual": { "type": "matrixGrid", "matrices": [ { "id": "M", "rows": [[15, 10], [5, 70]], "rowLabels": ["Aslinya siluman", "Aslinya biasa"], "colLabels": ["Ditebak siluman", "Ditebak biasa"] } ] },
+          "steps": [
+            { "text": "Ada 100 monster. Tiap monster punya kenyataan (siluman atau biasa) dan tebakan (siluman atau biasa).", "highlight": [] },
+            { "text": "Kiri atas: aslinya siluman dan ditebak siluman. Ini TP = 15.", "highlight": ["M:r1c1"] },
+            { "text": "Kanan atas: aslinya siluman tetapi ditebak biasa. Ini FN = 10. Siluman yang terlewat.", "highlight": ["M:r1c2"] },
+            { "text": "Kiri bawah: aslinya biasa tetapi ditebak siluman. Ini FP = 5. Alarm palsu.", "highlight": ["M:r2c1"] },
+            { "text": "Kanan bawah: aslinya biasa dan ditebak biasa. Ini TN = 70.", "highlight": ["M:r2c2"] },
+            { "text": "Jumlah semuanya: 15 + 10 + 5 + 70 = 100. Semua monster terhitung.", "highlight": [] },
+            { "text": "Dari empat kotak inilah semua metrik evaluasi dihitung.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t9c1p1", "type": "fillNumber", "question": "TP = 20, FN = 5, FP = 10, TN = 65. Berapa total contoh?", "answer": 100, "tolerance": 0, "unit": "", "why": "20 + 5 + 10 + 65 = 100." },
+            { "id": "t9c1p2", "type": "choice", "question": "Siluman asli yang ditebak biasa disebut...", "options": ["FN", "FP", "TP", "TN"], "correctIndex": 0, "why": "Aslinya positif tetapi ditebak negatif: negatif palsu (FN)." },
+            { "id": "t9c1p3", "type": "match", "question": "Cocokkan istilah dengan artinya.", "pairs": [ { "left": "TP", "right": "Aslinya positif, ditebak positif" }, { "left": "FP", "right": "Aslinya negatif, ditebak positif" }, { "left": "FN", "right": "Aslinya positif, ditebak negatif" }, { "left": "TN", "right": "Aslinya negatif, ditebak negatif" } ], "why": "P menunjukkan tebakan positif atau negatif, T/F menunjukkan benar atau salah." }
+          ],
+          "formula": { "lines": ["TP + FP + FN + TN = jumlah semua contoh"], "readAloud": "Keempat kotak dijumlahkan sama dengan semua contoh." },
+          "commonMistake": "Tertukar antara FP dan FN. FP: alarm palsu. FN: yang terlewat.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa beda FP dan FN pada detektor siluman?",
+          "reviewItems": [ { "id": "t9c1r1", "front": "Apa itu FP dan FN?", "back": "FP: aslinya negatif tetapi ditebak positif. FN: aslinya positif tetapi ditebak negatif." } ]
+        },
+        {
+          "chunkId": "t9c2",
+          "title": "Precision dan recall",
+          "goal": "Setelah ini kamu bisa menghitung precision dan recall dan tahu kapan memilih salah satunya.",
+          "terms": [
+            { "term": "precision", "plain": "dari yang ditebak positif, berapa bagian yang benar" },
+            { "term": "recall", "plain": "dari semua yang benar-benar positif, berapa bagian yang tertangkap" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Ada dua pertanyaan berbeda untuk detektor." },
+            { "who": "Rune", "text": "Pertama: dari yang kamu tebak siluman, berapa yang benar?" },
+            { "who": "Rune", "text": "Kedua: dari semua siluman asli, berapa yang tertangkap?" }
+          ],
+          "guess": { "question": "Detektor menebak 20 monster sebagai siluman (TP 15 + FP 5). Berapa dari 20 itu benar-benar siluman?", "options": ["15", "5", "10", "20"], "correctIndex": 0, "reveal": "Kita ubah jadi rumus." },
+          "steps": [
+            { "text": "Precision: dari yang ditebak siluman (TP + FP = 15 + 5 = 20), berapa yang benar? 15 ÷ 20 = 0,75.", "highlight": [] },
+            { "text": "Recall: dari semua siluman asli (TP + FN = 15 + 10 = 25), berapa yang tertangkap? 15 ÷ 25 = 0,6.", "highlight": [] },
+            { "text": "Precision tinggi artinya sedikit alarm palsu. Recall tinggi artinya sedikit siluman yang terlewat.", "highlight": [] },
+            { "text": "Jika terlewat itu berbahaya, misalnya skrining penyakit, utamakan recall.", "highlight": [] },
+            { "text": "Jika alarm palsu itu mahal, utamakan precision.", "highlight": [] },
+            { "text": "Keduanya berguna, karena yang satu tidak bisa menggantikan yang lain.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t9c2p1", "type": "fillNumber", "question": "TP = 8 dan FP = 2. Berapa precision?", "answer": 0.8, "tolerance": 0.001, "unit": "", "why": "8 ÷ (8 + 2) = 0,8." },
+            { "id": "t9c2p2", "type": "fillNumber", "question": "TP = 8 dan FN = 8. Berapa recall?", "answer": 0.5, "tolerance": 0.001, "unit": "", "why": "8 ÷ (8 + 8) = 0,5." },
+            { "id": "t9c2p3", "type": "choice", "question": "Pada skrining penyakit serius, jangan sampai ada orang sakit yang terlewat. Metrik yang diutamakan?", "options": ["Recall", "Precision", "Jumlah fitur", "Waktu latih"], "correctIndex": 0, "why": "Recall menjaga FN, yaitu yang terlewat, tetap kecil." }
+          ],
+          "formula": { "lines": ["precision = TP ÷ (TP + FP)", "recall = TP ÷ (TP + FN)"], "readAloud": "Precision: yang benar dibagi semua tebakan positif. Recall: yang benar dibagi semua yang aslinya positif." },
+          "commonMistake": "Tertukar penyebut: precision memakai TP + FP, recall memakai TP + FN.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: kapan recall lebih penting daripada precision?",
+          "reviewItems": [
+            { "id": "t9c2r1", "front": "Rumus precision?", "back": "TP ÷ (TP + FP)" },
+            { "id": "t9c2r2", "front": "Rumus recall?", "back": "TP ÷ (TP + FN)" }
+          ]
+        },
+        {
+          "chunkId": "t9c3",
+          "title": "Akurasi menyesatkan dan F1",
+          "goal": "Setelah ini kamu bisa menjelaskan mengapa akurasi bisa menipu dan menghitung F1.",
+          "terms": [
+            { "term": "akurasi", "plain": "bagian tebakan yang benar dari semua tebakan" },
+            { "term": "F1", "plain": "angka yang menggabungkan precision dan recall; rendah jika salah satunya rendah" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Ada 200 monster dan hanya 4 yang siluman." },
+            { "who": "Rune", "text": "Detektor malas selalu menebak 'biasa'." },
+            { "who": "Kamu", "text": "Pasti jelek. Mari kita lihat akurasinya." }
+          ],
+          "guess": { "question": "Detektor selalu menebak 'biasa'. Berapa akurasinya kira-kira?", "options": ["2%", "50%", "98%", "100%"], "correctIndex": 2, "reveal": "Hitungannya mengejutkan." },
+          "visual": { "type": "bars", "items": [ { "id": "akurasi", "label": "Akurasi (%)", "value": 98 }, { "id": "recall", "label": "Recall siluman (%)", "value": 0 } ] },
+          "steps": [
+            { "text": "Dari 200 monster, 196 biasa dan 4 siluman. Detektor menebak semuanya biasa.", "highlight": [] },
+            { "text": "Tebakan benar: 196 (semua yang biasa). Akurasi = 196 ÷ 200 = 98%.", "highlight": ["akurasi"] },
+            { "text": "Tetapi siluman yang tertangkap: 0 dari 4. Recall = 0.", "highlight": ["recall"] },
+            { "text": "Jadi akurasi tinggi belum berarti detektor bagus, terutama saat satu kelas jauh lebih banyak.", "highlight": ["akurasi", "recall"] },
+            { "text": "F1 menggabungkan precision (P) dan recall (R): F1 = 2·P·R ÷ (P + R).", "highlight": [] },
+            { "text": "Contoh P = 0,75 dan R = 0,6: F1 = 2×0,75×0,6 ÷ 1,35 = 0,9 ÷ 1,35 ≈ 0,67.", "highlight": [] },
+            { "text": "F1 rendah jika salah satunya rendah. Karena itu F1 lebih jujur daripada akurasi pada data tidak seimbang.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t9c3p1", "type": "fillNumber", "question": "Dari 500 contoh, 5 positif. Model selalu menebak negatif. Berapa akurasinya (dalam persen)?", "answer": 99, "tolerance": 0, "unit": "%", "why": "495 dari 500 tebakan benar: 99%." },
+            { "id": "t9c3p2", "type": "fillNumber", "question": "P = 0,9 dan R = 0,3. Berapa F1?", "answer": 0.45, "tolerance": 0.01, "unit": "", "why": "2×0,9×0,3 ÷ (0,9 + 0,3) = 0,54 ÷ 1,2 = 0,45." },
+            { "id": "t9c3p3", "type": "choice", "question": "F1 bernilai rendah jika...", "options": ["Precision atau recall rendah", "Precision dan recall tinggi", "Akurasi 100%", "Data uji besar"], "correctIndex": 0, "why": "F1 dibawa turun oleh yang paling rendah di antara precision dan recall." }
+          ],
+          "formula": { "lines": ["akurasi = (TP + TN) ÷ total", "F1 = 2·P·R ÷ (P + R)"], "readAloud": "Akurasi: yang benar dibagi semua. F1: dua kali P kali R dibagi P tambah R." },
+          "commonMistake": "Hanya melihat akurasi ketika satu kelas jauh lebih banyak dari yang lain.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa detektor malas punya akurasi 98% tetapi tidak berguna?",
+          "reviewItems": [
+            { "id": "t9c3r1", "front": "Mengapa akurasi bisa menyesatkan?", "back": "Pada data tidak seimbang, menebak kelas mayoritas saja sudah menghasilkan akurasi tinggi." },
+            { "id": "t9c3r2", "front": "Rumus F1?", "back": "2·P·R ÷ (P + R)" }
+          ]
+        },
+        {
+          "chunkId": "t9c4",
+          "title": "Cross-validation",
+          "goal": "Setelah ini kamu bisa menjelaskan dan menghitung k-fold cross-validation.",
+          "terms": [
+            { "term": "lipatan (fold)", "plain": "satu bagian dari data yang dibagi sama besar" },
+            { "term": "validasi", "plain": "bagian data yang dipakai untuk menilai model saat memilih dan menyetel" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Satu kali membagi latih dan uji bisa kebetulan menguntungkan atau merugikan." },
+            { "who": "Kamu", "text": "Bagaimana mendapat penilaian yang lebih stabil?" },
+            { "who": "Rune", "text": "Ulangi dengan pembagian yang berbeda-beda." }
+          ],
+          "guess": { "question": "Data dibagi menjadi 5 bagian sama besar. Berapa kali tiap bagian dipakai sebagai data validasi?", "options": ["Sekali", "Dua kali", "Lima kali", "Tidak pernah"], "correctIndex": 0, "reveal": "Kita lihat putarannya." },
+          "visual": { "type": "dotGrid", "total": 100, "columns": 10, "groups": [ { "id": "latih", "count": 80, "label": "Latih (4 lipatan)" }, { "id": "validasi", "count": 20, "label": "Validasi (1 lipatan)" } ] },
+          "steps": [
+            { "text": "Bagi 100 data menjadi 5 lipatan, masing-masing 20 data.", "highlight": ["latih", "validasi"] },
+            { "text": "Putaran 1: lipatan 1 menjadi validasi, lipatan 2 sampai 5 (80 data) menjadi latih.", "highlight": ["latih", "validasi"] },
+            { "text": "Putaran 2: lipatan 2 menjadi validasi, sisanya latih. Begitu seterusnya sampai 5 putaran.", "highlight": [] },
+            { "text": "Tiap data tepat sekali menjadi data validasi.", "highlight": ["validasi"] },
+            { "text": "Misalkan skor lima putaran: 0,80; 0,84; 0,78; 0,86; 0,82.", "highlight": [] },
+            { "text": "Rata-rata = 4,10 ÷ 5 = 0,82. Skor ini lebih stabil daripada satu kali pembagian.", "highlight": [] },
+            { "text": "Data uji akhir tetap disimpan dan baru dipakai pada penilaian terakhir.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t9c4p1", "type": "fillNumber", "question": "Data 150 dibagi menjadi 5 lipatan. Berapa data di satu lipatan?", "answer": 30, "tolerance": 0, "unit": "", "why": "150 ÷ 5 = 30." },
+            { "id": "t9c4p2", "type": "fillNumber", "question": "Skor empat putaran: 0,70; 0,74; 0,78; 0,78. Berapa rata-ratanya?", "answer": 0.75, "tolerance": 0.001, "unit": "", "why": "(0,70 + 0,74 + 0,78 + 0,78) ÷ 4 = 3,00 ÷ 4 = 0,75." },
+            { "id": "t9c4p3", "type": "choice", "question": "Pada 5-fold cross-validation, berapa kali model dilatih?", "options": ["5", "1", "4", "20"], "correctIndex": 0, "why": "Satu kali untuk tiap putaran, dan ada 5 putaran." }
+          ],
+          "formula": { "lines": ["k-fold: bagi data menjadi k lipatan; tiap lipatan sekali menjadi validasi", "skor akhir = rata-rata skor k putaran"], "readAloud": "Bagi data jadi k lipatan, bergiliran jadi validasi, lalu rata-ratakan skornya." },
+          "commonMistake": "Memakai data uji akhir di dalam cross-validation untuk memilih model.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa rata-rata dari beberapa putaran lebih stabil?",
+          "reviewItems": [ { "id": "t9c4r1", "front": "Apa itu k-fold cross-validation?", "back": "Bagi data jadi k lipatan; tiap lipatan sekali jadi validasi; skor akhir adalah rata-ratanya." } ]
+        },
+        {
+          "chunkId": "t9c5",
+          "title": "Overfitting dan underfitting",
+          "goal": "Setelah ini kamu bisa mendiagnosis overfitting dan underfitting dari skor latih dan uji.",
+          "terms": [
+            { "term": "overfitting", "plain": "model menghafal data latih sehingga gagal pada data baru" },
+            { "term": "underfitting", "plain": "model terlalu sederhana untuk menangkap pola" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Tiga murid. A belajar sedikit. B belajar sampai paham. C menghafal jawaban soal latihan." },
+            { "who": "Kamu", "text": "Siapa yang gagal saat ujian dengan soal baru?" },
+            { "who": "Rune", "text": "Lihat nilai latihan dan nilai ujian mereka." }
+          ],
+          "guess": { "question": "Murid C punya nilai latihan 100 tetapi nilai ujian 62. Apa yang terjadi?", "options": ["C menghafal, bukan memahami", "C pasti curang", "C belajar terlalu sedikit", "Soal ujian terlalu mudah"], "correctIndex": 0, "reveal": "Kita bandingkan ketiganya." },
+          "visual": { "type": "bars", "items": [ { "id": "aLatih", "label": "A: nilai latih", "value": 62 }, { "id": "aUji", "label": "A: nilai uji", "value": 60 }, { "id": "bLatih", "label": "B: nilai latih", "value": 88 }, { "id": "bUji", "label": "B: nilai uji", "value": 85 }, { "id": "cLatih", "label": "C: nilai latih", "value": 100 }, { "id": "cUji", "label": "C: nilai uji", "value": 62 } ] },
+          "steps": [
+            { "text": "Murid A: latih 62, uji 60. Keduanya rendah. Ini underfitting: modelnya terlalu sederhana.", "highlight": ["aLatih", "aUji"] },
+            { "text": "Murid B: latih 88, uji 85. Keduanya tinggi dan dekat. Ini pas.", "highlight": ["bLatih", "bUji"] },
+            { "text": "Murid C: latih 100, uji 62. Jurangnya 100 − 62 = 38. Ini overfitting.", "highlight": ["cLatih", "cUji"] },
+            { "text": "Overfitting: model menghafal data latih, termasuk noise, sehingga gagal pada data baru.", "highlight": ["cLatih", "cUji"] },
+            { "text": "Cara memeriksa: bandingkan skor latih dengan skor uji atau validasi.", "highlight": [] },
+            { "text": "Obat overfitting: data lebih banyak, model lebih sederhana, atau regularisasi. Obat underfitting: model lebih kuat atau fitur lebih informatif.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t9c5p1", "type": "fillNumber", "question": "Skor latih 97 dan skor uji 69. Berapa jurangnya?", "answer": 28, "tolerance": 0, "unit": "", "why": "97 − 69 = 28." },
+            { "id": "t9c5p2", "type": "choice", "question": "Skor latih 55 dan skor uji 53. Diagnosis?", "options": ["Underfitting", "Overfitting", "Pas", "Kebocoran data"], "correctIndex": 0, "why": "Keduanya rendah dan dekat: modelnya terlalu sederhana." },
+            { "id": "t9c5p3", "type": "choice", "question": "Salah satu cara mengurangi overfitting?", "options": ["Menambah data atau menyederhanakan model", "Menaikkan skor latih saja", "Menghapus data uji", "Melatih tanpa batas"], "correctIndex": 0, "why": "Data lebih banyak atau model lebih sederhana mengurangi kecenderungan menghafal." }
+          ],
+          "formula": { "lines": ["overfitting: skor latih jauh lebih tinggi dari skor uji", "underfitting: skor latih dan skor uji sama-sama rendah"], "readAloud": "Jurang besar antara skor latih dan uji menandakan overfitting. Keduanya rendah menandakan underfitting." },
+          "commonMistake": "Hanya memeriksa skor latih dan mengabaikan skor uji.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: bagaimana kamu mengenali murid C sebagai penghafal?",
+          "reviewItems": [
+            { "id": "t9c5r1", "front": "Tanda overfitting?", "back": "Skor latih jauh lebih tinggi daripada skor uji." },
+            { "id": "t9c5r2", "front": "Tanda underfitting?", "back": "Skor latih dan skor uji sama-sama rendah." }
+          ]
+        },
+        {
+          "chunkId": "t9c6",
+          "title": "AUC: seberapa baik membedakan",
+          "goal": "Setelah ini kamu bisa menjelaskan arti ROC-AUC dengan menghitung pasangan.",
+          "terms": [
+            { "term": "AUC", "plain": "peluang model memberi skor lebih tinggi pada contoh positif acak daripada pada contoh negatif acak" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Model memberi skor ke tiap monster. Skor tinggi berarti kemungkinan siluman." },
+            { "who": "Kamu", "text": "Aku harus memilih ambang berapa?" },
+            { "who": "Rune", "text": "AUC menilai kemampuan membedakan tanpa memilih ambang dulu." }
+          ],
+          "guess": { "question": "AUC 0,5 berarti model sama dengan...", "options": ["Tebakan acak", "Sempurna", "Selalu benar", "Selalu salah"], "correctIndex": 0, "reveal": "Kita lihat dari hitungan pasangan." },
+          "visual": { "type": "bars", "items": [ { "id": "s1", "label": "Siluman 1 (skor)", "value": 0.9 }, { "id": "s2", "label": "Siluman 2 (skor)", "value": 0.8 }, { "id": "s3", "label": "Siluman 3 (skor)", "value": 0.4 }, { "id": "b1", "label": "Biasa 1 (skor)", "value": 0.7 }, { "id": "b2", "label": "Biasa 2 (skor)", "value": 0.3 }, { "id": "b3", "label": "Biasa 3 (skor)", "value": 0.2 } ] },
+          "steps": [
+            { "text": "Tiga siluman punya skor 0,9; 0,8; 0,4. Tiga monster biasa punya skor 0,7; 0,3; 0,2.", "highlight": ["s1", "s2", "s3", "b1", "b2", "b3"] },
+            { "text": "Bandingkan tiap siluman dengan tiap monster biasa. Ada 3 × 3 = 9 pasangan.", "highlight": [] },
+            { "text": "Siluman 0,9 mengalahkan ketiga monster biasa: 3 pasangan benar.", "highlight": ["s1"] },
+            { "text": "Siluman 0,8 juga mengalahkan ketiganya: 3 pasangan benar.", "highlight": ["s2"] },
+            { "text": "Siluman 0,4 hanya mengalahkan 0,3 dan 0,2: 2 pasangan benar. Ia kalah dari 0,7.", "highlight": ["s3", "b1"] },
+            { "text": "Total benar: 3 + 3 + 2 = 8 dari 9. AUC ≈ 0,89.", "highlight": [] },
+            { "text": "AUC = 1 berarti semua pasangan benar. AUC = 0,5 berarti sama dengan tebakan acak.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t9c6p1", "type": "fillNumber", "question": "Skor positif: 0,9 dan 0,6. Skor negatif: 0,7 dan 0,2. Dari 4 pasangan, berapa pasangan yang benar (positif lebih tinggi)?", "answer": 3, "tolerance": 0, "unit": "", "why": "0,9 > 0,7 dan 0,9 > 0,2. 0,6 > 0,2 benar, tetapi 0,6 < 0,7 salah. Total 3." },
+            { "id": "t9c6p2", "type": "fillNumber", "question": "Dari soal itu, berapa AUC? (tulis desimal)", "answer": 0.75, "tolerance": 0.001, "unit": "", "why": "3 ÷ 4 = 0,75." },
+            { "id": "t9c6p3", "type": "choice", "question": "AUC 1,0 berarti...", "options": ["Model memisahkan semua positif dari negatif dengan sempurna", "Model selalu menebak positif", "Model sama dengan tebakan acak", "Datanya kosong"], "correctIndex": 0, "why": "Semua pasangan positif-negatif memberi skor positif yang lebih tinggi." }
+          ],
+          "formula": { "lines": ["AUC = peluang skor positif acak lebih tinggi dari skor negatif acak", "0,5 = tebakan acak; 1,0 = sempurna"], "readAloud": "AUC adalah peluang sebuah positif acak mendapat skor lebih tinggi daripada sebuah negatif acak." },
+          "commonMistake": "Mengira AUC adalah akurasi pada ambang 0,5.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa arti AUC 0,89 pada contoh tadi?",
+          "reviewItems": [ { "id": "t9c6r1", "front": "Arti AUC 0,5 dan 1,0?", "back": "0,5 sama dengan tebakan acak. 1,0 memisahkan positif dan negatif dengan sempurna." } ]
+        }
+      ]
+    },
+    {
+      "topicId": 10,
+      "chunks": [
+        {
+          "chunkId": "t10c1",
+          "title": "Pohon keputusan dan Gini",
+          "goal": "Setelah ini kamu bisa menghitung Gini untuk menilai kemurnian sekelompok data.",
+          "terms": [
+            { "term": "node", "plain": "satu simpul dalam pohon, berisi sekelompok data" },
+            { "term": "Gini", "plain": "ukuran ketidakmurnian; 0 berarti semua data satu kelas" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Peti berisi bola merah dan biru." },
+            { "who": "Rune", "text": "Pohon keputusan memisahkan bola dengan pertanyaan ya atau tidak." },
+            { "who": "Kamu", "text": "Bagaimana tahu sebuah peti sudah bersih?" }
+          ],
+          "guess": { "question": "Peti A berisi 10 bola merah. Peti B berisi 5 merah dan 5 biru. Peti mana yang lebih murni?", "options": ["A", "B", "Sama", "Tidak tahu"], "correctIndex": 0, "reveal": "Kita ukur dengan angka." },
+          "visual": { "type": "bars", "items": [ { "id": "petiA", "label": "Peti A (10 merah)", "value": 0 }, { "id": "petiB", "label": "Peti B (5 merah, 5 biru)", "value": 0.5 }, { "id": "petiC", "label": "Peti C (7 merah, 3 biru)", "value": 0.42 } ] },
+          "steps": [
+            { "text": "Peti A: 10 merah. Bola apa pun yang diambil pasti merah. Gini = 1 − (1² + 0²) = 0.", "highlight": ["petiA"] },
+            { "text": "Peti B: 5 merah dan 5 biru. Peluang tiap warna 0,5. Gini = 1 − (0,25 + 0,25) = 0,5.", "highlight": ["petiB"] },
+            { "text": "Peti C: 7 merah dan 3 biru. Peluangnya 0,7 dan 0,3. Gini = 1 − (0,49 + 0,09) = 0,42.", "highlight": ["petiC"] },
+            { "text": "Makin kecil Gini, makin murni. Untuk dua kelas, nilai terbesarnya 0,5.", "highlight": [] },
+            { "text": "Pohon keputusan memilih pertanyaan yang paling menurunkan Gini.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t10c1p1", "type": "fillNumber", "question": "Sebuah peti berisi 9 merah dan 1 biru. Berapa Gini?", "answer": 0.18, "tolerance": 0.005, "unit": "", "why": "1 − (0,9² + 0,1²) = 1 − (0,81 + 0,01) = 0,18." },
+            { "id": "t10c1p2", "type": "fillNumber", "question": "Sebuah peti berisi 6 merah dan 6 biru. Berapa Gini?", "answer": 0.5, "tolerance": 0.001, "unit": "", "why": "Peluang masing-masing 0,5. Gini = 1 − (0,25 + 0,25) = 0,5." },
+            { "id": "t10c1p3", "type": "choice", "question": "Gini = 0 berarti...", "options": ["Semua data berada pada satu kelas", "Data seimbang sempurna", "Model overfit", "Data kosong"], "correctIndex": 0, "why": "Tidak ada campuran, jadi ketidakmurniannya nol." }
+          ],
+          "formula": { "lines": ["Gini = 1 − Σ pₖ²"], "readAloud": "Gini sama dengan satu dikurangi jumlah kuadrat peluang tiap kelas." },
+          "commonMistake": "Lupa mengurangkan dari 1, sehingga yang dihitung hanya jumlah kuadrat peluang.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa arti Gini yang kecil?",
+          "reviewItems": [ { "id": "t10c1r1", "front": "Rumus Gini?", "back": "1 − Σ pₖ²" } ]
+        },
+        {
+          "chunkId": "t10c2",
+          "title": "Memilih pertanyaan terbaik",
+          "goal": "Setelah ini kamu bisa menilai kualitas sebuah pemisahan dengan Gini berbobot.",
+          "terms": [
+            { "term": "Gini berbobot", "plain": "rata-rata Gini kedua peti hasil pemisahan, dibobot menurut jumlah bolanya" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Peti induk berisi 5 merah dan 5 biru. Gini-nya 0,5." },
+            { "who": "Rune", "text": "Kita bagi dengan pertanyaan 'bola berkilau?'." },
+            { "who": "Rune", "text": "Peti kiri: 4 merah. Peti kanan: 1 merah dan 5 biru." }
+          ],
+          "guess": { "question": "Setelah dibagi, apakah ketidakmurnian rata-rata menurun?", "options": ["Menurun", "Naik", "Tetap", "Tidak bisa dihitung"], "correctIndex": 0, "reveal": "Kita hitung." },
+          "visual": { "type": "bars", "items": [ { "id": "induk", "label": "Peti induk", "value": 0.5 }, { "id": "kiri", "label": "Peti kiri", "value": 0 }, { "id": "kanan", "label": "Peti kanan", "value": 0.28 }, { "id": "berbobot", "label": "Rata-rata berbobot", "value": 0.17 } ] },
+          "steps": [
+            { "text": "Peti kiri: 4 merah dan 0 biru. Gini = 0. Jumlahnya 4 bola.", "highlight": ["kiri"] },
+            { "text": "Peti kanan: 1 merah dan 5 biru. Gini = 1 − (1/36 + 25/36) = 10/36 ≈ 0,28. Jumlahnya 6 bola.", "highlight": ["kanan"] },
+            { "text": "Gini berbobot: (4 ÷ 10) × 0 + (6 ÷ 10) × 0,28 ≈ 0,17.", "highlight": ["berbobot"] },
+            { "text": "Sebelum dibagi 0,5, sesudah dibagi 0,17. Turun banyak, jadi pertanyaan ini bagus.", "highlight": ["induk", "berbobot"] },
+            { "text": "Pohon mencoba banyak pertanyaan dan memilih yang Gini berbobotnya paling kecil.", "highlight": [] },
+            { "text": "Pohon terus membagi sampai peti murni atau sampai batas kedalaman.", "highlight": [] },
+            { "text": "Tanpa batas kedalaman, pohon cenderung menghafal data latih. Itu overfitting.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t10c2p1", "type": "fillNumber", "question": "Dua peti: kiri 5 bola (Gini 0), kanan 5 bola (Gini 0,4). Berapa Gini berbobot?", "answer": 0.2, "tolerance": 0.001, "unit": "", "why": "(5÷10)×0 + (5÷10)×0,4 = 0,2." },
+            { "id": "t10c2p2", "type": "fillNumber", "question": "Peti kiri 2 bola (Gini 0), peti kanan 8 bola (Gini 0,5). Berapa Gini berbobot?", "answer": 0.4, "tolerance": 0.001, "unit": "", "why": "(2÷10)×0 + (8÷10)×0,5 = 0,4." },
+            { "id": "t10c2p3", "type": "choice", "question": "Mengapa pohon tanpa batas kedalaman berisiko?", "options": ["Pohon pasti underfit", "Skor uji pasti sempurna", "Pohon cenderung menghafal data latih (overfitting)", "Pohon tidak bisa membuat pertanyaan"], "correctIndex": 2, "why": "Pohon yang sangat dalam bisa memisahkan tiap contoh latih, termasuk noise." }
+          ],
+          "formula": { "lines": ["Gini berbobot = (n_kiri ÷ n) · Gini_kiri + (n_kanan ÷ n) · Gini_kanan"], "readAloud": "Gini tiap peti dikali bagiannya dari seluruh bola, lalu dijumlahkan." },
+          "commonMistake": "Merata-ratakan Gini kedua peti tanpa memperhitungkan jumlah bolanya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa Gini peti kanan dihitung lebih berbobot daripada peti kiri?",
+          "reviewItems": [ { "id": "t10c2r1", "front": "Bagaimana pohon memilih pertanyaan?", "back": "Memilih yang menghasilkan Gini berbobot paling kecil." } ]
+        },
+        {
+          "chunkId": "t10c3",
+          "title": "Hutan acak dan boosting",
+          "goal": "Setelah ini kamu bisa membedakan random forest dari gradient boosting.",
+          "terms": [
+            { "term": "bootstrap", "plain": "sampel yang diambil acak dari data, boleh ada yang terambil berulang" },
+            { "term": "ensemble", "plain": "gabungan banyak model" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Satu juri bisa keliru. Lima juri yang berbeda lebih bisa dipercaya." },
+            { "who": "Kamu", "text": "Itu random forest?" },
+            { "who": "Rune", "text": "Ya. Dan boosting punya cara lain." }
+          ],
+          "guess": { "question": "Lima pohon memberi suara: A, A, B, A, B. Siapa yang menang pada random forest?", "options": ["A", "B", "Seri", "Tidak bisa ditentukan"], "correctIndex": 0, "reveal": "Mari kita lihat cara kerjanya." },
+          "steps": [
+            { "text": "Random forest melatih banyak pohon. Tiap pohon memakai sampel data acak yang berbeda (bootstrap).", "highlight": [] },
+            { "text": "Untuk klasifikasi, pohon-pohon memberi suara. Suara: A, A, B, A, B. A mendapat 3 suara, B 2 suara. Pemenang: A.", "highlight": [] },
+            { "text": "Satu pohon bisa keliru karena data latihnya kebetulan. Kesalahan yang berbeda-beda cenderung saling meniadakan, jadi varians turun.", "highlight": [] },
+            { "text": "Boosting berbeda: pohon dilatih berurutan.", "highlight": [] },
+            { "text": "Target 10. Pohon 1 menebak 7. Sisa kesalahan: 10 − 7 = 3.", "highlight": [] },
+            { "text": "Pohon 2 memperbaiki sisa itu dengan menambah 2. Gabungan: 7 + 2 = 9. Sisa 1.", "highlight": [] },
+            { "text": "Pohon 3 menambah 1. Gabungan: 9 + 1 = 10. Tiap pohon memperbaiki kesalahan sebelumnya.", "highlight": [] },
+            { "text": "Contoh boosting ini disederhanakan. Intinya: random forest memakai pohon yang bebas lalu voting, boosting memakai pohon berurutan.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t10c3p1", "type": "fillNumber", "question": "Lima pohon memberi suara: B, A, B, B, A. Berapa suara untuk pemenang?", "answer": 3, "tolerance": 0, "unit": "", "why": "B mendapat 3 suara dan A 2 suara." },
+            { "id": "t10c3p2", "type": "fillNumber", "question": "Target 20. Pohon 1 menebak 15 dan pohon 2 menambah 3. Berapa sisa kesalahan setelah dua pohon?", "answer": 2, "tolerance": 0, "unit": "", "why": "Gabungan 15 + 3 = 18. Sisa 20 − 18 = 2." },
+            { "id": "t10c3p3", "type": "choice", "question": "Ciri utama boosting?", "options": ["Pohon dibangun berurutan; tiap pohon memperbaiki kesalahan sebelumnya", "Pohon dilatih paralel lalu di-voting", "Hanya satu pohon yang dipakai", "Tidak memakai pohon"], "correctIndex": 0, "why": "Itulah yang membedakannya dari random forest." }
+          ],
+          "formula": { "lines": ["random forest: banyak pohon pada sampel bootstrap, hasil digabung", "gradient boosting: pohon berurutan, tiap pohon memperbaiki kesalahan sebelumnya"], "readAloud": "Random forest: pohon bebas lalu voting. Boosting: pohon berurutan yang saling memperbaiki." },
+          "commonMistake": "Menyamakan random forest dengan boosting padahal cara kerjanya berbeda.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa beda random forest dan boosting?",
+          "reviewItems": [
+            { "id": "t10c3r1", "front": "Ide utama random forest?", "back": "Banyak pohon pada sampel bootstrap berbeda, hasilnya digabung sehingga varians turun." },
+            { "id": "t10c3r2", "front": "Ide utama boosting?", "back": "Pohon dibangun berurutan, tiap pohon memperbaiki kesalahan sebelumnya." }
+          ]
+        },
+        {
+          "chunkId": "t10c4",
+          "title": "k-NN, SVM, dan memilih model",
+          "goal": "Setelah ini kamu bisa memakai k-NN dan menjelaskan pilihan antar model.",
+          "terms": [
+            { "term": "tetangga", "plain": "contoh data yang jaraknya paling dekat" },
+            { "term": "margin", "plain": "jarak antara batas pemisah dan contoh terdekat dari tiap kelas" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Ada monster baru yang jenisnya belum diketahui." },
+            { "who": "Kamu", "text": "Lihat saja tetangga terdekatnya!" },
+            { "who": "Rune", "text": "Itulah k-NN." }
+          ],
+          "guess": { "question": "Tetangga terdekat (urut jarak): A, B, A, B, B. Dengan k = 3, jenis monster baru?", "options": ["A", "B", "Seri", "Tidak tahu"], "correctIndex": 0, "reveal": "Kita hitung suaranya." },
+          "visual": { "type": "bars", "items": [ { "id": "n1", "label": "Tetangga 1 (A), jarak", "value": 1 }, { "id": "n2", "label": "Tetangga 2 (B), jarak", "value": 1.5 }, { "id": "n3", "label": "Tetangga 3 (A), jarak", "value": 2 }, { "id": "n4", "label": "Tetangga 4 (B), jarak", "value": 3 }, { "id": "n5", "label": "Tetangga 5 (B), jarak", "value": 4 } ] },
+          "steps": [
+            { "text": "k-NN melihat k tetangga terdekat lalu memberi suara.", "highlight": [] },
+            { "text": "Jarak ke lima tetangga: 1,0 (A), 1,5 (B), 2,0 (A), 3,0 (B), 4,0 (B).", "highlight": ["n1", "n2", "n3", "n4", "n5"] },
+            { "text": "Dengan k = 3: tetangga terdekat A, B, A. Suara A 2, suara B 1. Hasil: A.", "highlight": ["n1", "n2", "n3"] },
+            { "text": "Dengan k = 5: A, B, A, B, B. Suara A 2, suara B 3. Hasil: B.", "highlight": ["n1", "n2", "n3", "n4", "n5"] },
+            { "text": "Jadi pilihan k mengubah hasil. Nilai k perlu diuji dengan validasi.", "highlight": [] },
+            { "text": "k-NN memakai jarak, jadi skala fitur harus disamakan. Gaji (jutaan) tanpa skala akan mendominasi umur (puluhan).", "highlight": [] },
+            { "text": "SVM berbeda: ia mencari batas pemisah dengan margin terbesar.", "highlight": [] },
+            { "text": "Memilih model: pohon mudah dijelaskan. Random forest atau boosting biasanya lebih kuat tetapi lebih sulit dijelaskan.", "highlight": [] },
+            { "text": "k-NN sederhana tetapi peka pada skala. Apa pun pilihanmu, bandingkan dengan baseline dan validasi.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t10c4p1", "type": "choice", "question": "Dengan k = 3, tetangga terdekat adalah B, B, A. Hasilnya?", "options": ["B", "A", "Seri", "Tidak tahu"], "correctIndex": 0, "why": "B mendapat 2 suara dan A 1 suara." },
+            { "id": "t10c4p2", "type": "fillNumber", "question": "Dengan k = 5, tetangga terdekat adalah A, A, B, A, B. Berapa suara untuk A?", "answer": 3, "tolerance": 0, "unit": "", "why": "A muncul 3 kali." },
+            { "id": "t10c4p3", "type": "choice", "question": "Mengapa k-NN butuh fitur berskala sama?", "options": ["Karena k-NN memakai jarak, jadi fitur berskala besar akan mendominasi", "Karena k-NN memakai pohon", "Karena k-NN tidak memakai data", "Karena SVM menuntutnya"], "correctIndex": 0, "why": "Selisih angka besar mengalahkan selisih angka kecil dalam jarak." }
+          ],
+          "formula": { "lines": ["k-NN: ambil k tetangga terdekat lalu voting", "SVM: batas pemisah dengan margin terbesar"], "readAloud": "k-NN memberi suara dari tetangga terdekat. SVM mencari batas dengan margin terbesar." },
+          "commonMistake": "Memakai k-NN tanpa menyamakan skala fitur.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa nilai k bisa mengubah hasil k-NN?",
+          "reviewItems": [
+            { "id": "t10c4r1", "front": "Mengapa k-NN butuh penskalaan fitur?", "back": "Karena memakai jarak, sehingga fitur berskala besar akan mendominasi." },
+            { "id": "t10c4r2", "front": "Ide utama SVM?", "back": "Mencari batas pemisah dengan margin terbesar." }
+          ]
+        }
+      ]
+    },
+    {
+      "topicId": 11,
+      "chunks": [
+        {
+          "chunkId": "t11c1",
+          "title": "k-means: langkah demi langkah",
+          "goal": "Setelah ini kamu bisa menjalankan satu iterasi k-means.",
+          "terms": [
+            { "term": "klaster", "plain": "kelompok data yang saling berdekatan" },
+            { "term": "pusat (centroid)", "plain": "titik tengah sebuah klaster" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Ada 6 titik di sebuah garis: 1, 2, 3, 10, 11, 12." },
+            { "who": "Rune", "text": "Kita ingin mengelompokkannya tanpa label." },
+            { "who": "Kamu", "text": "Aku taruh dua pusat tebakan: 1 dan 12." }
+          ],
+          "guess": { "question": "Titik 3 lebih dekat ke pusat yang mana (1 atau 12)?", "options": ["Pusat 1", "Pusat 12", "Sama dekat", "Tidak tahu"], "correctIndex": 0, "reveal": "Mari kita jalankan langkahnya." },
+          "visual": { "type": "bars", "items": [ { "id": "p1", "label": "Titik 1", "value": 1 }, { "id": "p2", "label": "Titik 2", "value": 2 }, { "id": "p3", "label": "Titik 3", "value": 3 }, { "id": "p4", "label": "Titik 10", "value": 10 }, { "id": "p5", "label": "Titik 11", "value": 11 }, { "id": "p6", "label": "Titik 12", "value": 12 } ] },
+          "steps": [
+            { "text": "Pusat awal: 1 dan 12.", "highlight": [] },
+            { "text": "Langkah 1: tetapkan tiap titik ke pusat terdekat. Titik 1, 2, 3 dekat ke 1. Titik 10, 11, 12 dekat ke 12.", "highlight": ["p1", "p2", "p3", "p4", "p5", "p6"] },
+            { "text": "Langkah 2: hitung ulang pusat sebagai rata-rata anggota. Klaster 1: (1 + 2 + 3) ÷ 3 = 2. Klaster 2: (10 + 11 + 12) ÷ 3 = 11.", "highlight": [] },
+            { "text": "Ulangi langkah 1 dengan pusat baru 2 dan 11. Anggota tidak berubah.", "highlight": [] },
+            { "text": "Karena anggota tidak berubah, k-means berhenti. Hasilnya dua klaster dengan pusat 2 dan 11.", "highlight": [] },
+            { "text": "Intinya: tetapkan ke pusat terdekat, hitung ulang pusat, dan ulangi sampai stabil.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t11c1p1", "type": "fillNumber", "question": "Titik 3, 5, 13, 15 dengan pusat awal 3 dan 15. Setelah satu iterasi, berapa pusat klaster pertama?", "answer": 4, "tolerance": 0, "unit": "", "why": "Klaster pertama {3, 5}. Rata-rata = (3 + 5) ÷ 2 = 4." },
+            { "id": "t11c1p2", "type": "fillNumber", "question": "Pada soal yang sama, berapa pusat klaster kedua?", "answer": 14, "tolerance": 0, "unit": "", "why": "Klaster kedua {13, 15}. Rata-rata = (13 + 15) ÷ 2 = 14." },
+            { "id": "t11c1p3", "type": "choice", "question": "Apa yang dilakukan langkah 'hitung ulang pusat'?", "options": ["Mengambil rata-rata anggota klaster", "Mengambil nilai terbesar", "Mengacak titik", "Menghapus titik"], "correctIndex": 0, "why": "Pusat baru adalah rata-rata anggota klasternya." }
+          ],
+          "formula": { "lines": ["pusat baru = rata-rata anggota klaster"], "readAloud": "Pusat baru adalah rata-rata semua anggota klaster itu." },
+          "commonMistake": "Berhenti setelah satu iterasi, padahal harus diulang sampai anggota klaster tidak berubah.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: dua langkah yang diulang oleh k-means.",
+          "reviewItems": [ { "id": "t11c1r1", "front": "Dua langkah yang diulang oleh k-means?", "back": "Tetapkan titik ke pusat terdekat, lalu hitung ulang pusat sebagai rata-rata anggota." } ]
+        },
+        {
+          "chunkId": "t11c2",
+          "title": "Memilih k dan klaster yang menyesatkan",
+          "goal": "Setelah ini kamu bisa memilih k dengan metode siku dan tahu kapan klaster menyesatkan.",
+          "terms": [
+            { "term": "inertia", "plain": "jumlah jarak kuadrat tiap titik ke pusat klasternya; makin kecil, klaster makin rapat" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "k-means selalu mengeluarkan k kelompok. Lalu berapa k yang tepat?" },
+            { "who": "Kamu", "text": "Aku coba k = 1, 2, 3, dan 4." },
+            { "who": "Rune", "text": "Catat inertia untuk tiap k." }
+          ],
+          "guess": { "question": "Menurutmu, makin besar k, inertia akan...", "options": ["Makin kecil", "Makin besar", "Tetap", "Acak"], "correctIndex": 0, "reveal": "Kita lihat angkanya." },
+          "visual": { "type": "bars", "items": [ { "id": "k1", "label": "k = 1", "value": 100 }, { "id": "k2", "label": "k = 2", "value": 30 }, { "id": "k3", "label": "k = 3", "value": 25 }, { "id": "k4", "label": "k = 4", "value": 22 } ] },
+          "steps": [
+            { "text": "Contoh angka inertia: k = 1 → 100, k = 2 → 30, k = 3 → 25, k = 4 → 22.", "highlight": ["k1", "k2", "k3", "k4"] },
+            { "text": "Makin besar k, inertia makin kecil. Jika k sama dengan jumlah titik, inertia 0, tetapi itu tidak berguna.", "highlight": [] },
+            { "text": "Lihat penurunannya: 100 → 30 turun 70. 30 → 25 turun 5. 25 → 22 turun 3.", "highlight": ["k1", "k2", "k3"] },
+            { "text": "Penurunan besar berhenti di k = 2, lalu mendatar. Titik tekuk ini disebut siku. Pilihan masuk akal: k = 2.", "highlight": ["k2"] },
+            { "text": "Peringatan: k-means selalu menghasilkan klaster, bahkan jika data tidak punya kelompok.", "highlight": [] },
+            { "text": "k-means juga menganggap klaster berbentuk bulat dan peka pada skala fitur. Hasilnya bisa menyesatkan.", "highlight": [] },
+            { "text": "Karena itu jangan langsung percaya pada klaster. Periksa apakah klaster itu bermakna di dunia nyata.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t11c2p1", "type": "fillNumber", "question": "Inertia: k = 1 → 80 dan k = 2 → 20. Berapa penurunannya?", "answer": 60, "tolerance": 0, "unit": "", "why": "80 − 20 = 60." },
+            { "id": "t11c2p2", "type": "choice", "question": "Inertia: k=1: 90, k=2: 40, k=3: 15, k=4: 13, k=5: 12. Titik siku yang paling masuk akal?", "options": ["k = 3", "k = 5", "k = 1", "k = 4"], "correctIndex": 0, "why": "Penurunan besar (50, lalu 25) berhenti di k = 3, sesudahnya hanya turun 2 dan 1." },
+            { "id": "t11c2p3", "type": "choice", "question": "Mengapa klaster k-means bisa menyesatkan?", "options": ["Selalu mengeluarkan klaster walau data tidak punya kelompok", "Tidak pernah menemukan apa pun", "Hanya bekerja pada data berlabel", "Selalu benar"], "correctIndex": 0, "why": "k-means memaksa data masuk ke k kelompok, apakah kelompok itu nyata atau tidak." }
+          ],
+          "formula": { "lines": ["inertia = Σ jarak² titik ke pusat klasternya", "pilih k di titik siku, tempat penurunan mulai melandai"], "readAloud": "Inertia adalah jumlah kuadrat jarak ke pusat. Pilih k di titik siku." },
+          "commonMistake": "Menganggap klaster yang dihasilkan pasti nyata dan bermakna.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kamu tidak bisa memilih k hanya dengan inertia terkecil?",
+          "reviewItems": [
+            { "id": "t11c2r1", "front": "Bagaimana memilih k dengan metode siku?", "back": "Pilih k di titik tempat penurunan inertia mulai melandai." },
+            { "id": "t11c2r2", "front": "Kapan klaster k-means menyesatkan?", "back": "Saat data tak punya kelompok nyata, klaster tidak bulat, atau skala fitur sangat berbeda." }
+          ]
+        },
+        {
+          "chunkId": "t11c3",
+          "title": "PCA: meringkas banyak fitur",
+          "goal": "Setelah ini kamu bisa menghitung persentase variasi yang dijelaskan komponen PCA.",
+          "terms": [
+            { "term": "PCA", "plain": "cara meringkas banyak fitur menjadi beberapa komponen yang menangkap variasi terbesar" },
+            { "term": "eigenvalue (λ)", "plain": "angka yang menunjukkan seberapa banyak variasi sebuah komponen" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Bayangkan bayanganmu di dinding." },
+            { "who": "Rune", "text": "Dari sudut yang tepat, bayangan masih menunjukkan bentuk tubuhmu." },
+            { "who": "Kamu", "text": "Jadi data 3D dijadikan 2D dengan memilih sudut terbaik?" }
+          ],
+          "guess": { "question": "PCA memilih arah proyeksi yang...", "options": ["Menangkap variasi data terbanyak", "Menghapus semua variasi", "Mengacak data", "Memilih fitur terkecil"], "correctIndex": 0, "reveal": "Kita lihat angkanya." },
+          "visual": { "type": "bars", "items": [ { "id": "l1", "label": "Komponen 1 (λ)", "value": 8 }, { "id": "l2", "label": "Komponen 2 (λ)", "value": 1.5 }, { "id": "l3", "label": "Komponen 3 (λ)", "value": 0.5 } ] },
+          "steps": [
+            { "text": "Data punya 3 fitur. PCA membuat 3 komponen, diurutkan dari yang paling banyak menangkap variasi.", "highlight": [] },
+            { "text": "Eigenvalue tiap komponen (contoh): 8, 1,5, dan 0,5. Total = 10.", "highlight": ["l1", "l2", "l3"] },
+            { "text": "Komponen 1 menangkap 8 ÷ 10 = 80% variasi. Komponen 2: 1,5 ÷ 10 = 15%. Komponen 3: 0,5 ÷ 10 = 5%.", "highlight": ["l1", "l2", "l3"] },
+            { "text": "Jika kita pakai dua komponen saja: 80% + 15% = 95% variasi tertangkap.", "highlight": ["l1", "l2"] },
+            { "text": "Jadi 3 fitur diringkas menjadi 2 dengan kehilangan sekitar 5% variasi.", "highlight": [] },
+            { "text": "Ingat: standarisasi fitur lebih dulu, karena fitur berskala besar akan mendominasi komponen.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t11c3p1", "type": "fillNumber", "question": "Eigenvalue: 5, 3, 2. Berapa persen variasi di komponen 1?", "answer": 50, "tolerance": 0, "unit": "%", "why": "5 ÷ (5 + 3 + 2) = 0,5 = 50%." },
+            { "id": "t11c3p2", "type": "fillNumber", "question": "Eigenvalue yang sama: berapa persen variasi tertangkap oleh dua komponen pertama?", "answer": 80, "tolerance": 0, "unit": "%", "why": "(5 + 3) ÷ 10 = 0,8 = 80%." },
+            { "id": "t11c3p3", "type": "choice", "question": "Mengapa fitur distandarisasi sebelum PCA?", "options": ["Agar fitur berskala besar tidak mendominasi", "Agar datanya lebih sedikit", "Agar PCA tidak perlu dipakai", "Agar label hilang"], "correctIndex": 0, "why": "PCA mengejar variasi terbesar, dan fitur berskala besar punya variasi mentah yang jauh lebih besar." }
+          ],
+          "formula": { "lines": ["variasi dijelaskan komponen i = λᵢ ÷ Σλ"], "readAloud": "Variasi komponen sama dengan eigenvalue-nya dibagi jumlah semua eigenvalue." },
+          "commonMistake": "Menjalankan PCA tanpa menyamakan skala fitur terlebih dulu.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa arti '95% variasi tertangkap oleh dua komponen'?",
+          "reviewItems": [
+            { "id": "t11c3r1", "front": "Rumus persen variasi komponen i?", "back": "λᵢ ÷ Σλ" },
+            { "id": "t11c3r2", "front": "Mengapa PCA butuh standarisasi?", "back": "Agar fitur berskala besar tidak mendominasi komponen." }
+          ]
+        }
+      ]
+    }
+  ]
+}

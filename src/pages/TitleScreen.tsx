@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { AVATARS, ROADMAP_ASSUMPTIONS } from '../data/roadmap.js';
 import { useGameStore } from '../store/useGameStore';
 import { AvatarSprite, PixelSwordSprite, TitleCrestLogo } from '../components/PixelSprites';
+import { MusicHudIndicator } from '../components/MusicControls';
+import { musicManager } from '../audio/musicManager';
 import { useSound } from '../hooks/useSound.js';
 import { getLevelProgress } from '../game/formulas';
 
@@ -28,11 +30,13 @@ export const TitleScreen: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    musicManager.notifyUserInteraction();
     playLevelUp();
     startAdventure(nameInput, selectedAvatar);
   };
 
   const handleContinue = () => {
+    musicManager.notifyUserInteraction();
     playClick();
     continueAdventure();
   };
@@ -46,7 +50,10 @@ export const TitleScreen: React.FC = () => {
         className="w-full max-w-3xl pixel-box p-4 sm:p-6"
       >
         {/* Pixel Crest Logo & Game Title Lockup */}
-        <div className="text-center border-b-2 border-[#3a306e] pb-4 mb-4">
+        <div className="text-center border-b-2 border-[#3a306e] pb-4 mb-4 relative">
+          <div className="flex justify-end mb-1">
+            <MusicHudIndicator />
+          </div>
           <div className="flex justify-center mb-2">
             <TitleCrestLogo className="w-24 h-16 sm:w-32 sm:h-20" />
           </div>

@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useGameStore, ScreenView } from '../store/useGameStore';
 import { getDisplayStreak, getLevelProgress, isFloorUnlocked } from '../game/formulas';
+import { getLocalDateKey } from '../game/campTracker';
+import { getDueReviewItems } from '../game/lessonEngine';
 import { AvatarSprite, PixelLockSprite } from './PixelSprites';
+import { MusicHudIndicator } from './MusicControls';
 import { useSound } from '../hooks/useSound.js';
 import { ALL_TOPICS } from '../data/roadmap.js';
 
@@ -18,6 +21,7 @@ export const XPBar: React.FC<XPBarProps> = ({ onOpen3DDungeon }) => {
   const completedRooms = useGameStore((s) => s.completedRooms);
   const spellsUnlocked = useGameStore((s) => s.spellsUnlocked);
   const defeatedBosses = useGameStore((s) => s.defeatedBosses);
+  const reviewQueue = useGameStore((s) => s.reviewQueue);
   const currentView = useGameStore((s) => s.currentView);
   const activeFloorId = useGameStore((s) => s.activeFloorId);
   const soundEnabled = useGameStore((s) => s.soundEnabled);
@@ -46,6 +50,11 @@ export const XPBar: React.FC<XPBarProps> = ({ onOpen3DDungeon }) => {
   const activeStreak = getDisplayStreak(streak, lastActiveDate);
   const towerUnlocked = isFloorUnlocked(6, defeatedBosses);
 
+  const dueReviewCount = useMemo(
+    () => getDueReviewItems(reviewQueue, getLocalDateKey(), 10).totalDueCount,
+    [reviewQueue]
+  );
+
   const handleNav = (view: ScreenView) => {
     playClick();
     setView(view);
@@ -61,6 +70,11 @@ export const XPBar: React.FC<XPBarProps> = ({ onOpen3DDungeon }) => {
       id: 'grimoire',
       label: 'Grimoire & Dojo',
       badge: `${spellsUnlocked.length}/28`,
+    },
+    {
+      id: 'review',
+      label: 'Ulasan Harian',
+      badge: `${dueReviewCount}`,
     },
     {
       id: 'camp',
@@ -173,6 +187,7 @@ export const XPBar: React.FC<XPBarProps> = ({ onOpen3DDungeon }) => {
             >
               Aula Guild (F5)
             </button>
+            <MusicHudIndicator />
             <button
               type="button"
               onClick={() => {

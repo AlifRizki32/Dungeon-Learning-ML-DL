@@ -1,44 +1,34 @@
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { useGameStore } from '../store/useGameStore';
+import { unlockSharedAudioContext } from '../audio/instruments';
 
 /**
  * Simple 8-bit Web Audio API synthesizer for retro game sound effects.
- * OFF by default, never autoplays.
+ * OFF by default, never autoplays. Shares AudioContext with background music.
  */
 export function useSound() {
   const soundEnabled = useGameStore((s) => s.soundEnabled);
-  const audioCtxRef = useRef(null);
+  const sfxVolume = useGameStore((s) => s.sfxVolume ?? 0.75);
 
   const getContext = useCallback(() => {
-    if (!soundEnabled) return null;
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return null;
-      if (!audioCtxRef.current) {
-        audioCtxRef.current = new AudioCtx();
-      }
-      if (audioCtxRef.current.state === 'suspended') {
-        audioCtxRef.current.resume();
-      }
-      return audioCtxRef.current;
-    } catch {
-      return null;
-    }
-  }, [soundEnabled]);
+    if (!soundEnabled || sfxVolume <= 0) return null;
+    return unlockSharedAudioContext();
+  }, [soundEnabled, sfxVolume]);
 
   const playTone = useCallback(
     (freq, durationMs, type = 'square', startDelayMs = 0, gainValue = 0.08) => {
       const ctx = getContext();
       if (!ctx) return;
       try {
+        const scaledGain = Math.max(0.0015, gainValue * (sfxVolume / 0.75));
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = type;
         const startTime = ctx.currentTime + startDelayMs / 1000;
         const endTime = startTime + durationMs / 1000;
         osc.frequency.setValueAtTime(freq, startTime);
-        gain.gain.setValueAtTime(gainValue, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, endTime);
+        gain.gain.setValueAtTime(scaledGain, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.0005, endTime);
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.start(startTime);
@@ -47,7 +37,7 @@ export function useSound() {
         // Ignore audio errors
       }
     },
-    [getContext]
+    [getContext, sfxVolume]
   );
 
   const playClick = useCallback(() => {

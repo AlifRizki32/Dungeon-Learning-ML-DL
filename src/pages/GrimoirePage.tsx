@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { FLOORS } from '../data/roadmap.js';
 import { useGameStore } from '../store/useGameStore';
 import { getLocalDateKey } from '../game/campTracker';
+import { getDueReviewItems } from '../game/lessonEngine';
 import {
   DOJO_CORRECT_XP,
   DOJO_DAILY_XP_CAP,
@@ -23,6 +24,7 @@ export const GrimoirePage: React.FC = () => {
   const completedRooms = useGameStore((s) => s.completedRooms);
   const questionStats = useGameStore((s) => s.questionStats);
   const dojoDailyXP = useGameStore((s) => s.dojoDailyXP);
+  const reviewQueue = useGameStore((s) => s.reviewQueue);
   const reduceMotion = useGameStore((s) => s.reduceMotion);
   const openScrollViewer = useGameStore((s) => s.openScrollViewer);
   const awardDojoAnswerXP = useGameStore((s) => s.awardDojoAnswerXP);
@@ -56,6 +58,10 @@ export const GrimoirePage: React.FC = () => {
 
   const todayKey = getLocalDateKey();
   const todayDojoXP = dojoDailyXP.date === todayKey ? dojoDailyXP.xp : 0;
+  const dueReviewCount = useMemo(
+    () => getDueReviewItems(reviewQueue, todayKey, 10).totalDueCount,
+    [reviewQueue, todayKey]
+  );
 
   const defeatedSpellbookTopicsCount = useMemo(
     () =>
@@ -334,6 +340,24 @@ export const GrimoirePage: React.FC = () => {
             >
               <PixelSwordSprite size={16} />
               <span>Dojo Latihan</span>
+            </button>
+
+            <button
+              type="button"
+              data-testid="grimoire-review-badge-btn"
+              onClick={() => {
+                playClick();
+                setView('review');
+              }}
+              className="pixel-btn px-4 py-2.5 bg-[#12263a] text-[#3ac5eb] border-[#3ac5eb] font-pixel text-xs gap-2"
+            >
+              <span>Ulasan Harian</span>
+              <span
+                data-testid="grimoire-review-due-count"
+                className="bg-[#0d0a1a] text-[#f5b935] px-1.5 py-0.5 border border-[#f5b935] text-[9px] tabular-nums"
+              >
+                {dueReviewCount}
+              </span>
             </button>
           </div>
         </div>

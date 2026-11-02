@@ -5,4 +5,8 @@ export function useSound(): {
   playDefeat: () => void;
   playLevelUp: () => void;
   playBossAppear: () => void;
+  playCast: () => void;
+  playFizzle: () => void;
+  playBossSegmentBreak: () => void;
 };
+

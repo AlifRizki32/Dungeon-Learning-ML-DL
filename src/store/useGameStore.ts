@@ -40,11 +40,22 @@ import {
   recoverBossAfterFaint,
   updateQuestionStat,
 } from '../game/spellbookEngine';
+import {
+  DEFAULT_INTERVAL_SCALE,
+  LessonChunkProgress,
+  LessonReviewItem,
+  ReviewQueueEntry,
+  ReviewRating,
+  clampIntervalScale,
+  getLessonChunksForTopic,
+  scheduleReviewItem,
+} from '../game/lessonEngine';
 
 export type ScreenView =
   | 'title'
   | 'dungeon'
   | 'grimoire'
+  | 'review'
   | 'camp'
   | 'dashboard'
   | 'inventory'
@@ -99,7 +110,16 @@ export interface GameState {
   activeFloorId: number;
   activeNodeByFloor: Record<number, string>;
   soundEnabled: boolean;
+  sfxVolume: number;
+  musicEnabled: boolean;
+  musicVolume: number;
   reduceMotion: boolean;
+  lessonProgress: Record<string, LessonChunkProgress>;
+  summaries: Record<string, string>;
+  reviewQueue: Record<string, ReviewQueueEntry>;
+  settings: {
+    intervalScale: number;
+  };
 
   // Transient UI state
   currentView: ScreenView;
@@ -182,7 +202,16 @@ export interface GameState {
   dismissLevelUpModal: () => void;
   clearNewlyUnlocked: () => void;
   toggleSound: () => void;
+  setSfxVolume: (volume: number) => void;
+  toggleMusic: () => void;
+  setMusicEnabled: (enabled: boolean) => void;
+  setMusicVolume: (volume: number) => void;
   toggleReduceMotion: () => void;
+  recordChunkPracticeAttempt: (chunkId: string, activityId: string, totalPracticeIds?: string[]) => void;
+  completeLessonChunk: (chunkId: string, reviewItems: LessonReviewItem[]) => void;
+  setChunkSummary: (chunkId: string, summary: string) => void;
+  gradeReviewItem: (itemId: string, rating: ReviewRating) => ReviewQueueEntry;
+  setIntervalScale: (scale: number) => void;
   resetProgress: () => void;
 }
 
@@ -252,7 +281,16 @@ const INITIAL_PERSISTED_STATE = {
     5: 'topic-21',
   } as Record<number, string>,
   soundEnabled: false,
+  sfxVolume: 0.75,
+  musicEnabled: true,
+  musicVolume: 0.35,
   reduceMotion: false,
+  lessonProgress: {} as Record<string, LessonChunkProgress>,
+  summaries: {} as Record<string, string>,
+  reviewQueue: {} as Record<string, ReviewQueueEntry>,
+  settings: {
+    intervalScale: DEFAULT_INTERVAL_SCALE,
+  },
 };
 
 function normalizeSingleBossProgress(raw: unknown, floorId: number = 1): BossProgressState {
@@ -424,6 +462,83 @@ export function migrateStateToV3(rawState: Record<string, unknown>) {
       ? rawState.certificateIssuedAt
       : null;
 
+  // Normalize Lesson Chunks v3 fields
+  const normalizedLessonProgress: Record<string, LessonChunkProgress> = {};
+  if (
+    rawState.lessonProgress &&
+    typeof rawState.lessonProgress === 'object' &&
+    !Array.isArray(rawState.lessonProgress)
+  ) {
+    for (const [cId, val] of Object.entries(rawState.lessonProgress as Record<string, unknown>)) {
+      if (val && typeof val === 'object' && !Array.isArray(val)) {
+        const obj = val as Partial<LessonChunkProgress>;
+        normalizedLessonProgress[cId] = {
+          done: Boolean(obj.done),
+          attempts: typeof obj.attempts === 'number' && obj.attempts >= 0 ? obj.attempts : 0,
+          attemptedActivities: Array.isArray(obj.attemptedActivities)
+            ? obj.attemptedActivities.filter((x): x is string => typeof x === 'string')
+            : [],
+        };
+      }
+    }
+  }
+
+  const normalizedSummaries: Record<string, string> = {};
+  if (
+    rawState.summaries &&
+    typeof rawState.summaries === 'object' &&
+    !Array.isArray(rawState.summaries)
+  ) {
+    for (const [cId, val] of Object.entries(rawState.summaries as Record<string, unknown>)) {
+      if (typeof val === 'string') {
+        normalizedSummaries[cId] = val.slice(0, 400);
+      }
+    }
+  }
+
+  const normalizedReviewQueue: Record<string, ReviewQueueEntry> = {};
+  if (
+    rawState.reviewQueue &&
+    typeof rawState.reviewQueue === 'object' &&
+    !Array.isArray(rawState.reviewQueue)
+  ) {
+    for (const [itemId, val] of Object.entries(rawState.reviewQueue as Record<string, unknown>)) {
+      if (val && typeof val === 'object' && !Array.isArray(val)) {
+        const obj = val as Partial<ReviewQueueEntry>;
+        if (typeof obj.due === 'string' && obj.due.trim()) {
+          normalizedReviewQueue[itemId] = {
+            box:
+              typeof obj.box === 'number'
+                ? Math.max(0, Math.min(4, Math.floor(obj.box)))
+                : 0,
+            due: obj.due.trim(),
+          };
+        }
+      }
+    }
+  }
+
+  const rawSettings =
+    rawState.settings && typeof rawState.settings === 'object'
+      ? (rawState.settings as { intervalScale?: unknown })
+      : {};
+  const normalizedIntervalScale = clampIntervalScale(
+    typeof rawSettings.intervalScale === 'number'
+      ? rawSettings.intervalScale
+      : DEFAULT_INTERVAL_SCALE
+  );
+
+  const normalizedMusicEnabled =
+    typeof rawState.musicEnabled === 'boolean' ? rawState.musicEnabled : true;
+  const normalizedMusicVolume =
+    typeof rawState.musicVolume === 'number' && !Number.isNaN(rawState.musicVolume)
+      ? Math.max(0, Math.min(1, Number(rawState.musicVolume.toFixed(2))))
+      : 0.35;
+  const normalizedSfxVolume =
+    typeof rawState.sfxVolume === 'number' && !Number.isNaN(rawState.sfxVolume)
+      ? Math.max(0, Math.min(1, Number(rawState.sfxVolume.toFixed(2))))
+      : 0.75;
+
   return {
     ...INITIAL_PERSISTED_STATE,
     ...rawState,
@@ -444,6 +559,15 @@ export function migrateStateToV3(rawState: Record<string, unknown>) {
         : {},
     bossProgress: bossProgressMap,
     evidenceNotes: normalizedNotes,
+    lessonProgress: normalizedLessonProgress,
+    summaries: normalizedSummaries,
+    reviewQueue: normalizedReviewQueue,
+    settings: {
+      intervalScale: normalizedIntervalScale,
+    },
+    musicEnabled: normalizedMusicEnabled,
+    musicVolume: normalizedMusicVolume,
+    sfxVolume: normalizedSfxVolume,
     version: CURRENT_VERSION,
   };
 }
@@ -1350,6 +1474,10 @@ export const useGameStore = create<GameState>()(
             activeNodeByFloor: s.activeNodeByFloor,
             soundEnabled: s.soundEnabled,
             reduceMotion: s.reduceMotion,
+            lessonProgress: s.lessonProgress,
+            summaries: s.summaries,
+            reviewQueue: s.reviewQueue,
+            settings: s.settings,
           },
         };
         return JSON.stringify(payload, null, 2);
@@ -1385,8 +1513,183 @@ export const useGameStore = create<GameState>()(
         set((s) => ({ soundEnabled: !s.soundEnabled }));
       },
 
+      setSfxVolume: (volume: number) => {
+        const clamped =
+          typeof volume === 'number' && !Number.isNaN(volume)
+            ? Math.max(0, Math.min(1, Number(volume.toFixed(2))))
+            : 0.75;
+        set({ sfxVolume: clamped });
+      },
+
+      toggleMusic: () => {
+        set((s) => ({ musicEnabled: !s.musicEnabled }));
+      },
+
+      setMusicEnabled: (enabled: boolean) => {
+        set({ musicEnabled: Boolean(enabled) });
+      },
+
+      setMusicVolume: (volume: number) => {
+        const clamped =
+          typeof volume === 'number' && !Number.isNaN(volume)
+            ? Math.max(0, Math.min(1, Number(volume.toFixed(2))))
+            : 0.35;
+        set({ musicVolume: clamped });
+      },
+
       toggleReduceMotion: () => {
         set((s) => ({ reduceMotion: !s.reduceMotion }));
+      },
+
+      recordChunkPracticeAttempt: (
+        chunkId: string,
+        activityId: string,
+        totalPracticeIds?: string[]
+      ) => {
+        const state = get();
+        const prev = state.lessonProgress[chunkId] || {
+          done: false,
+          attempts: 0,
+          attemptedActivities: [],
+        };
+        const attemptedSet = new Set(prev.attemptedActivities || []);
+        attemptedSet.add(activityId);
+
+        let foundChunk = null;
+        for (let tId = 1; tId <= 28; tId++) {
+          const found = getLessonChunksForTopic(tId).find((c) => c.chunkId === chunkId);
+          if (found) {
+            foundChunk = found;
+            break;
+          }
+        }
+
+        let allAttempted = prev.done;
+        if (Array.isArray(totalPracticeIds) && totalPracticeIds.length > 0) {
+          allAttempted =
+            prev.done || totalPracticeIds.every((id) => attemptedSet.has(id));
+        } else if (foundChunk) {
+          allAttempted =
+            prev.done ||
+            foundChunk.practice.every((act) => attemptedSet.has(act.id));
+        }
+
+        const nextReviewQueue = { ...state.reviewQueue };
+        if (allAttempted && foundChunk) {
+          const todayKey = getLocalDateKey();
+          for (const item of foundChunk.reviewItems || []) {
+            if (!nextReviewQueue[item.id]) {
+              nextReviewQueue[item.id] = {
+                box: 0,
+                due: todayKey,
+              };
+            }
+          }
+        }
+
+        set({
+          lessonProgress: {
+            ...state.lessonProgress,
+            [chunkId]: {
+              done: allAttempted,
+              attempts: prev.attempts + 1,
+              attemptedActivities: Array.from(attemptedSet),
+            },
+          },
+          reviewQueue: nextReviewQueue,
+        });
+      },
+
+      completeLessonChunk: (chunkId: string, reviewItems: LessonReviewItem[]) => {
+        const state = get();
+        const prev = state.lessonProgress[chunkId] || {
+          done: false,
+          attempts: 0,
+          attemptedActivities: [],
+        };
+        const attemptedSet = new Set(prev.attemptedActivities || []);
+        let allAttempted = prev.done;
+        for (let tId = 1; tId <= 28; tId++) {
+          const found = getLessonChunksForTopic(tId).find((c) => c.chunkId === chunkId);
+          if (found) {
+            allAttempted =
+              prev.done ||
+              found.practice.every((act) => attemptedSet.has(act.id));
+            break;
+          }
+        }
+
+        const todayKey = getLocalDateKey();
+        const nextReviewQueue = { ...state.reviewQueue };
+
+        for (const item of reviewItems || []) {
+          if (!nextReviewQueue[item.id]) {
+            nextReviewQueue[item.id] = {
+              box: 0,
+              due: todayKey,
+            };
+          }
+        }
+
+        set({
+          lessonProgress: {
+            ...state.lessonProgress,
+            [chunkId]: {
+              ...prev,
+              done: allAttempted,
+              attempts: Math.max(1, prev.attempts),
+            },
+          },
+          reviewQueue: nextReviewQueue,
+        });
+      },
+
+      setChunkSummary: (chunkId: string, summary: string) => {
+        const state = get();
+        const cleanSummary = String(summary ?? '').slice(0, 400);
+        set({
+          summaries: {
+            ...state.summaries,
+            [chunkId]: cleanSummary,
+          },
+        });
+      },
+
+      gradeReviewItem: (itemId: string, rating: ReviewRating) => {
+        const state = get();
+        const todayKey = getLocalDateKey();
+        const currentEntry = state.reviewQueue[itemId];
+        const nextEntry = scheduleReviewItem(
+          currentEntry,
+          rating,
+          state.settings?.intervalScale ?? DEFAULT_INTERVAL_SCALE,
+          todayKey
+        );
+
+        // Reviews count toward the daily streak but give no XP
+        const nextStreakInfo = computeNextStreak(state.streak, state.lastActiveDate);
+
+        set({
+          reviewQueue: {
+            ...state.reviewQueue,
+            [itemId]: nextEntry,
+          },
+          streak: nextStreakInfo.streak,
+          lastActiveDate: nextStreakInfo.lastActiveDate,
+        });
+
+        return nextEntry;
+      },
+
+      setIntervalScale: (scale: number) => {
+        const state = get();
+        const safeScale = clampIntervalScale(scale);
+        set({
+          settings: {
+            ...state.settings,
+            intervalScale: safeScale,
+          },
+        });
       },
 
       resetProgress: () => {
@@ -1438,7 +1741,14 @@ export const useGameStore = create<GameState>()(
         activeFloorId: state.activeFloorId,
         activeNodeByFloor: state.activeNodeByFloor,
         soundEnabled: state.soundEnabled,
+        sfxVolume: state.sfxVolume,
+        musicEnabled: state.musicEnabled,
+        musicVolume: state.musicVolume,
         reduceMotion: state.reduceMotion,
+        lessonProgress: state.lessonProgress,
+        summaries: state.summaries,
+        reviewQueue: state.reviewQueue,
+        settings: state.settings,
       }),
       migrate: (persistedState: unknown, _version: number) => {
         try {

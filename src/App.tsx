@@ -14,13 +14,18 @@ import { CampPage } from './pages/CampPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { TowerPage } from './pages/TowerPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { ReviewPage } from './pages/ReviewPage';
 import { AIChatbot } from './components/AIChatbot/AIChatbot';
 import { Dungeon3D } from './components/Dungeon3D/Dungeon3D';
+import { useBackgroundMusic } from './hooks/useBackgroundMusic';
 
 export default function App() {
   const currentView = useGameStore((s) => s.currentView);
   const reduceMotion = useGameStore((s) => s.reduceMotion);
   const continueAdventure = useGameStore((s) => s.continueAdventure);
+
+  // Sync dynamic RPG chiptune background music with game state
+  useBackgroundMusic();
 
   const [osReducedMotion, setOsReducedMotion] = useState(false);
   const [is3DDungeonOpen, setIs3DDungeonOpen] = useState(false);
@@ -94,6 +99,7 @@ export default function App() {
             >
               {currentView === 'dungeon' && <DungeonMap />}
               {currentView === 'grimoire' && <GrimoirePage />}
+              {currentView === 'review' && <ReviewPage />}
               {currentView === 'camp' && <CampPage />}
               {currentView === 'dashboard' && <DashboardPage />}
               {currentView === 'inventory' && <Inventory />}

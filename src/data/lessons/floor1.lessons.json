@@ -1,0 +1,746 @@
+{
+  "reviewStatus": "needs-human-review",
+  "floor": 1,
+  "lessonVersion": 3,
+  "guide": { "name": "Rune", "role": "Pemandu dungeon" },
+  "topics": [
+    {
+      "topicId": 1,
+      "chunks": [
+        {
+          "chunkId": "t1c1",
+          "title": "Menyederhanakan pecahan",
+          "goal": "Setelah ini kamu bisa menyederhanakan pecahan seperti 6/8.",
+          "terms": [
+            { "term": "pembilang", "plain": "angka di atas garis pecahan" },
+            { "term": "penyebut", "plain": "angka di bawah garis pecahan" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Peti ini berisi 8 kristal. Ada 6 kristal biru." },
+            { "who": "Rune", "text": "Bagian biru ditulis 6/8. Tapi 6/8 bisa ditulis lebih ringkas." },
+            { "who": "Kamu", "text": "Bagaimana caranya?" },
+            { "who": "Rune", "text": "Cari satu angka yang bisa membagi 6 dan 8 sekaligus." }
+          ],
+          "guess": { "question": "Menurutmu, 6/8 sama dengan pecahan yang mana?", "options": ["3/4", "2/3", "1/2", "6/4"], "correctIndex": 0, "reveal": "Mari kita buktikan langkah demi langkah." },
+          "visual": { "type": "dotGrid", "total": 8, "columns": 4, "groups": [ { "id": "biru", "count": 6, "label": "Kristal biru" }, { "id": "lain", "count": 2, "label": "Kristal lain" } ] },
+          "steps": [
+            { "text": "6/8 artinya 6 bagian dari 8 bagian.", "highlight": ["biru", "lain"] },
+            { "text": "Angka 2 bisa membagi 6 dan juga 8.", "highlight": [] },
+            { "text": "Bagi pembilang: 6 ÷ 2 = 3. Bagi penyebut: 8 ÷ 2 = 4.", "highlight": [] },
+            { "text": "Hasilnya 3/4. Nilainya sama, karena atas dan bawah dibagi angka yang sama.", "highlight": ["biru"] }
+          ],
+          "practice": [
+            { "id": "t1c1p1", "type": "choice", "question": "Bentuk paling sederhana dari 10/15 adalah...", "options": ["5/10", "2/3", "1/3", "10/5"], "correctIndex": 1, "why": "Bagi 10 dan 15 dengan 5: 10 ÷ 5 = 2 dan 15 ÷ 5 = 3." },
+            { "id": "t1c1p2", "type": "fillNumber", "question": "12/16 disederhanakan menjadi 3/?. Berapa penyebutnya?", "answer": 4, "tolerance": 0, "unit": "", "why": "Bagi 12 dan 16 dengan 4: 12 ÷ 4 = 3 dan 16 ÷ 4 = 4." }
+          ],
+          "formula": { "lines": ["Bagi pembilang dan penyebut dengan angka yang sama."], "readAloud": "Atas dan bawah dibagi angka yang sama, jadi nilainya tidak berubah." },
+          "commonMistake": "Hanya membagi angka di atas. Angka di bawah juga harus dibagi.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa 6/8 dan 3/4 bernilai sama?",
+          "reviewItems": [ { "id": "t1c1r1", "front": "Bagaimana menyederhanakan pecahan?", "back": "Bagi pembilang dan penyebut dengan angka yang sama." } ]
+        },
+        {
+          "chunkId": "t1c2",
+          "title": "Persen dan perubahan persen",
+          "goal": "Setelah ini kamu bisa menghitung berapa persen sesuatu naik atau turun.",
+          "terms": [ { "term": "persen", "plain": "bagian dari seratus" } ],
+          "scene": [
+            { "who": "Rune", "text": "Harga ramuan kemarin 80 koin. Hari ini 100 koin." },
+            { "who": "Kamu", "text": "Selisihnya 20. Jadi naik 20%?" },
+            { "who": "Rune", "text": "Selisihnya memang 20 koin. Tapi persen selalu dibandingkan dengan harga yang lama. Kita hitung pelan-pelan." }
+          ],
+          "guess": { "question": "Harga naik dari 80 jadi 100. Menurutmu naik berapa persen?", "options": ["20%", "25%", "80%", "125%"], "correctIndex": 1, "reveal": "Kita buktikan di langkah berikut." },
+          "visual": { "type": "bars", "items": [ { "id": "lama", "label": "Harga lama", "value": 80 }, { "id": "baru", "label": "Harga baru", "value": 100 }, { "id": "selisih", "label": "Selisih", "value": 20 } ] },
+          "steps": [
+            { "text": "Harga lama 80 koin. Harga baru 100 koin.", "highlight": ["lama", "baru"] },
+            { "text": "Cari selisihnya: 100 − 80 = 20 koin.", "highlight": ["selisih"] },
+            { "text": "Bandingkan selisih dengan harga LAMA: 20 ÷ 80 = 0,25.", "highlight": ["lama", "selisih"] },
+            { "text": "Ubah ke persen: 0,25 × 100 = 25%.", "highlight": [] },
+            { "text": "Jadi harga naik 25%, karena selisih 20 koin adalah seperempat dari harga lama 80 koin.", "highlight": ["lama"] }
+          ],
+          "practice": [
+            { "id": "t1c2p1", "type": "fillNumber", "question": "Harga naik dari 60 jadi 90. Berapa persen kenaikannya?", "answer": 50, "tolerance": 0.01, "unit": "%", "why": "(90 − 60) ÷ 60 × 100 = 50." },
+            { "id": "t1c2p2", "type": "fillNumber", "question": "Harga turun dari 200 jadi 150. Berapa persen perubahannya? Tulis turun sebagai angka negatif.", "answer": -25, "tolerance": 0.01, "unit": "%", "why": "(150 − 200) ÷ 200 × 100 = −25." },
+            { "id": "t1c2p3", "type": "order", "question": "Urutkan langkah menghitung perubahan persen.", "items": ["Cari selisih: baru − lama", "Bagi selisih dengan nilai lama", "Kalikan hasilnya dengan 100", "Tulis tanda % dan naik atau turun"], "why": "Selisih dulu, lalu dibandingkan dengan nilai lama, lalu diubah ke persen." }
+          ],
+          "formula": { "lines": ["perubahan % = (baru − lama) ÷ lama × 100"], "readAloud": "Selisih nilai baru dan lama, dibagi nilai lama, lalu dikali seratus." },
+          "commonMistake": "Membagi dengan harga baru. Selalu bagi dengan harga lama.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa perubahan persen dibagi dengan nilai lama?",
+          "reviewItems": [
+            { "id": "t1c2r1", "front": "Rumus perubahan persen?", "back": "(baru − lama) ÷ lama × 100" },
+            { "id": "t1c2r2", "front": "Perubahan persen dibagi dengan nilai yang mana?", "back": "Nilai lama." }
+          ]
+        },
+        {
+          "chunkId": "t1c3",
+          "title": "Fungsi dan garis lurus",
+          "goal": "Setelah ini kamu bisa membaca y = m·x + c dan menghitung nilainya.",
+          "terms": [
+            { "term": "fungsi", "plain": "aturan yang mengubah satu angka masukan menjadi satu angka hasil" },
+            { "term": "kemiringan", "plain": "seberapa cepat garis naik atau turun" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Di arena ada permainan. Tiap main bayar 3 koin." },
+            { "who": "Rune", "text": "Ada juga biaya masuk 2 koin, dibayar sekali di awal." },
+            { "who": "Kamu", "text": "Kalau main 5 kali, berapa total koinku?" }
+          ],
+          "guess": { "question": "Main 5 kali. Tiap main 3 koin, ditambah biaya masuk 2 koin. Berapa total?", "options": ["15", "17", "20", "13"], "correctIndex": 1, "reveal": "Mari kita ubah jadi rumus." },
+          "visual": { "type": "linePlot", "points": [[0, 2], [1, 5], [2, 8], [3, 11], [4, 14], [5, 17]], "line": { "m": 3, "c": 2 } },
+          "steps": [
+            { "text": "Beri nama: x = jumlah permainan, y = total koin.", "highlight": [] },
+            { "text": "Tiap permainan menambah 3 koin. Jadi y naik 3 setiap x naik 1. Angka 3 ini disebut kemiringan (m).", "highlight": ["line"] },
+            { "text": "Biaya masuk 2 koin dibayar sebelum main. Saat x = 0, y = 2. Angka 2 ini disebut c.", "highlight": ["x0"] },
+            { "text": "Tulis rumusnya: y = 3·x + 2.", "highlight": [] },
+            { "text": "Untuk x = 5: y = 3·5 + 2 = 15 + 2 = 17.", "highlight": ["x5"] },
+            { "text": "Jadi garisnya mulai dari 2 di sumbu y, lalu naik 3 untuk tiap langkah ke kanan.", "highlight": ["line"] }
+          ],
+          "practice": [
+            { "id": "t1c3p1", "type": "fillNumber", "question": "Pada y = 3x + 2, berapa y ketika x = 6?", "answer": 20, "tolerance": 0, "unit": "", "why": "y = 3×6 + 2 = 18 + 2 = 20." },
+            { "id": "t1c3p2", "type": "choice", "question": "Pada y = 3x + 2, angka 3 berarti...", "options": ["Biaya masuk 2 koin", "Tiap permainan menambah 3 koin", "Total koin selalu 3", "Jumlah permainan adalah 3"], "correctIndex": 1, "why": "Angka di depan x adalah kemiringan: y naik 3 setiap x naik 1." },
+            { "id": "t1c3p3", "type": "match", "question": "Cocokkan simbol dengan artinya.", "pairs": [ { "left": "m", "right": "berapa y berubah setiap x naik 1" }, { "left": "c", "right": "nilai y saat x = 0" }, { "left": "x", "right": "nilai masukan, misalnya jumlah permainan" }, { "left": "y", "right": "hasil, misalnya total koin" } ], "why": "m = kemiringan, c = titik awal di sumbu y." }
+          ],
+          "formula": { "lines": ["y = m·x + c"], "readAloud": "y sama dengan m kali x, ditambah c." },
+          "commonMistake": "Tertukar antara m dan c. m adalah kenaikan tiap langkah, c adalah titik awal.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa arti m dan c pada permainan arena tadi?",
+          "reviewItems": [ { "id": "t1c3r1", "front": "Arti m dan c pada y = m·x + c?", "back": "m: kemiringan (y berubah berapa tiap x naik 1). c: nilai y saat x = 0." } ]
+        }
+      ]
+    },
+    {
+      "topicId": 2,
+      "chunks": [
+        {
+          "chunkId": "t2c1",
+          "title": "Rata-rata dan median",
+          "goal": "Setelah ini kamu bisa memilih antara rata-rata dan median.",
+          "terms": [
+            { "term": "rata-rata", "plain": "jumlah semua nilai dibagi banyaknya nilai" },
+            { "term": "median", "plain": "nilai paling tengah setelah data diurutkan" },
+            { "term": "outlier", "plain": "nilai yang jauh berbeda dari yang lain" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Lima monster punya kekuatan serang 5, 6, 7, 8, dan 200." },
+            { "who": "Rune", "text": "Si 200 itu bos kecil." },
+            { "who": "Kamu", "text": "Berapa kekuatan monster yang biasa?" }
+          ],
+          "guess": { "question": "Menurutmu, mana yang paling mewakili monster biasa?", "options": ["Rata-rata (sekitar 45)", "Median (7)", "Jumlah (226)", "Angka terbesar (200)"], "correctIndex": 1, "reveal": "Kita hitung keduanya." },
+          "visual": { "type": "bars", "items": [ { "id": "m1", "label": "Monster 1", "value": 5 }, { "id": "m2", "label": "Monster 2", "value": 6 }, { "id": "m3", "label": "Monster 3", "value": 7 }, { "id": "m4", "label": "Monster 4", "value": 8 }, { "id": "m5", "label": "Bos kecil", "value": 200 }, { "id": "mean", "label": "Rata-rata", "value": 45.2 }, { "id": "median", "label": "Median", "value": 7 } ] },
+          "steps": [
+            { "text": "Jumlahkan semuanya: 5 + 6 + 7 + 8 + 200 = 226.", "highlight": ["m1", "m2", "m3", "m4", "m5"] },
+            { "text": "Bagi dengan banyaknya data (5): 226 ÷ 5 = 45,2. Itu rata-rata.", "highlight": ["mean"] },
+            { "text": "Sekarang median. Urutkan: 5, 6, 7, 8, 200. Nilai paling tengah adalah 7.", "highlight": ["median"] },
+            { "text": "Rata-rata 45,2 jauh di atas empat monster pertama, karena si 200 menariknya ke atas.", "highlight": ["mean", "m5"] },
+            { "text": "Jadi bila ada outlier, median lebih mewakili. Alasannya: median hanya melihat posisi tengah, bukan besarnya nilai ekstrem.", "highlight": ["median"] }
+          ],
+          "practice": [
+            { "id": "t2c1p1", "type": "fillNumber", "question": "Berapa median dari 3, 9, 4, 8, 5? (urutkan dulu)", "answer": 5, "tolerance": 0, "unit": "", "why": "Urut: 3, 4, 5, 8, 9. Nilai tengahnya 5." },
+            { "id": "t2c1p2", "type": "fillNumber", "question": "Berapa rata-rata dari 2, 4, 6, 8?", "answer": 5, "tolerance": 0, "unit": "", "why": "(2 + 4 + 6 + 8) ÷ 4 = 20 ÷ 4 = 5." },
+            { "id": "t2c1p3", "type": "choice", "question": "Di sebuah desa, 9 orang bergaji 5 juta dan 1 orang bergaji 500 juta. Ukuran mana yang lebih mewakili gaji tipikal?", "options": ["Rata-rata", "Median", "Jumlah", "Rentang"], "correctIndex": 1, "why": "Rata-rata menjadi 54,5 juta karena satu gaji besar, sedangkan median tetap 5 juta." }
+          ],
+          "formula": { "lines": ["rata-rata = jumlah semua nilai ÷ banyaknya nilai", "median = nilai tengah setelah data diurutkan"], "readAloud": "Rata-rata: jumlahkan semua, lalu bagi banyaknya. Median: urutkan, ambil yang di tengah." },
+          "commonMistake": "Memakai rata-rata untuk data dengan outlier besar tanpa memeriksa median.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: kapan median lebih baik daripada rata-rata?",
+          "reviewItems": [
+            { "id": "t2c1r1", "front": "Kapan median lebih mewakili daripada rata-rata?", "back": "Saat ada outlier yang menarik rata-rata." },
+            { "id": "t2c1r2", "front": "Cara mencari median?", "back": "Urutkan data, lalu ambil nilai yang paling tengah." }
+          ]
+        },
+        {
+          "chunkId": "t2c2",
+          "title": "Sebaran data (varians)",
+          "goal": "Setelah ini kamu bisa menghitung varians dan menjelaskan artinya.",
+          "terms": [ { "term": "varians", "plain": "ukuran seberapa menyebar data dari rata-ratanya" } ],
+          "scene": [
+            { "who": "Rune", "text": "Dua tim punya rata-rata HP yang sama, yaitu 5." },
+            { "who": "Rune", "text": "Tim A: 4, 5, 6. Tim B: 1, 5, 9." },
+            { "who": "Kamu", "text": "Kalau rata-ratanya sama, apa bedanya?" }
+          ],
+          "guess": { "question": "Menurutmu, tim mana yang HP-nya lebih menyebar?", "options": ["Tim A", "Tim B", "Sama saja", "Tidak bisa diketahui"], "correctIndex": 1, "reveal": "Kita ukur dengan angka." },
+          "visual": { "type": "bars", "items": [ { "id": "a1", "label": "A1", "value": 4 }, { "id": "a2", "label": "A2", "value": 5 }, { "id": "a3", "label": "A3", "value": 6 }, { "id": "b1", "label": "B1", "value": 1 }, { "id": "b2", "label": "B2", "value": 5 }, { "id": "b3", "label": "B3", "value": 9 } ] },
+          "steps": [
+            { "text": "Rata-rata Tim A: (4 + 5 + 6) ÷ 3 = 5. Rata-rata Tim B: (1 + 5 + 9) ÷ 3 = 5.", "highlight": ["a1", "a2", "a3", "b1", "b2", "b3"] },
+            { "text": "Hitung jarak tiap angka dari rata-rata. Tim A: −1, 0, 1. Tim B: −4, 0, 4.", "highlight": [] },
+            { "text": "Kuadratkan supaya tidak ada yang negatif. Tim A: 1, 0, 1. Tim B: 16, 0, 16.", "highlight": [] },
+            { "text": "Jumlahkan: Tim A = 2. Tim B = 32.", "highlight": [] },
+            { "text": "Bagi dengan (n − 1) = 2. Varians Tim A = 1. Varians Tim B = 16.", "highlight": [] },
+            { "text": "Jadi Tim B jauh lebih menyebar, karena angka variansnya lebih besar.", "highlight": ["b1", "b3"] }
+          ],
+          "practice": [
+            { "id": "t2c2p1", "type": "fillNumber", "question": "Berapa varians sampel dari 1, 2, 3?", "answer": 1, "tolerance": 0.01, "unit": "", "why": "Rata-rata 2. Jarak: −1, 0, 1. Kuadrat: 1, 0, 1. Jumlah 2. Dibagi (3 − 1) = 1." },
+            { "id": "t2c2p2", "type": "choice", "question": "Mengapa jarak ke rata-rata dikuadratkan?", "options": ["Agar jarak negatif dan positif tidak saling menghapus", "Agar angkanya selalu lebih kecil", "Agar rata-rata berubah", "Agar data terurut"], "correctIndex": 0, "why": "Tanpa kuadrat, −4 dan +4 akan menjumlah jadi 0 dan sebaran terlihat nol." },
+            { "id": "t2c2p3", "type": "fillNumber", "question": "Data sampel berisi 5 angka. Varians dibagi berapa?", "answer": 4, "tolerance": 0, "unit": "", "why": "Untuk data sampel, pembaginya n − 1 = 5 − 1 = 4." }
+          ],
+          "formula": { "lines": ["varians sampel s² = Σ(x − rata-rata)² ÷ (n − 1)"], "readAloud": "Jarak tiap nilai dari rata-rata dikuadratkan, dijumlahkan, lalu dibagi n kurang satu." },
+          "commonMistake": "Lupa memakai (n − 1) sebagai pembagi untuk data sampel.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa arti varians Tim B yang jauh lebih besar?",
+          "reviewItems": [ { "id": "t2c2r1", "front": "Rumus varians sampel?", "back": "Σ(x − rata-rata)² ÷ (n − 1)" } ]
+        },
+        {
+          "chunkId": "t2c3",
+          "title": "Peluang bersyarat",
+          "goal": "Setelah ini kamu bisa menghitung peluang jika kamu sudah tahu satu hal.",
+          "terms": [ { "term": "peluang bersyarat", "plain": "peluang sesuatu jika kita sudah tahu hal lain sudah terjadi" } ],
+          "scene": [
+            { "who": "Rune", "text": "Ada 20 petualang. 8 di antaranya memakai topi." },
+            { "who": "Rune", "text": "Dari 8 yang bertopi, 6 membawa pedang." },
+            { "who": "Kamu", "text": "Kalau aku tahu seorang petualang bertopi, berapa peluang ia membawa pedang?" }
+          ],
+          "guess": { "question": "Peluang petualang membawa pedang, jika kita tahu ia bertopi?", "options": ["6/20", "6/8", "8/20", "6/14"], "correctIndex": 1, "reveal": "Kita lihat kenapa." },
+          "visual": { "type": "dotGrid", "total": 20, "columns": 5, "groups": [ { "id": "tanpaTopi", "count": 12, "label": "Tanpa topi" }, { "id": "topi", "count": 8, "label": "Bertopi" }, { "id": "topiPedang", "count": 6, "label": "Bertopi dan membawa pedang", "subsetOf": "topi" } ] },
+          "steps": [
+            { "text": "Syaratnya: bertopi. Jadi kita hanya melihat 8 petualang bertopi.", "highlight": ["topi"] },
+            { "text": "Dari 8 itu, 6 membawa pedang.", "highlight": ["topiPedang"] },
+            { "text": "Peluangnya 6 ÷ 8 = 0,75.", "highlight": ["topiPedang"] },
+            { "text": "Penyebutnya 8, bukan 20, karena yang tidak bertopi tidak dihitung lagi.", "highlight": ["topi"] },
+            { "text": "Cara lain: peluang bertopi dan berpedang = 6/20 = 0,3. Peluang bertopi = 8/20 = 0,4. Maka 0,3 ÷ 0,4 = 0,75.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t2c3p1", "type": "fillNumber", "question": "Dari 12 monster, 4 bersayap. Dari yang bersayap, 1 berwarna merah. Berapa peluang merah jika bersayap? (tulis desimal)", "answer": 0.25, "tolerance": 0.001, "unit": "", "why": "Hanya lihat 4 monster bersayap: 1 ÷ 4 = 0,25." },
+            { "id": "t2c3p2", "type": "fillNumber", "question": "Dari 10 kartu, 5 bergambar naga. Dari yang bergambar naga, 2 berwarna emas. Berapa peluang emas jika bergambar naga? (tulis desimal)", "answer": 0.4, "tolerance": 0.001, "unit": "", "why": "2 ÷ 5 = 0,4." },
+            { "id": "t2c3p3", "type": "choice", "question": "Pada peluang bersyarat P(A|B), penyebut perhitungannya adalah...", "options": ["Semua kejadian", "Hanya kejadian B", "Hanya kejadian A", "Jumlah A dan B"], "correctIndex": 1, "why": "Kita sudah tahu B terjadi, jadi hanya kelompok B yang dihitung." }
+          ],
+          "formula": { "lines": ["P(A|B) = P(A dan B) ÷ P(B)"], "readAloud": "Peluang A jika B sama dengan peluang A dan B bersama-sama, dibagi peluang B." },
+          "commonMistake": "Membagi dengan seluruh jumlah (20), bukan hanya kelompok yang sudah diketahui (8).",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa penyebutnya hanya kelompok yang bertopi?",
+          "reviewItems": [ { "id": "t2c3r1", "front": "Rumus peluang bersyarat?", "back": "P(A|B) = P(A dan B) ÷ P(B)" } ]
+        },
+        {
+          "chunkId": "t2c4",
+          "title": "Teorema Bayes: alarm yang sering bunyi tanpa api",
+          "goal": "Setelah ini kamu bisa menghitung peluang sebenarnya dari hasil alarm atau tes.",
+          "terms": [
+            { "term": "positif palsu", "plain": "alarm bunyi padahal tidak ada api" },
+            { "term": "kejadian jarang", "plain": "hal yang hanya terjadi pada sedikit kasus" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Di dapur ada alarm asap." },
+            { "who": "Rune", "text": "Kadang api benar-benar menyala. Itu jarang." },
+            { "who": "Rune", "text": "Kadang alarm bunyi karena asap roti panggang. Itu lebih sering." },
+            { "who": "Kamu", "text": "Kalau alarm bunyi, berarti pasti ada api?" },
+            { "who": "Rune", "text": "Jangan menebak. Kita hitung." }
+          ],
+          "guess": { "question": "Alarm bunyi. Menurutmu peluang ada api sungguhan kira-kira berapa?", "options": ["Sekitar 90%", "Sekitar 50%", "Sekitar 15%", "Sekitar 1%"], "correctIndex": 2, "reveal": "Jawabannya mungkin mengejutkan. Kita buktikan." },
+          "visual": { "type": "dotGrid", "total": 2000, "columns": 50, "groups": [ { "id": "tanpaApi", "count": 1980, "label": "Hari tanpa api" }, { "id": "api", "count": 20, "label": "Hari ada api" }, { "id": "apiAlarm", "count": 18, "label": "Ada api, alarm bunyi", "subsetOf": "api" }, { "id": "palsu", "count": 99, "label": "Tanpa api, alarm tetap bunyi", "subsetOf": "tanpaApi" } ] },
+          "steps": [
+            { "text": "Bayangkan 2.000 hari. Tiap kotak kecil adalah satu hari.", "highlight": ["tanpaApi", "api"] },
+            { "text": "Hanya 20 hari ada api sungguhan. Itu 1 dari tiap 100 hari.", "highlight": ["api"] },
+            { "text": "Pada 20 hari itu, alarm bunyi di 18 hari. Alarmnya bagus, tetapi tidak sempurna.", "highlight": ["apiAlarm"] },
+            { "text": "Ada 1.980 hari tanpa api. Alarm tetap bunyi di 99 hari karena asap roti. Itu 5 dari tiap 100 hari tanpa api.", "highlight": ["palsu"] },
+            { "text": "Hitung semua hari saat alarm bunyi: 18 + 99 = 117 hari.", "highlight": ["apiAlarm", "palsu"] },
+            { "text": "Dari 117 hari itu, hanya 18 hari yang benar-benar ada api. 18 ÷ 117 ≈ 0,15.", "highlight": ["apiAlarm"] },
+            { "text": "Jadi alarm bunyi menaikkan peluang api dari 1% menjadi sekitar 15%. Naik banyak, tetapi masih jauh dari pasti, karena api sungguhan jarang.", "highlight": ["apiAlarm", "palsu"] }
+          ],
+          "practice": [
+            { "id": "t2c4p1", "type": "fillNumber", "question": "Dari 1.000 hari: 10 hari ada api. Alarm bunyi di 9 dari 10 hari api, dan di 50 hari tanpa api. Berapa hari total alarm bunyi?", "answer": 59, "tolerance": 0, "unit": "hari", "why": "9 + 50 = 59." },
+            { "id": "t2c4p2", "type": "choice", "question": "Dari hari-hari alarm bunyi itu, bagian mana yang benar-benar ada api?", "options": ["9 dari 59 (sekitar 15%)", "9 dari 10 (90%)", "50 dari 59 (sekitar 85%)", "10 dari 1.000 (1%)"], "correctIndex": 0, "why": "Hanya 9 dari 59 hari alarm bunyi yang ada api: 9 ÷ 59 ≈ 0,15." },
+            { "id": "t2c4p3", "type": "choice", "question": "Mengapa alarm yang bunyi lebih sering salah daripada benar?", "options": ["Karena alarmnya rusak", "Karena hari tanpa api jauh lebih banyak, jadi 5% dari hari itu tetap menghasilkan banyak alarm palsu", "Karena api selalu terlambat", "Karena 5% lebih besar dari 90%"], "correctIndex": 1, "why": "Yang jarang (api) kalah banyak dari alarm palsu yang sering muncul." }
+          ],
+          "formula": {
+            "lines": [
+              "P(A|B) = P(B|A) · P(A) ÷ P(B)",
+              "P(B) = P(B|A)·P(A) + P(B|tidak A)·P(tidak A)",
+              "Dengan angka alarm: 0,9×0,01 ÷ (0,9×0,01 + 0,05×0,99) = 0,009 ÷ 0,0585 ≈ 0,154",
+              "Di soal kuis, 'api' diganti 'penyakit' dan 'alarm bunyi' diganti 'tes positif'. Polanya sama."
+            ],
+            "readAloud": "Peluang A jika B sama dengan peluang B jika A, dikali peluang A, lalu dibagi peluang B."
+          },
+          "commonMistake": "Mengira peluang api jika alarm bunyi sama dengan peluang alarm bunyi jika ada api. Yang kedua 90%, yang pertama hanya sekitar 15%.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa angka 15% jauh lebih kecil dari 90%?",
+          "reviewItems": [
+            { "id": "t2c4r1", "front": "Rumus Teorema Bayes?", "back": "P(A|B) = P(B|A)·P(A) ÷ P(B)" },
+            { "id": "t2c4r2", "front": "Mengapa positif palsu bisa lebih banyak dari positif benar?", "back": "Karena kejadian aslinya jarang, jadi kelompok tanpa kejadian sangat besar." }
+          ]
+        }
+      ]
+    },
+    {
+      "topicId": 3,
+      "chunks": [
+        {
+          "chunkId": "t3c1",
+          "title": "Kurva lonceng (distribusi normal)",
+          "goal": "Setelah ini kamu bisa memakai aturan 68-95-99,7 untuk membaca data berbentuk lonceng.",
+          "terms": [
+            { "term": "simpangan baku (σ)", "plain": "ukuran seberapa menyebar data dari rata-rata; makin besar, makin menyebar" },
+            { "term": "distribusi normal", "plain": "bentuk lonceng: banyak data di tengah, sedikit di ujung" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Tinggi 1.000 prajurit dicatat. Rata-ratanya 170 cm." },
+            { "who": "Rune", "text": "Simpangan bakunya 10 cm. Artinya tinggi mereka menyebar sekitar 10 cm dari rata-rata." }
+          ],
+          "guess": { "question": "Berapa persen prajurit yang tingginya antara 160 dan 180 cm?", "options": ["Sekitar 50%", "Sekitar 68%", "Sekitar 95%", "Sekitar 99,7%"], "correctIndex": 1, "reveal": "Kita lihat aturannya." },
+          "visual": { "type": "bars", "items": [ { "id": "s1", "label": "±1σ", "value": 68 }, { "id": "s2", "label": "±2σ", "value": 95 }, { "id": "s3", "label": "±3σ", "value": 99.7 } ] },
+          "steps": [
+            { "text": "Data berbentuk lonceng: paling banyak di sekitar rata-rata 170 cm.", "highlight": [] },
+            { "text": "Satu σ = 10 cm. Rentang ±1σ adalah 160 sampai 180 cm. Isinya sekitar 68% prajurit.", "highlight": ["s1"] },
+            { "text": "Rentang ±2σ adalah 150 sampai 190 cm. Isinya sekitar 95%.", "highlight": ["s2"] },
+            { "text": "Rentang ±3σ adalah 140 sampai 200 cm. Isinya sekitar 99,7%.", "highlight": ["s3"] },
+            { "text": "Jadi prajurit setinggi 205 cm sangat jarang, karena ia berada di luar 3σ dari rata-rata.", "highlight": ["s3"] }
+          ],
+          "practice": [
+            { "id": "t3c1p1", "type": "fillNumber", "question": "Rata-rata 170, σ = 10. Berapa batas bawah rentang ±2σ?", "answer": 150, "tolerance": 0, "unit": "cm", "why": "170 − 2×10 = 150." },
+            { "id": "t3c1p2", "type": "choice", "question": "Prajurit setinggi 200 cm berada berapa σ dari rata-rata?", "options": ["1", "2", "3", "30"], "correctIndex": 2, "why": "(200 − 170) ÷ 10 = 3." },
+            { "id": "t3c1p3", "type": "choice", "question": "Kira-kira berapa persen data berada di luar ±2σ?", "options": ["5%", "32%", "0,3%", "50%"], "correctIndex": 0, "why": "Di dalam ±2σ sekitar 95%, jadi di luarnya sekitar 100% − 95% = 5%." }
+          ],
+          "formula": { "lines": ["±1σ ≈ 68%", "±2σ ≈ 95%", "±3σ ≈ 99,7%"], "readAloud": "Satu, dua, dan tiga simpangan baku dari rata-rata mencakup sekitar 68, 95, dan 99,7 persen data." },
+          "commonMistake": "Memakai aturan ini untuk data yang tidak berbentuk lonceng.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa prajurit setinggi 205 cm dianggap sangat jarang?",
+          "reviewItems": [ { "id": "t3c1r1", "front": "Aturan 68-95-99,7?", "back": "±1σ ≈ 68%, ±2σ ≈ 95%, ±3σ ≈ 99,7% dari data normal." } ]
+        },
+        {
+          "chunkId": "t3c2",
+          "title": "Koin dan distribusi binomial",
+          "goal": "Setelah ini kamu bisa menghitung peluang tepat k sukses dari n percobaan.",
+          "terms": [ { "term": "binomial", "plain": "cara menghitung berapa kali sukses dalam n percobaan yang sama" } ],
+          "scene": [
+            { "who": "Rune", "text": "Lempar koin adil 3 kali. G artinya gambar, A artinya angka." },
+            { "who": "Kamu", "text": "Berapa peluang mendapat tepat 2 gambar?" }
+          ],
+          "guess": { "question": "Peluang tepat 2 gambar dari 3 lemparan?", "options": ["1/8", "3/8", "1/2", "2/3"], "correctIndex": 1, "reveal": "Kita daftar semua hasilnya." },
+          "visual": { "type": "dotGrid", "total": 8, "columns": 4, "groups": [ { "id": "lain", "count": 5, "label": "Hasil lain" }, { "id": "dua", "count": 3, "label": "Tepat 2 gambar" } ] },
+          "steps": [
+            { "text": "Ada 2 × 2 × 2 = 8 hasil yang mungkin.", "highlight": ["lain", "dua"] },
+            { "text": "Hasil dengan tepat 2 gambar: GGA, GAG, AGG. Ada 3 hasil.", "highlight": ["dua"] },
+            { "text": "Tiap hasil sama mungkin, yaitu 1 dari 8.", "highlight": [] },
+            { "text": "Peluang = 3 ÷ 8 = 0,375.", "highlight": ["dua"] },
+            { "text": "Jadi tepat 2 gambar punya peluang 0,375, karena 3 dari 8 hasil yang sama mungkin memenuhi syarat.", "highlight": ["dua"] }
+          ],
+          "practice": [
+            { "id": "t3c2p1", "type": "fillNumber", "question": "Berapa rata-rata jumlah gambar pada 20 lemparan koin adil?", "answer": 10, "tolerance": 0, "unit": "", "why": "rata-rata = n·p = 20 × 0,5 = 10." },
+            { "id": "t3c2p2", "type": "fillNumber", "question": "Dari 3 lemparan koin adil, berapa peluang tepat 3 gambar? (tulis desimal)", "answer": 0.125, "tolerance": 0.0005, "unit": "", "why": "Hanya 1 dari 8 hasil: GGG. 1 ÷ 8 = 0,125." },
+            { "id": "t3c2p3", "type": "choice", "question": "Pada 3 lemparan koin, berapa jumlah semua hasil yang mungkin?", "options": ["6", "8", "9", "3"], "correctIndex": 1, "why": "2 × 2 × 2 = 8." }
+          ],
+          "formula": { "lines": ["P(X = k) = C(n, k) · p^k · (1 − p)^(n − k)", "rata-rata = n · p", "Contoh: C(3, 2) = 3; 0,5² × 0,5 = 0,125; 3 × 0,125 = 0,375"], "readAloud": "Banyaknya cara dikali peluang tiap cara. Rata-ratanya n kali p." },
+          "commonMistake": "Lupa menghitung banyaknya cara (C), sehingga peluangnya terlalu kecil.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: dari mana angka 3 pada contoh tepat 2 gambar berasal?",
+          "reviewItems": [ { "id": "t3c2r1", "front": "Rata-rata distribusi binomial?", "back": "n · p" } ]
+        },
+        {
+          "chunkId": "t3c3",
+          "title": "Uji hipotesis dan p-value",
+          "goal": "Setelah ini kamu bisa menjelaskan arti p-value tanpa salah.",
+          "terms": [
+            { "term": "H0", "plain": "anggapan awal: tidak ada efek atau tidak ada yang istimewa" },
+            { "term": "p-value", "plain": "seberapa jarang hasilmu terjadi jika H0 benar" },
+            { "term": "α (alfa)", "plain": "ambang yang kamu tetapkan, biasanya 0,05" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Seorang pedagang bilang koinnya adil." },
+            { "who": "Rune", "text": "Kamu melempar 10 kali dan dapat 9 gambar." },
+            { "who": "Kamu", "text": "Itu mencurigakan. Tapi apa mungkin kebetulan?" }
+          ],
+          "guess": { "question": "Jika koinnya adil, seberapa sering kira-kira kita dapat 9 gambar atau lebih dari 10 lemparan?", "options": ["Sekitar 1 dari 100", "Sekitar 1 dari 4", "Sekitar 1 dari 2", "Hampir tidak pernah"], "correctIndex": 0, "reveal": "Kita hitung." },
+          "visual": { "type": "dotGrid", "total": 1024, "columns": 32, "groups": [ { "id": "lain", "count": 1013, "label": "Hasil lain" }, { "id": "ekstrem", "count": 11, "label": "9 atau 10 gambar" } ] },
+          "steps": [
+            { "text": "Anggapan awal (H0): koinnya adil.", "highlight": [] },
+            { "text": "Hasilmu: 9 gambar dari 10. Kita curiga koin condong ke gambar.", "highlight": [] },
+            { "text": "Pertanyaannya: jika koin adil, seberapa jarang hasil 9 gambar atau lebih?", "highlight": [] },
+            { "text": "Ada 2^10 = 1.024 hasil mungkin. Tepat 9 gambar ada 10 cara. Tepat 10 gambar ada 1 cara. Total 11 hasil.", "highlight": ["ekstrem"] },
+            { "text": "Peluangnya: 11 ÷ 1.024 ≈ 0,011. Angka ini disebut p-value.", "highlight": ["ekstrem"] },
+            { "text": "Ambang yang umum α = 0,05. Karena 0,011 lebih kecil dari 0,05, kita menolak H0.", "highlight": [] },
+            { "text": "Jadi ada bukti koinnya condong ke gambar. Perhatikan: p-value BUKAN peluang koin itu adil.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t3c3p1", "type": "choice", "question": "p-value = 0,04 berarti...", "options": ["Jika H0 benar, hasil seekstrem ini muncul sekitar 4% dari waktu", "Peluang H0 benar adalah 4%", "Peluang H1 benar adalah 96%", "Hasilnya pasti kebetulan"], "correctIndex": 0, "why": "p-value dihitung dengan mengandaikan H0 benar. Ia bukan peluang H0 itu sendiri." },
+            { "id": "t3c3p2", "type": "choice", "question": "p-value = 0,30 dan α = 0,05. Keputusannya?", "options": ["Tolak H0", "Gagal menolak H0: bukti belum cukup", "H0 pasti benar", "H1 pasti benar"], "correctIndex": 1, "why": "0,30 lebih besar dari α, jadi kita gagal menolak H0. Itu bukan bukti H0 benar." },
+            { "id": "t3c3p3", "type": "order", "question": "Urutkan langkah uji hipotesis.", "items": ["Tulis H0 (tidak ada efek)", "Ambil data dan lihat hasilnya", "Hitung p-value: seberapa jarang hasil itu jika H0 benar", "Bandingkan p-value dengan α lalu putuskan"], "why": "Anggapan dulu, lalu data, lalu hitung kejarangan hasil, baru memutuskan." }
+          ],
+          "formula": { "lines": ["p-value = peluang hasil sekurang-kurangnya seekstrem yang teramati, jika H0 benar", "jika p-value < α, tolak H0; jika tidak, gagal menolak H0"], "readAloud": "p-value adalah seberapa jarang hasilmu terjadi jika anggapan awal benar." },
+          "commonMistake": "Mengartikan p-value sebagai peluang H0 benar.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang dihitung p-value, dan apa yang TIDAK dihitung?",
+          "reviewItems": [
+            { "id": "t3c3r1", "front": "Apa arti p-value?", "back": "Peluang hasil sekurang-kurangnya seekstrem yang teramati, jika H0 benar." },
+            { "id": "t3c3r2", "front": "Jika p-value lebih besar dari α, keputusannya?", "back": "Gagal menolak H0 (bukan berarti H0 benar)." }
+          ]
+        },
+        {
+          "chunkId": "t3c4",
+          "title": "Rentang keyakinan (confidence interval)",
+          "goal": "Setelah ini kamu bisa menjelaskan apa arti rentang keyakinan 95%.",
+          "terms": [ { "term": "rentang keyakinan", "plain": "perkiraan berupa rentang, bukan satu angka" } ],
+          "scene": [
+            { "who": "Rune", "text": "Kamu menimbang sampel monster untuk memperkirakan berat rata-rata semua monster." },
+            { "who": "Kamu", "text": "Tapi satu sampel bisa meleset." },
+            { "who": "Rune", "text": "Karena itu kita membuat perkiraan berupa rentang." }
+          ],
+          "guess": { "question": "Dari 100 rentang keyakinan 95%, kira-kira berapa yang memuat nilai sebenarnya?", "options": ["5", "50", "95", "100"], "correctIndex": 2, "reveal": "Kita lihat alasannya." },
+          "visual": { "type": "dotGrid", "total": 100, "columns": 10, "groups": [ { "id": "memuat", "count": 95, "label": "Rentang yang memuat nilai sebenarnya" }, { "id": "meleset", "count": 5, "label": "Rentang yang meleset" } ] },
+          "steps": [
+            { "text": "Satu sampel memberi satu perkiraan, dan perkiraan itu bisa meleset.", "highlight": [] },
+            { "text": "Rentang keyakinan membuat perkiraan berupa rentang, misalnya 48 sampai 56.", "highlight": [] },
+            { "text": "Bayangkan kamu mengambil sampel baru 100 kali dan membuat satu rentang tiap kali.", "highlight": ["memuat", "meleset"] },
+            { "text": "Pada rentang keyakinan 95%, sekitar 95 dari 100 rentang itu memuat nilai sebenarnya.", "highlight": ["memuat"] },
+            { "text": "Jadi 95% menggambarkan seberapa andal CARA membuat rentang itu jika diulang berkali-kali.", "highlight": ["memuat", "meleset"] }
+          ],
+          "practice": [
+            { "id": "t3c4p1", "type": "fillNumber", "question": "Dari 200 rentang keyakinan 95%, kira-kira berapa yang memuat nilai sebenarnya?", "answer": 190, "tolerance": 0, "unit": "", "why": "95% dari 200 = 190." },
+            { "id": "t3c4p2", "type": "choice", "question": "Cara mengartikan rentang keyakinan 95% yang paling tepat?", "options": ["Cara membuat rentang ini, jika diulang pada banyak sampel, memuat nilai sebenarnya sekitar 95% dari waktu", "95% data berada di dalam rentang ini", "Rata-ratanya pasti 95", "Nilai sebenarnya pasti berada di dalam rentang ini"], "correctIndex": 0, "why": "Persentasenya menjelaskan keandalan cara membuat rentang, bukan isi data atau kepastian satu rentang." }
+          ],
+          "formula": { "lines": ["rentang keyakinan 95%: cara membuat rentang yang, jika diulang, memuat nilai sebenarnya sekitar 95% dari waktu"], "readAloud": "Dari seratus rentang yang dibuat dengan cara ini, sekitar sembilan puluh lima memuat nilai sebenarnya." },
+          "commonMistake": "Mengira 95% adalah banyaknya data yang berada di dalam rentang.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa arti 95% pada rentang keyakinan?",
+          "reviewItems": [ { "id": "t3c4r1", "front": "Arti rentang keyakinan 95%?", "back": "Cara membuat rentang yang, jika diulang pada banyak sampel, memuat nilai sebenarnya sekitar 95% dari waktu." } ]
+        },
+        {
+          "chunkId": "t3c5",
+          "title": "Korelasi dan garis tren",
+          "goal": "Setelah ini kamu bisa membaca korelasi dan garis tren sederhana, tanpa salah mengira sebab-akibat.",
+          "terms": [
+            { "term": "korelasi (r)", "plain": "angka dari −1 sampai 1 yang menunjukkan kekuatan hubungan lurus dua hal" },
+            { "term": "regresi sederhana", "plain": "garis tren yang memperkirakan y dari x" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Di kota, makin banyak sepatu bot hujan terjual, makin banyak payung terjual." },
+            { "who": "Kamu", "text": "Berarti sepatu bot membuat orang membeli payung?" },
+            { "who": "Rune", "text": "Hati-hati. Mari kita periksa." }
+          ],
+          "guess": { "question": "Sepatu bot dan payung sama-sama banyak terjual. Penjelasan paling masuk akal?", "options": ["Sepatu bot menyebabkan orang membeli payung", "Payung menyebabkan orang membeli sepatu bot", "Ada faktor ketiga, yaitu hujan, yang memengaruhi keduanya", "Itu pasti kebetulan"], "correctIndex": 2, "reveal": "Itulah inti pelajaran ini." },
+          "steps": [
+            { "text": "Korelasi r bernilai −1 sampai 1. Dekat 1: dua hal naik bersama. Dekat −1: satu naik, yang lain turun. Dekat 0: tidak ada hubungan lurus.", "highlight": [] },
+            { "text": "Sepatu bot dan payung punya r yang tinggi karena sama-sama naik saat hujan.", "highlight": [] },
+            { "text": "Hujan adalah faktor ketiga. Korelasi hanya menunjukkan dua hal bergerak bersama, bukan siapa penyebabnya.", "highlight": [] },
+            { "text": "Garis tren y = 2 + 3x memperkirakan y dari x. Angka 2 adalah nilai awal. Angka 3 adalah kenaikan y tiap x naik 1.", "highlight": [] },
+            { "text": "Untuk x = 4: y = 2 + 3×4 = 14.", "highlight": [] },
+            { "text": "Jadi garis tren berguna untuk memperkirakan, tetapi tidak membuktikan sebab-akibat, karena ia hanya meringkas pola data.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t3c5p1", "type": "fillNumber", "question": "Pada garis tren y = 2 + 3x, berapa y ketika x = 5?", "answer": 17, "tolerance": 0, "unit": "", "why": "y = 2 + 3×5 = 17." },
+            { "id": "t3c5p2", "type": "choice", "question": "Korelasi r = −0,9 antara dua hal berarti...", "options": ["Satu naik, yang lain cenderung turun, dan hubungannya kuat", "Tidak ada hubungan sama sekali", "Satu menyebabkan yang lain turun", "Hubungannya lemah dan naik"], "correctIndex": 0, "why": "Tanda negatif berarti berlawanan arah. Nilai mendekati −1 berarti hubungannya kuat. Ini tidak membuktikan sebab-akibat." },
+            { "id": "t3c5p3", "type": "choice", "question": "Penjualan jaket dan penjualan teh hangat berkorelasi tinggi. Kesimpulan yang aman?", "options": ["Jaket membuat orang minum teh", "Keduanya naik bersamaan, mungkin karena faktor ketiga seperti cuaca dingin", "Teh membuat orang beli jaket", "Datanya pasti salah"], "correctIndex": 1, "why": "Korelasi tidak menyebut penyebab. Cuaca dingin bisa memengaruhi keduanya." }
+          ],
+          "formula": { "lines": ["−1 ≤ r ≤ 1", "regresi sederhana: y = b0 + b1·x"], "readAloud": "r selalu berada di antara min satu dan satu. y sama dengan b nol ditambah b satu kali x." },
+          "commonMistake": "Menyimpulkan sebab-akibat hanya dari korelasi yang tinggi.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa korelasi tinggi belum membuktikan sebab-akibat?",
+          "reviewItems": [
+            { "id": "t3c5r1", "front": "Apakah korelasi membuktikan sebab-akibat?", "back": "Tidak. Bisa ada faktor ketiga." },
+            { "id": "t3c5r2", "front": "Arti b1 pada y = b0 + b1·x?", "back": "Perubahan rata-rata y setiap x naik 1." }
+          ]
+        }
+      ]
+    },
+    {
+      "topicId": 4,
+      "chunks": [
+        {
+          "chunkId": "t4c1",
+          "title": "Dot product dan ukuran matriks",
+          "goal": "Setelah ini kamu bisa menghitung dot product dan mengecek ukuran perkalian matriks.",
+          "terms": [
+            { "term": "vektor", "plain": "daftar angka yang berurutan" },
+            { "term": "dot product", "plain": "kalikan pasangan angka yang sejajar, lalu jumlahkan semuanya" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Di toko, kamu beli 3 pedang (4 koin), 2 perisai (5 koin), dan 1 ramuan (6 koin)." },
+            { "who": "Kamu", "text": "Berapa total belanjaanku?" }
+          ],
+          "guess": { "question": "Berapa total belanjaan itu?", "options": ["15", "28", "21", "60"], "correctIndex": 1, "reveal": "Kita hitung bagian demi bagian." },
+          "visual": { "type": "matrixGrid", "matrices": [ { "id": "A", "rows": [[3, 2, 1]] }, { "id": "B", "rows": [[4], [5], [6]] }, { "id": "C", "rows": [[28]] } ] },
+          "steps": [
+            { "text": "Jumlah barang: [3, 2, 1]. Harga barang: [4, 5, 6].", "highlight": ["A:r1", "B:c1"] },
+            { "text": "Kalikan pasangan yang sejajar. Pedang: 3×4 = 12.", "highlight": ["A:r1c1", "B:r1c1"] },
+            { "text": "Perisai: 2×5 = 10. Ramuan: 1×6 = 6.", "highlight": ["A:r1c2", "B:r2c1", "A:r1c3", "B:r3c1"] },
+            { "text": "Jumlahkan: 12 + 10 + 6 = 28.", "highlight": ["C:r1c1"] },
+            { "text": "Hasil ini disebut dot product. Total belanjamu 28 koin.", "highlight": ["C:r1c1"] },
+            { "text": "Aturan ukuran: matriks 1×3 dikali 3×1 menghasilkan 1×1. Angka 3 di tengah harus sama, lalu hilang.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t4c1p1", "type": "fillNumber", "question": "Hitung [2, 0, 1] · [5, 3, 4].", "answer": 14, "tolerance": 0, "unit": "", "why": "2×5 + 0×3 + 1×4 = 10 + 0 + 4 = 14." },
+            { "id": "t4c1p2", "type": "fillNumber", "question": "Hitung [1, −1, 2] · [3, 3, 3].", "answer": 6, "tolerance": 0, "unit": "", "why": "1×3 + (−1)×3 + 2×3 = 3 − 3 + 6 = 6." },
+            { "id": "t4c1p3", "type": "choice", "question": "Matriks A berukuran 3×2 dikalikan B berukuran 2×5. Ukuran hasilnya?", "options": ["3×5", "2×2", "3×2", "5×3"], "correctIndex": 0, "why": "Angka tengah (2 dan 2) cocok dan hilang. Sisanya 3 dan 5, jadi 3×5." }
+          ],
+          "formula": { "lines": ["a·b = a1·b1 + a2·b2 + a3·b3 + ...", "(m×n) dikali (n×p) = (m×p)"], "readAloud": "Kalikan pasangan yang sejajar, lalu jumlahkan. Angka n di tengah harus sama." },
+          "commonMistake": "Mengalikan matriks yang angka tengahnya berbeda, misalnya 3×2 dengan 3×2.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang dilakukan dot product pada belanjaan tadi?",
+          "reviewItems": [
+            { "id": "t4c1r1", "front": "Apa itu dot product?", "back": "Kalikan pasangan angka yang sejajar, lalu jumlahkan semuanya." },
+            { "id": "t4c1r2", "front": "Syarat ukuran perkalian matriks?", "back": "Angka tengah harus sama: (m×n)·(n×p) = (m×p)." }
+          ]
+        },
+        {
+          "chunkId": "t4c2",
+          "title": "Perkalian matriks",
+          "goal": "Setelah ini kamu bisa mengalikan dua matriks kecil dan tahu fungsinya di ML.",
+          "terms": [ { "term": "matriks", "plain": "tabel angka berisi baris dan kolom" } ],
+          "scene": [
+            { "who": "Rune", "text": "Perkalian matriks hanyalah dot product yang diulang." },
+            { "who": "Rune", "text": "Satu dot product untuk setiap pasangan baris dan kolom." }
+          ],
+          "guess": { "question": "A = [[1,0],[2,1]] dan B = [[3,1],[0,2]]. Berapa isi baris 2 kolom 1 dari A·B?", "options": ["6", "3", "4", "2"], "correctIndex": 0, "reveal": "Kita hitung semua kotaknya." },
+          "visual": { "type": "matrixGrid", "matrices": [ { "id": "A", "rows": [[1, 0], [2, 1]] }, { "id": "B", "rows": [[3, 1], [0, 2]] }, { "id": "C", "rows": [[3, 1], [6, 4]] } ] },
+          "steps": [
+            { "text": "Tiap kotak hasil = baris dari A · kolom dari B.", "highlight": [] },
+            { "text": "Baris 1, kolom 1: [1, 0] · [3, 0] = 3 + 0 = 3.", "highlight": ["A:r1", "B:c1", "C:r1c1"] },
+            { "text": "Baris 1, kolom 2: [1, 0] · [1, 2] = 1 + 0 = 1.", "highlight": ["A:r1", "B:c2", "C:r1c2"] },
+            { "text": "Baris 2, kolom 1: [2, 1] · [3, 0] = 6 + 0 = 6.", "highlight": ["A:r2", "B:c1", "C:r2c1"] },
+            { "text": "Baris 2, kolom 2: [2, 1] · [1, 2] = 2 + 2 = 4.", "highlight": ["A:r2", "B:c2", "C:r2c2"] },
+            { "text": "Hasilnya [[3, 1], [6, 4]]. Jadi perkalian matriks adalah dot product yang diulang untuk tiap pasangan baris dan kolom.", "highlight": ["C:r1c1", "C:r1c2", "C:r2c1", "C:r2c2"] }
+          ],
+          "practice": [
+            { "id": "t4c2p1", "type": "fillNumber", "question": "A = [[2,1],[0,3]], B = [[1,0],[4,2]]. Berapa isi baris 2 kolom 1 dari A·B?", "answer": 12, "tolerance": 0, "unit": "", "why": "Baris 2 A = [0, 3], kolom 1 B = [1, 4]. 0×1 + 3×4 = 12." },
+            { "id": "t4c2p2", "type": "choice", "question": "Apakah A·B selalu sama dengan B·A?", "options": ["Ya, selalu", "Tidak, urutan penting", "Hanya jika ukurannya 1×1", "Tergantung warna"], "correctIndex": 1, "why": "Umumnya A·B ≠ B·A. Urutan mengubah hasil." },
+            { "id": "t4c2p3", "type": "choice", "question": "Satu lapisan neural network menghitung W·x. Artinya tiap keluaran adalah...", "options": ["Jumlah fitur dikali bobotnya", "Fitur terbesar saja", "Rata-rata semua bobot", "Label dari data"], "correctIndex": 0, "why": "Tiap baris W memberi bobot pada semua fitur x, lalu menjumlahkannya." }
+          ],
+          "formula": { "lines": ["C[i][j] = baris ke-i dari A · kolom ke-j dari B", "A·B umumnya tidak sama dengan B·A"], "readAloud": "Isi kotak baris i kolom j adalah dot product baris i dari A dengan kolom j dari B." },
+          "commonMistake": "Mengira A·B = B·A.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: bagaimana kamu mencari isi satu kotak hasil perkalian matriks?",
+          "reviewItems": [ { "id": "t4c2r1", "front": "Isi kotak C[i][j] pada A·B?", "back": "Dot product baris ke-i dari A dengan kolom ke-j dari B." } ]
+        },
+        {
+          "chunkId": "t4c3",
+          "title": "Eigenvector dan SVD",
+          "goal": "Setelah ini kamu bisa menjelaskan arti eigenvector dan fungsi SVD.",
+          "terms": [
+            { "term": "eigenvector", "plain": "vektor yang arahnya tidak berubah saat dikalikan matriks" },
+            { "term": "eigenvalue (λ)", "plain": "faktor yang meregangkan eigenvector" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Matriks A = [[2,0],[0,3]] meregangkan ruang." },
+            { "who": "Rune", "text": "Sumbu x diregangkan 2 kali. Sumbu y diregangkan 3 kali." },
+            { "who": "Kamu", "text": "Ada arah yang tidak berubah?" }
+          ],
+          "guess": { "question": "Setelah dikalikan A, vektor [1, 0] menjadi...", "options": ["[2, 0]", "[0, 3]", "[2, 3]", "[1, 0]"], "correctIndex": 0, "reveal": "Mari kita hitung." },
+          "visual": { "type": "matrixGrid", "matrices": [ { "id": "A", "rows": [[2, 0], [0, 3]] }, { "id": "v", "rows": [[1], [0]] }, { "id": "Av", "rows": [[2], [0]] } ] },
+          "steps": [
+            { "text": "Coba v = [1, 0]. A·v = [2×1 + 0×0, 0×1 + 3×0] = [2, 0].", "highlight": ["v:c1", "Av:c1"] },
+            { "text": "[2, 0] sejajar dengan [1, 0]. Ia hanya diregangkan 2 kali: [2, 0] = 2 · [1, 0].", "highlight": ["Av:c1"] },
+            { "text": "Coba v = [1, 1]. A·v = [2, 3]. Ini TIDAK sejajar dengan [1, 1].", "highlight": [] },
+            { "text": "Jadi [1, 0] adalah eigenvector dengan eigenvalue λ = 2, karena arahnya tidak berubah dan panjangnya dikali λ.", "highlight": ["Av:c1"] },
+            { "text": "SVD menguraikan sebuah matriks menjadi tiga matriks (U, Σ, Vᵀ) dan dipakai untuk memampatkan data atau mengurangi dimensi.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t4c3p1", "type": "fillNumber", "question": "A = [[2,0],[0,3]] dan v = [0, 1]. Berapa λ sehingga A·v = λ·v?", "answer": 3, "tolerance": 0, "unit": "", "why": "A·[0,1] = [0, 3] = 3·[0, 1], jadi λ = 3." },
+            { "id": "t4c3p2", "type": "choice", "question": "Eigenvector adalah vektor yang...", "options": ["selalu bernilai nol", "selalu sepanjang 1", "arahnya tidak berubah saat dikalikan A (hanya diskalakan)", "tegak lurus ke semua vektor lain"], "correctIndex": 2, "why": "Itu definisinya: A·v = λ·v." },
+            { "id": "t4c3p3", "type": "choice", "question": "SVD menguraikan matriks menjadi...", "options": ["satu bilangan", "dua vektor", "satu grafik", "tiga matriks: U, Σ, dan Vᵀ"], "correctIndex": 3, "why": "A = U·Σ·Vᵀ." }
+          ],
+          "formula": { "lines": ["A·v = λ·v", "SVD: A = U · Σ · Vᵀ"], "readAloud": "A kali v sama dengan lambda kali v. Matriks A diuraikan menjadi U, Sigma, dan V transpos." },
+          "commonMistake": "Mengira semua vektor tetap searah setelah dikalikan matriks. Hanya eigenvector yang begitu.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang istimewa dari eigenvector?",
+          "reviewItems": [
+            { "id": "t4c3r1", "front": "Arti A·v = λ·v?", "back": "v adalah eigenvector: arahnya tak berubah, hanya diskalakan oleh λ." },
+            { "id": "t4c3r2", "front": "Kegunaan SVD?", "back": "Menguraikan matriks menjadi U, Σ, Vᵀ untuk kompresi atau reduksi dimensi." }
+          ]
+        }
+      ]
+    },
+    {
+      "topicId": 5,
+      "chunks": [
+        {
+          "chunkId": "t5c1",
+          "title": "Turunan: seberapa curam kurva",
+          "goal": "Setelah ini kamu bisa menjelaskan turunan dan menghitung turunan xⁿ.",
+          "terms": [ { "term": "turunan", "plain": "kemiringan kurva di satu titik; seberapa cepat nilai berubah" } ],
+          "scene": [
+            { "who": "Rune", "text": "Kurva f(x) = x² mendaki seperti lereng bukit." },
+            { "who": "Kamu", "text": "Seberapa curam lerengnya di x = 3?" }
+          ],
+          "guess": { "question": "Menurutmu, kemiringan kurva x² di x = 3 mendekati berapa?", "options": ["3", "6", "9", "2"], "correctIndex": 1, "reveal": "Kita ukur dengan geseran kecil." },
+          "visual": { "type": "linePlot", "points": [[0, 0], [1, 1], [2, 4], [3, 9], [4, 16]] },
+          "steps": [
+            { "text": "f(x) = x². Di x = 3, nilainya 9.", "highlight": ["x3"] },
+            { "text": "Geser sedikit ke x = 3,1: nilainya 9,61. Naik 0,61 untuk geseran 0,1.", "highlight": [] },
+            { "text": "Kemiringan perkiraan: 0,61 ÷ 0,1 = 6,1.", "highlight": [] },
+            { "text": "Geser lebih kecil ke x = 3,01: nilainya 9,0601. Naik 0,0601 untuk geseran 0,01, jadi kemiringan 6,01.", "highlight": [] },
+            { "text": "Makin kecil geserannya, kemiringan makin dekat 6. Angka 6 itu turunan f di x = 3.", "highlight": ["x3"] },
+            { "text": "Jalan pintasnya: turunan x² adalah 2x. Di x = 3: 2×3 = 6, cocok dengan hitungan tadi.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t5c1p1", "type": "fillNumber", "question": "Berapa turunan dari 5x² saat x = 2?", "answer": 20, "tolerance": 0, "unit": "", "why": "Turunan 5x² adalah 5 × 2x = 10x. Di x = 2: 20." },
+            { "id": "t5c1p2", "type": "fillNumber", "question": "Berapa turunan dari x³ saat x = 2?", "answer": 12, "tolerance": 0, "unit": "", "why": "Turunan x³ adalah 3x². Di x = 2: 3×4 = 12." },
+            { "id": "t5c1p3", "type": "choice", "question": "Berapa turunan dari 4x²?", "options": ["8x", "4x", "8x²", "2x"], "correctIndex": 0, "why": "4 × (2x) = 8x." }
+          ],
+          "formula": { "lines": ["(xⁿ)' = n · xⁿ⁻¹"], "readAloud": "Turunan x pangkat n adalah n dikali x pangkat n kurang satu." },
+          "commonMistake": "Lupa mengalikan dengan pangkat, atau lupa mengurangi pangkat satu.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa arti angka 6 pada contoh x = 3 tadi?",
+          "reviewItems": [ { "id": "t5c1r1", "front": "Turunan xⁿ?", "back": "n · xⁿ⁻¹" } ]
+        },
+        {
+          "chunkId": "t5c2",
+          "title": "Turunan parsial dan gradien",
+          "goal": "Setelah ini kamu bisa menghitung turunan parsial dan menyusun gradien.",
+          "terms": [
+            { "term": "turunan parsial", "plain": "turunan terhadap satu variabel, sementara variabel lain dianggap tetap" },
+            { "term": "gradien", "plain": "vektor berisi semua turunan parsial; menunjuk arah naik tercepat" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Sekarang tanahnya punya dua arah: x dan y." },
+            { "who": "Rune", "text": "Ketinggiannya f(x, y) = x·y²." },
+            { "who": "Kamu", "text": "Ke arah mana lereng paling curam?" }
+          ],
+          "guess": { "question": "Di titik (2, 3), apakah ke arah x atau y lereng lebih curam?", "options": ["Arah x", "Arah y", "Sama", "Tidak bisa diketahui"], "correctIndex": 1, "reveal": "Kita hitung tiap arah." },
+          "steps": [
+            { "text": "Di (2, 3): f = 2 × 3² = 18.", "highlight": [] },
+            { "text": "Turunan parsial terhadap x: anggap y tetap. f seperti x dikali angka tetap y². Turunannya y².", "highlight": [] },
+            { "text": "Di (2, 3): ∂f/∂x = 3² = 9.", "highlight": [] },
+            { "text": "Turunan parsial terhadap y: anggap x tetap. Turunan y² adalah 2y, jadi ∂f/∂y = x · 2y = 2xy. Di (2, 3): 2×2×3 = 12.", "highlight": [] },
+            { "text": "Kumpulkan keduanya jadi vektor: gradien = (9, 12).", "highlight": [] },
+            { "text": "Gradien menunjuk arah naik tercepat. Karena 12 lebih besar dari 9, lereng ke arah y lebih curam daripada ke arah x.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t5c2p1", "type": "fillNumber", "question": "f(x, y) = x² + 3y. Berapa ∂f/∂x di titik (2, 5)?", "answer": 4, "tolerance": 0, "unit": "", "why": "Turunan x² adalah 2x, dan 3y dianggap tetap. Di x = 2: 4." },
+            { "id": "t5c2p2", "type": "fillNumber", "question": "f(x, y) = 3x + y². Berapa ∂f/∂y saat y = 4?", "answer": 8, "tolerance": 0, "unit": "", "why": "Turunan y² adalah 2y. Di y = 4: 8." },
+            { "id": "t5c2p3", "type": "choice", "question": "Gradien menunjuk ke arah...", "options": ["kenaikan tercepat", "penurunan tercepat", "nilai nol", "titik minimum"], "correctIndex": 0, "why": "Gradien menunjuk arah naik paling cepat. Untuk turun, kita berjalan ke arah sebaliknya." }
+          ],
+          "formula": { "lines": ["∇f = (∂f/∂x, ∂f/∂y, ...)"], "readAloud": "Gradien adalah daftar turunan parsial terhadap tiap variabel." },
+          "commonMistake": "Tidak menganggap variabel lain tetap saat menurunkan satu variabel.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang ditunjukkan gradien (9, 12)?",
+          "reviewItems": [ { "id": "t5c2r1", "front": "Gradien menunjuk arah apa?", "back": "Arah kenaikan tercepat." } ]
+        },
+        {
+          "chunkId": "t5c3",
+          "title": "Gradient descent: turun ke lembah",
+          "goal": "Setelah ini kamu bisa menghitung satu langkah gradient descent.",
+          "terms": [
+            { "term": "learning rate (η)", "plain": "seberapa besar langkah yang kamu ambil" },
+            { "term": "loss", "plain": "angka yang ingin dibuat sekecil mungkin" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Kamu berdiri di lereng berkabut. Kamu hanya merasakan kemiringan tanah di bawah kakimu." },
+            { "who": "Rune", "text": "Tujuanmu turun ke lembah, yaitu titik dengan loss terendah." }
+          ],
+          "guess": { "question": "Jika tanah menurun ke kanan, ke mana sebaiknya kamu melangkah?", "options": ["Ke kanan", "Ke kiri", "Diam", "Tidak bisa diketahui"], "correctIndex": 0, "reveal": "Kita ubah ini jadi aturan hitungan." },
+          "steps": [
+            { "text": "Loss f(x) = (x − 5)². Kamu mulai di x = 1.", "highlight": [] },
+            { "text": "Kemiringan: f'(x) = 2(x − 5). Di x = 1: 2×(1 − 5) = −8.", "highlight": [] },
+            { "text": "Kemiringan negatif artinya lembah ada di sebelah kanan (x lebih besar).", "highlight": [] },
+            { "text": "Langkah baru: x − η × kemiringan. Dengan η = 0,1: 1 − 0,1 × (−8) = 1,8.", "highlight": [] },
+            { "text": "Ulangi di x = 1,8: kemiringan = 2×(1,8 − 5) = −6,4. x baru = 1,8 − 0,1 × (−6,4) = 2,44.", "highlight": [] },
+            { "text": "Tiap langkah mendekati x = 5, titik terendah. Alasannya: kita selalu melangkah berlawanan arah kemiringan.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t5c3p1", "type": "fillNumber", "question": "f(x) = x², x = 4, η = 0,25. Berapa x setelah satu langkah?", "answer": 2, "tolerance": 0, "unit": "", "why": "f'(4) = 8. x baru = 4 − 0,25 × 8 = 2." },
+            { "id": "t5c3p2", "type": "fillNumber", "question": "f(x) = (x − 2)², x = 6, η = 0,5. Berapa x setelah satu langkah?", "answer": 2, "tolerance": 0, "unit": "", "why": "f'(6) = 2×(6 − 2) = 8. x baru = 6 − 0,5 × 8 = 2." },
+            { "id": "t5c3p3", "type": "choice", "question": "Apa risiko learning rate yang terlalu besar?", "options": ["Langkah bisa melompati lembah dan loss malah membesar", "Selalu lebih akurat", "Gradien menjadi nol", "Data berkurang"], "correctIndex": 0, "why": "Langkah terlalu besar melewati titik terendah sehingga loss tidak turun dengan stabil." }
+          ],
+          "formula": { "lines": ["θ_baru = θ − η · gradien"], "readAloud": "Parameter baru sama dengan parameter lama dikurangi learning rate dikali gradien." },
+          "commonMistake": "Salah tanda: menambah gradien (naik bukit) padahal seharusnya mengurangi.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kita melangkah berlawanan arah gradien?",
+          "reviewItems": [ { "id": "t5c3r1", "front": "Rumus satu langkah gradient descent?", "back": "θ_baru = θ − η · gradien" } ]
+        },
+        {
+          "chunkId": "t5c4",
+          "title": "Aturan rantai",
+          "goal": "Setelah ini kamu bisa menurunkan fungsi berlapis dengan aturan rantai.",
+          "terms": [ { "term": "fungsi berlapis", "plain": "fungsi yang di dalamnya ada fungsi lain" } ],
+          "scene": [
+            { "who": "Rune", "text": "Mesin api punya dua lapis. Lapis dalam: u = 3x + 1. Lapis luar: y = u²." },
+            { "who": "Kamu", "text": "Bagaimana menurunkan y terhadap x?" }
+          ],
+          "guess": { "question": "Untuk y = (3x + 1)², menurutmu turunannya melibatkan apa saja?", "options": ["Hanya turunan lapis luar", "Hanya turunan lapis dalam", "Turunan kedua lapis dikalikan", "Turunan kedua lapis dijumlahkan"], "correctIndex": 2, "reveal": "Kita buktikan." },
+          "steps": [
+            { "text": "y = (3x + 1)². Pecah jadi dua lapis: u = 3x + 1, lalu y = u².", "highlight": [] },
+            { "text": "Turunan lapis luar: dy/du = 2u.", "highlight": [] },
+            { "text": "Turunan lapis dalam: du/dx = 3.", "highlight": [] },
+            { "text": "Kalikan keduanya: dy/dx = 2u × 3 = 6u.", "highlight": [] },
+            { "text": "Kembalikan u = 3x + 1: dy/dx = 6(3x + 1). Di x = 1: 6 × 4 = 24.", "highlight": [] },
+            { "text": "Jadi turunan fungsi berlapis adalah turunan tiap lapis yang dikalikan. Inilah dasar backpropagation.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t5c4p1", "type": "fillNumber", "question": "y = (2x + 3)². Berapa dy/dx saat x = 1?", "answer": 20, "tolerance": 0, "unit": "", "why": "u = 2x + 3 = 5. dy/du = 2u = 10. du/dx = 2. dy/dx = 10 × 2 = 20." },
+            { "id": "t5c4p2", "type": "fillNumber", "question": "y = (x + 1)³. Berapa dy/dx saat x = 1?", "answer": 12, "tolerance": 0, "unit": "", "why": "dy/du = 3u² dengan u = 2, jadi 12. du/dx = 1. dy/dx = 12." },
+            { "id": "t5c4p3", "type": "choice", "question": "Aturan rantai dipakai pada backpropagation untuk...", "options": ["Menghitung gradien lewat banyak lapis", "Mengurutkan data", "Menghapus outlier", "Mengganti label"], "correctIndex": 0, "why": "Jaringan neural berlapis-lapis, dan gradien tiap lapis dihitung dengan mengalikan turunan antar lapis." }
+          ],
+          "formula": { "lines": ["(f(g(x)))' = f'(g(x)) · g'(x)"], "readAloud": "Turunan lapis luar di titik lapis dalam, dikali turunan lapis dalam." },
+          "commonMistake": "Lupa mengalikan dengan turunan lapis dalam.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kita mengalikan turunan lapis luar dan lapis dalam?",
+          "reviewItems": [ { "id": "t5c4r1", "front": "Aturan rantai?", "back": "(f(g(x)))' = f'(g(x)) · g'(x)" } ]
+        }
+      ]
+    },
+    {
+      "topicId": 6,
+      "chunks": [
+        {
+          "chunkId": "t6c1",
+          "title": "NumPy: array dan operasi",
+          "goal": "Setelah ini kamu bisa memakai array NumPy dan membedakan * dari @.",
+          "terms": [ { "term": "array", "plain": "daftar angka yang bisa dioperasikan sekaligus" } ],
+          "scene": [
+            { "who": "Rune", "text": "Python punya NumPy untuk menghitung banyak angka sekaligus." },
+            { "who": "Kamu", "text": "Tanpa menulis loop?" },
+            { "who": "Rune", "text": "Tepat. Kita coba." }
+          ],
+          "guess": { "question": "Jika a = np.array([1, 2, 3]), berapa a + 10?", "options": ["[11 12 13]", "[1 2 3 10]", "[10 20 30]", "Error"], "correctIndex": 0, "reveal": "Mari kita lihat kodenya." },
+          "visual": { "type": "codeBlock", "lines": ["import numpy as np", "a = np.array([1, 2, 3])", "print(a * 3)    # [3 6 9]", "print(a + 10)   # [11 12 13]", "M = np.array([[1, 2], [3, 4]])", "print(M.shape)  # (2, 2)", "print(M * M)    # [[ 1  4] [ 9 16]]", "print(M @ M)    # [[ 7 10] [15 22]]"] },
+          "steps": [
+            { "text": "NumPy menyimpan angka dalam array. Array dibuat dengan np.array([...]).", "highlight": ["l2"] },
+            { "text": "Operasi pada array berlaku untuk SETIAP elemen. a * 3 mengalikan tiap angka dengan 3: [3 6 9].", "highlight": ["l3"] },
+            { "text": "a + 10 menambah 10 ke tiap angka: [11 12 13]. Tidak perlu loop.", "highlight": ["l4"] },
+            { "text": "M adalah array dua dimensi. M.shape menyebut ukurannya: 2 baris dan 2 kolom.", "highlight": ["l5", "l6"] },
+            { "text": "M * M mengalikan per elemen: [[1 4] [9 16]].", "highlight": ["l7"] },
+            { "text": "M @ M adalah perkalian matriks seperti di pelajaran sebelumnya: [[7 10] [15 22]]. Jadi * dan @ memberi hasil yang berbeda.", "highlight": ["l8"] }
+          ],
+          "practice": [
+            { "id": "t6c1p1", "type": "choice", "question": "Operator mana yang menghitung perkalian matriks pada array NumPy?", "options": ["@", "*", "+", "%"], "correctIndex": 0, "why": "@ adalah perkalian matriks. * adalah perkalian per elemen." },
+            { "id": "t6c1p2", "type": "fillNumber", "question": "a = np.array([1, 2, 3, 4]). Berapa hasil a.sum()?", "answer": 10, "tolerance": 0, "unit": "", "why": "1 + 2 + 3 + 4 = 10." },
+            { "id": "t6c1p3", "type": "choice", "question": "np.array([2, 4, 6]) / 2 menghasilkan...", "options": ["[1. 2. 3.]", "[4 8 12]", "[2 4 6 2]", "Error"], "correctIndex": 0, "why": "Pembagian berlaku untuk tiap elemen: 2÷2, 4÷2, 6÷2." }
+          ],
+          "formula": { "lines": ["a * b: perkalian per elemen", "a @ b: perkalian matriks"], "readAloud": "Bintang mengalikan elemen yang sejajar. Tanda at mengalikan sebagai matriks." },
+          "commonMistake": "Memakai * untuk perkalian matriks.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa beda M * M dan M @ M?",
+          "reviewItems": [ { "id": "t6c1r1", "front": "Beda * dan @ pada NumPy?", "back": "* per elemen, @ perkalian matriks." } ]
+        },
+        {
+          "chunkId": "t6c2",
+          "title": "pandas: tabel data",
+          "goal": "Setelah ini kamu bisa memeriksa dan meringkas tabel data dengan pandas.",
+          "terms": [ { "term": "DataFrame", "plain": "tabel berlabel di pandas, dengan baris dan kolom" } ],
+          "scene": [
+            { "who": "Rune", "text": "Data nyata biasanya berbentuk tabel." },
+            { "who": "Rune", "text": "pandas membuat tabel itu mudah dipakai." }
+          ],
+          "guess": { "question": "Tabel punya kolom kota dan harga. Mana cara tepat menghitung rata-rata harga per kota?", "options": ["df.groupby('kota')['harga'].mean()", "df.mean('kota')", "df.kota.harga", "df.sort('kota')"], "correctIndex": 0, "reveal": "Kita lihat langkah-langkahnya." },
+          "visual": { "type": "codeBlock", "lines": ["import pandas as pd", "df = pd.DataFrame({'kota': ['Jakarta', 'Jakarta', 'Bandung', 'Bandung'], 'harga': [10, 20, 5, 15]})", "print(df.head())", "print(df.isna().sum())", "print(df.describe())", "print(df.groupby('kota')['harga'].mean())"] },
+          "steps": [
+            { "text": "DataFrame adalah tabel berlabel. Di sini ada kolom kota dan harga.", "highlight": ["l2"] },
+            { "text": "df.head() menampilkan beberapa baris pertama (secara bawaan lima baris) supaya kamu melihat isinya.", "highlight": ["l3"] },
+            { "text": "df.isna().sum() menghitung nilai kosong di tiap kolom. Cek ini sebelum melatih model.", "highlight": ["l4"] },
+            { "text": "df.describe() memberi ringkasan angka seperti rata-rata serta nilai terkecil dan terbesar.", "highlight": ["l5"] },
+            { "text": "df.groupby('kota')['harga'].mean() menghitung rata-rata per kota. Bandung: (5 + 15) ÷ 2 = 10. Jakarta: (10 + 20) ÷ 2 = 15.", "highlight": ["l6"] },
+            { "text": "Jadi rutinitas awal: lihat datanya, hitung yang kosong, ringkas, lalu kelompokkan.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t6c2p1", "type": "fillNumber", "question": "Berapa rata-rata harga di Bandung pada tabel tadi?", "answer": 10, "tolerance": 0, "unit": "", "why": "(5 + 15) ÷ 2 = 10." },
+            { "id": "t6c2p2", "type": "choice", "question": "Perintah untuk menghitung jumlah nilai kosong di tiap kolom?", "options": ["df.head()", "df.describe()", "df.isna().sum()", "df.shape()"], "correctIndex": 2, "why": "df.isna() menandai sel kosong, lalu .sum() menjumlahkannya per kolom." },
+            { "id": "t6c2p3", "type": "choice", "question": "df.head() menampilkan...", "options": ["baris-baris pertama tabel", "jumlah nilai kosong", "rata-rata tiap kolom", "sebuah grafik"], "correctIndex": 0, "why": "head() menampilkan beberapa baris pertama." }
+          ],
+          "formula": { "lines": ["df.isna().sum() → nilai kosong per kolom", "df.groupby('kolom')['nilai'].mean() → rata-rata per kelompok"], "readAloud": "Kelompokkan berdasarkan kolom, lalu hitung rata-rata kolom nilai." },
+          "commonMistake": "Melatih model tanpa memeriksa nilai kosong dan ringkasan data lebih dulu.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kita memeriksa nilai kosong sebelum melatih model?",
+          "reviewItems": [ { "id": "t6c2r1", "front": "Perintah menghitung nilai kosong per kolom?", "back": "df.isna().sum()" } ]
+        },
+        {
+          "chunkId": "t6c3",
+          "title": "matplotlib: histogram dan scatter",
+          "goal": "Setelah ini kamu bisa memilih grafik yang tepat untuk pertanyaanmu.",
+          "terms": [
+            { "term": "histogram", "plain": "grafik batang yang menunjukkan berapa banyak data di tiap rentang nilai" },
+            { "term": "scatter plot", "plain": "grafik titik untuk melihat hubungan dua variabel" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Grafik membantu melihat pola yang tak terlihat di tabel angka." },
+            { "who": "Kamu", "text": "Tapi grafik yang mana?" },
+            { "who": "Rune", "text": "Tergantung pertanyaanmu." }
+          ],
+          "guess": { "question": "Kamu ingin melihat sebaran harga satu kolom. Grafik yang cocok?", "options": ["Histogram", "Scatter plot", "Diagram lingkaran", "Peta panas"], "correctIndex": 0, "reveal": "Kita pelajari alasannya." },
+          "visual": { "type": "codeBlock", "lines": ["import matplotlib.pyplot as plt", "plt.hist(df['harga'])", "plt.show()", "plt.scatter(df['luas'], df['harga'])", "plt.show()"] },
+          "steps": [
+            { "text": "Grafik membantu melihat pola yang tidak terlihat di tabel angka.", "highlight": [] },
+            { "text": "Histogram (plt.hist) membagi nilai ke rentang dan menunjukkan banyaknya data di tiap rentang. Cocok untuk satu variabel.", "highlight": ["l2"] },
+            { "text": "Scatter plot (plt.scatter) menaruh satu titik per baris data, dengan x dan y dari dua kolom. Cocok untuk melihat hubungan dua variabel.", "highlight": ["l4"] },
+            { "text": "plt.show() menampilkan grafiknya.", "highlight": ["l3", "l5"] },
+            { "text": "Jadi pilih grafik sesuai pertanyaan: sebaran satu hal pakai histogram, hubungan dua hal pakai scatter.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t6c3p1", "type": "choice", "question": "Kamu ingin melihat hubungan antara luas rumah dan harga. Grafik yang cocok?", "options": ["Histogram", "Scatter plot", "Satu angka rata-rata", "Tabel kosong"], "correctIndex": 1, "why": "Dua variabel dan ingin melihat hubungannya: scatter plot." },
+            { "id": "t6c3p2", "type": "choice", "question": "Kamu ingin melihat sebaran harga rumah (satu variabel). Grafik yang cocok?", "options": ["Diagram lingkaran", "Histogram", "Peta panas", "Scatter plot"], "correctIndex": 1, "why": "Histogram menunjukkan sebaran satu variabel." },
+            { "id": "t6c3p3", "type": "order", "question": "Urutkan rutinitas awal memeriksa data.", "items": ["Lihat isi tabel (df.head())", "Hitung nilai kosong (df.isna().sum())", "Ringkas angka (df.describe())", "Buat grafik (plt.hist atau plt.scatter)"], "why": "Lihat, cek yang kosong, ringkas, lalu visualisasikan." }
+          ],
+          "formula": { "lines": ["plt.hist(x) → sebaran satu variabel", "plt.scatter(x, y) → hubungan dua variabel"], "readAloud": "Histogram untuk sebaran satu hal. Scatter untuk hubungan dua hal." },
+          "commonMistake": "Memakai scatter plot untuk satu variabel, atau histogram untuk dua variabel.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: bagaimana kamu memilih antara histogram dan scatter?",
+          "reviewItems": [ { "id": "t6c3r1", "front": "Kapan memakai histogram dan kapan scatter?", "back": "Histogram untuk sebaran satu variabel. Scatter untuk hubungan dua variabel." } ]
+        }
+      ]
+    }
+  ]
+}

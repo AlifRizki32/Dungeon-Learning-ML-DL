@@ -3,6 +3,7 @@ import { AVATARS } from '../data/roadmap.js';
 import { useGameStore } from '../store/useGameStore';
 import { getLocalDateKey } from '../game/campTracker';
 import { AvatarSprite } from '../components/PixelSprites';
+import { MusicSettingsPanel } from '../components/MusicControls';
 import { useSound } from '../hooks/useSound.js';
 
 export const SettingsPage: React.FC = () => {
@@ -10,8 +11,10 @@ export const SettingsPage: React.FC = () => {
   const avatarId = useGameStore((s) => s.avatarId);
   const soundEnabled = useGameStore((s) => s.soundEnabled);
   const reduceMotion = useGameStore((s) => s.reduceMotion);
+  const intervalScale = useGameStore((s) => s.settings?.intervalScale ?? 1);
   const toggleSound = useGameStore((s) => s.toggleSound);
   const toggleReduceMotion = useGameStore((s) => s.toggleReduceMotion);
+  const setIntervalScale = useGameStore((s) => s.setIntervalScale);
   const startAdventure = useGameStore((s) => s.startAdventure);
   const exportSaveJSON = useGameStore((s) => s.exportSaveJSON);
   const importSaveJSON = useGameStore((s) => s.importSaveJSON);
@@ -154,7 +157,10 @@ export const SettingsPage: React.FC = () => {
         </h1>
 
         <div className="space-y-4">
-          {/* Sound Toggle */}
+          {/* Dynamic Background Music & SFX Volume Panel */}
+          <MusicSettingsPanel />
+
+          {/* Sound Effects Toggle */}
           <div className="bg-[#120d26] border-2 border-[#5c4e99] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="font-pixel text-xs text-[#f4f1ea]">
@@ -207,6 +213,51 @@ export const SettingsPage: React.FC = () => {
             >
               {reduceMotion ? 'AKTIF (ON)' : 'MATI (OFF)'}
             </button>
+          </div>
+
+          {/* Spaced Review Interval Scale (0.5 - 2.0, default 1.0) */}
+          <div className="bg-[#120d26] border-2 border-[#5c4e99] p-4 space-y-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <label
+                htmlFor="settings-interval-scale"
+                className="font-pixel text-xs text-[#f4f1ea]"
+              >
+                SKALA INTERVAL ULASAN HARIAN (0.5x – 2.0x)
+              </label>
+              <span
+                data-testid="settings-interval-scale-value"
+                className="font-pixel text-xs text-[#f5b935] bg-[#0d0a1a] px-2.5 py-1 border border-[#f5b935] tabular-nums"
+              >
+                {intervalScale.toFixed(1)}x
+              </span>
+            </div>
+            <p className="font-vt text-xl text-[#b3aad1]">
+              Mengalikan interval hari dasar <code>[1, 3, 7, 14, 30]</code> pada fitur{' '}
+              <strong>Ulasan Harian</strong> (0.5x = lebih sering diulas, 2.0x = jeda lebih panjang).
+            </p>
+            <div className="flex items-center gap-3">
+              <input
+                id="settings-interval-scale"
+                data-testid="settings-interval-scale-slider"
+                type="range"
+                min={0.5}
+                max={2}
+                step={0.1}
+                value={intervalScale}
+                onChange={(e) => setIntervalScale(parseFloat(e.target.value))}
+                className="flex-1 accent-[#f5b935] cursor-pointer"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  playClick();
+                  setIntervalScale(1);
+                }}
+                className="pixel-btn px-3 py-1 bg-[#16112b] text-[#b3aad1] font-pixel text-[9px]"
+              >
+                Reset (1.0x)
+              </button>
+            </div>
           </div>
         </div>
       </section>

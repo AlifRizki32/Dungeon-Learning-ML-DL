@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   ALL_BADGES,
   ALL_RELICS,
@@ -14,6 +14,8 @@ import {
   getLevelProgress,
   isFloorUnlocked,
 } from '../game/formulas';
+import { getLocalDateKey } from '../game/campTracker';
+import { getDueReviewItems } from '../game/lessonEngine';
 import { getWeakestTopics } from '../game/quizEngine';
 import { FLOOR6_CONTENT, getTopicContent, TOWER_RELICS } from '../game/spellbookEngine';
 import { AvatarSprite, BadgeSprite, RelicSprite } from '../components/PixelSprites';
@@ -31,6 +33,7 @@ export const DashboardPage: React.FC = () => {
   const specialization = useGameStore((s) => s.specialization);
   const certificateIssuedAt = useGameStore((s) => s.certificateIssuedAt);
   const quizBestScores = useGameStore((s) => s.quizBestScores);
+  const reviewQueue = useGameStore((s) => s.reviewQueue);
   const badges = useGameStore((s) => s.badges);
   const relics = useGameStore((s) => s.relics);
   const evidenceNotes = useGameStore((s) => s.evidenceNotes);
@@ -45,6 +48,10 @@ export const DashboardPage: React.FC = () => {
   const weakestTopics = getWeakestTopics(quizBestScores, 6);
   const guildFloor = FLOORS.find((f) => f.id === 5);
   const totalRelicsAvailable = ALL_RELICS.length + TOWER_RELICS.length;
+  const dueReviewCount = useMemo(
+    () => getDueReviewItems(reviewQueue, getLocalDateKey(), 10).totalDueCount,
+    [reviewQueue]
+  );
 
   return (
     <div className="w-full max-w-6xl mx-auto px-3 pb-14 space-y-6">
@@ -77,7 +84,7 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
             <div className="bg-[#120d26] border-2 border-[#5c4e99] px-3 py-2 text-center">
               <div className="font-pixel text-[9px] text-[#b3aad1]">STREAK HARI</div>
               <div className="font-pixel text-sm text-[#f5b935] mt-1 tabular-nums">
@@ -102,6 +109,23 @@ export const DashboardPage: React.FC = () => {
                 {relics.length}/{totalRelicsAvailable}
               </div>
             </div>
+            <button
+              type="button"
+              data-testid="dashboard-review-badge-btn"
+              onClick={() => {
+                playClick();
+                setView('review');
+              }}
+              className="bg-[#120d26] border-2 border-[#f5b935] hover:bg-[#1f193d] px-3 py-2 text-center cursor-pointer"
+            >
+              <div className="font-pixel text-[9px] text-[#f5b935]">ULASAN HARIAN</div>
+              <div
+                data-testid="dashboard-review-due-count"
+                className="font-pixel text-sm text-[#38d864] mt-1 tabular-nums"
+              >
+                {dueReviewCount} jatuh tempo
+              </div>
+            </button>
           </div>
         </div>
 

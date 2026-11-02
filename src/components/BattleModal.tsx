@@ -143,6 +143,12 @@ export const BattleModal: React.FC = () => {
     if (!selectedTopicId) return undefined;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        if (
+          e.defaultPrevented ||
+          document.querySelector('[data-testid="glossary-popover"], [data-testid="kamus-drawer"]')
+        ) {
+          return;
+        }
         closeRoomBattle();
         return;
       }
