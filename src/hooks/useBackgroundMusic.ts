@@ -14,7 +14,7 @@ export function useBackgroundMusic(): MusicManagerSnapshot {
   const currentView = useGameStore((s) => s.currentView);
   const activeFloorId = useGameStore((s) => s.activeFloorId);
   const selectedBossFloorId = useGameStore((s) => s.selectedBossFloorId);
-  const musicEnabled = useGameStore((s) => s.musicEnabled ?? true);
+  const musicEnabled = useGameStore((s) => s.musicEnabled ?? false);
   const musicVolume = useGameStore((s) => s.musicVolume ?? 0.35);
 
   const [snapshot, setSnapshot] = useState<MusicManagerSnapshot>(() =>

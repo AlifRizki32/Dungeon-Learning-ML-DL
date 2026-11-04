@@ -1,4 +1,7 @@
-import { ALL_TOPICS } from '../data/roadmap.js';
+import { ALL_TOPICS, FLOORS } from '../data/roadmap.js';
+
+export const MAX_SAVE_FILE_BYTES = 1024 * 1024; // 1 MB
+
 
 export function getLocalDateKey(d: Date = new Date()): string {
   const year = d.getFullYear();
@@ -43,7 +46,7 @@ export interface ProjectedCompletionInfo {
   projectedMonthYear: string;
 }
 
-export const WEEKLY_BONUS_XP = 150;
+export const WEEKLY_BONUS_XP = 50;
 export const DEFAULT_WEEKLY_TARGET_HOURS = 9;
 export const BASELINE_HOURS_PER_ROADMAP_WEEK = 9; // Midpoint of 8-10 hours/week roadmap assumption
 
@@ -290,13 +293,34 @@ export function calculateProjectedCompletion(
 }
 
 /**
+ * Validates whether a node ID is a valid topic ID or boss ID on the given floor (1..5).
+ */
+export function isValidFloorNodeId(floorId: number, nodeId: unknown): nodeId is string {
+  if (typeof nodeId !== 'string' || !nodeId.trim()) return false;
+  const floor = FLOORS.find((f) => f.id === floorId);
+  if (!floor) return false;
+  return floor.boss.id === nodeId || floor.topics.some((t) => t.id === nodeId);
+}
+
+/**
  * Validates and normalizes an imported JSON save file string.
  */
 export function validateAndParseSaveJSON(
   rawJson: string
 ): { valid: true; data: Record<string, unknown> } | { valid: false; error: string } {
-  if (!rawJson || !rawJson.trim()) {
+  if (!rawJson || typeof rawJson !== 'string' || !rawJson.trim()) {
     return { valid: false, error: 'Teks atau file JSON kosong.' };
+  }
+
+  const byteLength =
+    typeof TextEncoder !== 'undefined'
+      ? new TextEncoder().encode(rawJson).length
+      : rawJson.length;
+  if (byteLength > MAX_SAVE_FILE_BYTES) {
+    return {
+      valid: false,
+      error: 'Ukuran file terlalu besar (maksimal 1 MB). File simpanan ditolak.',
+    };
   }
 
   try {
@@ -316,7 +340,12 @@ export function validateAndParseSaveJSON(
       'xp' in candidate ||
       'playerName' in candidate ||
       'completedRooms' in candidate ||
-      'studySessions' in candidate;
+      'defeatedBosses' in candidate ||
+      'towerCompleted' in candidate ||
+      'completedTowerQuests' in candidate ||
+      'studySessions' in candidate ||
+      'lessonProgress' in candidate ||
+      'reviewQueue' in candidate;
 
     if (!hasKnownKeys) {
       return {
@@ -327,15 +356,36 @@ export function validateAndParseSaveJSON(
 
     const sanitized: Record<string, unknown> = {};
 
+    // 1. version
+    if (
+      typeof candidate.version === 'number' &&
+      Number.isFinite(candidate.version) &&
+      candidate.version >= 1
+    ) {
+      sanitized.version = Math.floor(candidate.version);
+    }
+
+    // 2. hasStarted
+    if (typeof candidate.hasStarted === 'boolean') {
+      sanitized.hasStarted = candidate.hasStarted;
+    }
+
+    // 3. playerName (<= 28 chars)
     if (typeof candidate.playerName === 'string') {
       sanitized.playerName = candidate.playerName.trim().slice(0, 28) || 'Petualang Tensor';
     }
-    if (typeof candidate.avatarId === 'string') {
-      sanitized.avatarId = candidate.avatarId;
+
+    // 4. avatarId
+    if (typeof candidate.avatarId === 'string' && candidate.avatarId.trim()) {
+      sanitized.avatarId = candidate.avatarId.trim();
     }
+
+    // 5. xp
     if (typeof candidate.xp === 'number' && Number.isFinite(candidate.xp) && candidate.xp >= 0) {
       sanitized.xp = Math.floor(candidate.xp);
     }
+
+    // 6. streak
     if (
       typeof candidate.streak === 'number' &&
       Number.isFinite(candidate.streak) &&
@@ -343,25 +393,35 @@ export function validateAndParseSaveJSON(
     ) {
       sanitized.streak = Math.floor(candidate.streak);
     }
-    if (typeof candidate.lastActiveDate === 'string' || candidate.lastActiveDate === null) {
-      sanitized.lastActiveDate = candidate.lastActiveDate;
+
+    // 7. lastActiveDate (null or YYYY-MM-DD)
+    if (candidate.lastActiveDate === null) {
+      sanitized.lastActiveDate = null;
+    } else if (
+      typeof candidate.lastActiveDate === 'string' &&
+      /^\d{4}-\d{2}-\d{2}$/.test(candidate.lastActiveDate.trim())
+    ) {
+      sanitized.lastActiveDate = candidate.lastActiveDate.trim();
     }
+
+    // 8. completedRooms
     if (Array.isArray(candidate.completedRooms)) {
       sanitized.completedRooms = candidate.completedRooms.filter((x) => typeof x === 'string');
     }
+
+    // 9. defeatedBosses
     if (Array.isArray(candidate.defeatedBosses)) {
       sanitized.defeatedBosses = candidate.defeatedBosses.filter((x) => typeof x === 'string');
     }
+
+    // 10. completedTowerQuests
     if (Array.isArray(candidate.completedTowerQuests)) {
       sanitized.completedTowerQuests = candidate.completedTowerQuests.filter(
         (x) => typeof x === 'string'
       );
     }
-    if (Array.isArray(candidate.towerCompleted)) {
-      sanitized.towerCompleted = candidate.towerCompleted.filter(
-        (x) => typeof x === 'string'
-      );
-    }
+
+    // 11. towerSteps
     if (
       candidate.towerSteps &&
       typeof candidate.towerSteps === 'object' &&
@@ -382,6 +442,15 @@ export function validateAndParseSaveJSON(
       }
       sanitized.towerSteps = cleanSteps;
     }
+
+    // 12. towerCompleted
+    if (Array.isArray(candidate.towerCompleted)) {
+      sanitized.towerCompleted = candidate.towerCompleted.filter(
+        (x) => typeof x === 'string'
+      );
+    }
+
+    // 13. reflections (<= 500 chars)
     if (
       candidate.reflections &&
       typeof candidate.reflections === 'object' &&
@@ -395,52 +464,146 @@ export function validateAndParseSaveJSON(
       }
       sanitized.reflections = cleanReflections;
     }
+
+    // 14. specialization
     if (typeof candidate.specialization === 'string' || candidate.specialization === null) {
       sanitized.specialization =
         typeof candidate.specialization === 'string'
           ? candidate.specialization.trim() || null
           : null;
     }
+
+    // 15. certificateIssuedAt
     if (
       typeof candidate.certificateIssuedAt === 'string' ||
       candidate.certificateIssuedAt === null
     ) {
       sanitized.certificateIssuedAt = candidate.certificateIssuedAt;
     }
+
+    // 16. relics
     if (Array.isArray(candidate.relics)) {
       sanitized.relics = candidate.relics.filter((x) => typeof x === 'string');
     }
+
+    // 17. badges
     if (Array.isArray(candidate.badges)) {
       sanitized.badges = candidate.badges.filter((x) => typeof x === 'string');
     }
-    if (candidate.quizBestScores && typeof candidate.quizBestScores === 'object') {
-      sanitized.quizBestScores = candidate.quizBestScores;
+
+    // 18. quizBestScores
+    if (
+      candidate.quizBestScores &&
+      typeof candidate.quizBestScores === 'object' &&
+      !Array.isArray(candidate.quizBestScores)
+    ) {
+      const cleanScores: Record<string, number> = {};
+      for (const [k, v] of Object.entries(candidate.quizBestScores as Record<string, unknown>)) {
+        if (typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100) {
+          cleanScores[k] = v;
+        }
+      }
+      sanitized.quizBestScores = cleanScores;
     }
-    if (candidate.bestScoreByTopic && typeof candidate.bestScoreByTopic === 'object') {
-      sanitized.bestScoreByTopic = candidate.bestScoreByTopic;
+
+    // 19. bestScoreByTopic
+    if (
+      candidate.bestScoreByTopic &&
+      typeof candidate.bestScoreByTopic === 'object' &&
+      !Array.isArray(candidate.bestScoreByTopic)
+    ) {
+      const cleanBestScores: Record<string, number> = {};
+      for (const [k, v] of Object.entries(candidate.bestScoreByTopic as Record<string, unknown>)) {
+        if (typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100) {
+          cleanBestScores[k] = v;
+        }
+      }
+      sanitized.bestScoreByTopic = cleanBestScores;
     }
+
+    // 20. quizBonusClaimedRooms
     if (Array.isArray(candidate.quizBonusClaimedRooms)) {
       sanitized.quizBonusClaimedRooms = candidate.quizBonusClaimedRooms.filter(
         (x) => typeof x === 'string'
       );
     }
+
+    // 21. echoBonusClaimedRooms
     if (Array.isArray(candidate.echoBonusClaimedRooms)) {
       sanitized.echoBonusClaimedRooms = candidate.echoBonusClaimedRooms.filter(
         (x) => typeof x === 'string'
       );
     }
+
+    // 22. spellsUnlocked
     if (Array.isArray(candidate.spellsUnlocked)) {
       sanitized.spellsUnlocked = candidate.spellsUnlocked.filter((x) => typeof x === 'string');
     }
-    if (candidate.questionStats && typeof candidate.questionStats === 'object') {
-      sanitized.questionStats = candidate.questionStats;
+
+    // 23. questionStats
+    if (
+      candidate.questionStats &&
+      typeof candidate.questionStats === 'object' &&
+      !Array.isArray(candidate.questionStats)
+    ) {
+      const cleanStats: Record<string, { seen: number; wrong: number; correctStreak: number }> = {};
+      for (const [qId, rawStat] of Object.entries(
+        candidate.questionStats as Record<string, unknown>
+      )) {
+        if (rawStat && typeof rawStat === 'object' && !Array.isArray(rawStat)) {
+          const st = rawStat as Record<string, unknown>;
+          if (
+            typeof st.seen === 'number' &&
+            Number.isFinite(st.seen) &&
+            st.seen >= 0 &&
+            typeof st.wrong === 'number' &&
+            Number.isFinite(st.wrong) &&
+            st.wrong >= 0 &&
+            typeof st.correctStreak === 'number' &&
+            Number.isFinite(st.correctStreak) &&
+            st.correctStreak >= 0
+          ) {
+            cleanStats[qId] = {
+              seen: Math.floor(st.seen),
+              wrong: Math.floor(st.wrong),
+              correctStreak: Math.floor(st.correctStreak),
+            };
+          }
+        }
+      }
+      sanitized.questionStats = cleanStats;
     }
-    if (candidate.bossProgress && typeof candidate.bossProgress === 'object') {
+
+    // 24. bossProgress (supports v2 flat object and v3 floor-keyed object)
+    if (
+      candidate.bossProgress &&
+      typeof candidate.bossProgress === 'object' &&
+      !Array.isArray(candidate.bossProgress)
+    ) {
       sanitized.bossProgress = candidate.bossProgress;
     }
-    if (candidate.dojoDailyXP && typeof candidate.dojoDailyXP === 'object') {
-      sanitized.dojoDailyXP = candidate.dojoDailyXP;
+
+    // 25. dojoDailyXP
+    if (
+      candidate.dojoDailyXP &&
+      typeof candidate.dojoDailyXP === 'object' &&
+      !Array.isArray(candidate.dojoDailyXP)
+    ) {
+      const dj = candidate.dojoDailyXP as Record<string, unknown>;
+      if (
+        typeof dj.date === 'string' &&
+        typeof dj.xp === 'number' &&
+        Number.isFinite(dj.xp) &&
+        dj.xp >= 0
+      ) {
+        sanitized.dojoDailyXP = {
+          date: dj.date,
+          xp: Math.floor(dj.xp),
+        };
+      }
     }
+
+    // 26. evidenceNotes (<= 300 chars)
     if (
       candidate.evidenceNotes &&
       typeof candidate.evidenceNotes === 'object' &&
@@ -454,16 +617,25 @@ export function validateAndParseSaveJSON(
       }
       sanitized.evidenceNotes = cleanNotes;
     }
+
+    // 27. studySessions
     if (Array.isArray(candidate.studySessions)) {
       sanitized.studySessions = candidate.studySessions.filter(
         (s) =>
           s &&
           typeof s === 'object' &&
+          !Array.isArray(s) &&
           typeof (s as StudySession).id === 'string' &&
+          typeof (s as StudySession).topicId === 'string' &&
           typeof (s as StudySession).durationMinutes === 'number' &&
-          typeof (s as StudySession).date === 'string'
+          Number.isFinite((s as StudySession).durationMinutes) &&
+          (s as StudySession).durationMinutes > 0 &&
+          typeof (s as StudySession).date === 'string' &&
+          /^\d{4}-\d{2}-\d{2}$/.test((s as StudySession).date)
       );
     }
+
+    // 28. weeklyTargetHours
     if (
       typeof candidate.weeklyTargetHours === 'number' &&
       Number.isFinite(candidate.weeklyTargetHours) &&
@@ -471,17 +643,127 @@ export function validateAndParseSaveJSON(
     ) {
       sanitized.weeklyTargetHours = Math.min(80, Math.max(1, candidate.weeklyTargetHours));
     }
+
+    // 29. claimedWeeklyBonusWeeks
     if (Array.isArray(candidate.claimedWeeklyBonusWeeks)) {
       sanitized.claimedWeeklyBonusWeeks = candidate.claimedWeeklyBonusWeeks.filter(
         (x) => typeof x === 'string'
       );
     }
+
+    // 30. activeFloorId (valid floor ids 1..6 only)
+    if (
+      typeof candidate.activeFloorId === 'number' &&
+      Number.isInteger(candidate.activeFloorId) &&
+      candidate.activeFloorId >= 1 &&
+      candidate.activeFloorId <= 6
+    ) {
+      sanitized.activeFloorId = candidate.activeFloorId;
+    }
+
+    // 31. activeNodeByFloor (valid floor ids 1..5 -> valid topic/boss id on that floor)
+    if (
+      candidate.activeNodeByFloor &&
+      typeof candidate.activeNodeByFloor === 'object' &&
+      !Array.isArray(candidate.activeNodeByFloor)
+    ) {
+      const cleanNodeByFloor: Record<number, string> = {};
+      for (const [fKey, nodeVal] of Object.entries(
+        candidate.activeNodeByFloor as Record<string, unknown>
+      )) {
+        const floorNum = Number(fKey);
+        if (
+          Number.isInteger(floorNum) &&
+          floorNum >= 1 &&
+          floorNum <= 5 &&
+          isValidFloorNodeId(floorNum, nodeVal)
+        ) {
+          cleanNodeByFloor[floorNum] = nodeVal;
+        }
+      }
+      sanitized.activeNodeByFloor = cleanNodeByFloor;
+    }
+
+    // 32. soundEnabled
     if (typeof candidate.soundEnabled === 'boolean') {
       sanitized.soundEnabled = candidate.soundEnabled;
     }
+
+    // 33. sfxVolume (0..1)
+    if (typeof candidate.sfxVolume === 'number' && Number.isFinite(candidate.sfxVolume)) {
+      sanitized.sfxVolume = Math.max(0, Math.min(1, Number(candidate.sfxVolume.toFixed(2))));
+    }
+
+    // 34. musicEnabled
+    if (typeof candidate.musicEnabled === 'boolean') {
+      sanitized.musicEnabled = candidate.musicEnabled;
+    }
+
+    // 35. musicVolume (0..1)
+    if (typeof candidate.musicVolume === 'number' && Number.isFinite(candidate.musicVolume)) {
+      sanitized.musicVolume = Math.max(0, Math.min(1, Number(candidate.musicVolume.toFixed(2))));
+    }
+
+    // 36. reduceMotion
     if (typeof candidate.reduceMotion === 'boolean') {
       sanitized.reduceMotion = candidate.reduceMotion;
     }
+
+    // 37. lessonProgress ({ done: boolean, attempts: number, attemptedActivities: string[] })
+    if (
+      candidate.lessonProgress &&
+      typeof candidate.lessonProgress === 'object' &&
+      !Array.isArray(candidate.lessonProgress)
+    ) {
+      const cleanLessonProgress: Record<
+        string,
+        { done: boolean; attempts: number; attemptedActivities: string[] }
+      > = {};
+      for (const [cId, val] of Object.entries(
+        candidate.lessonProgress as Record<string, unknown>
+      )) {
+        if (!val || typeof val !== 'object' || Array.isArray(val)) continue;
+        const obj = val as Record<string, unknown>;
+        if ('done' in obj && typeof obj.done !== 'boolean') continue;
+        if (
+          'attempts' in obj &&
+          (typeof obj.attempts !== 'number' || !Number.isFinite(obj.attempts) || obj.attempts < 0)
+        ) {
+          continue;
+        }
+        if ('attemptedActivities' in obj && !Array.isArray(obj.attemptedActivities)) {
+          continue;
+        }
+        cleanLessonProgress[cId] = {
+          done: Boolean(obj.done),
+          attempts:
+            typeof obj.attempts === 'number' && Number.isFinite(obj.attempts) && obj.attempts >= 0
+              ? Math.floor(obj.attempts)
+              : 0,
+          attemptedActivities: Array.isArray(obj.attemptedActivities)
+            ? obj.attemptedActivities.filter((x): x is string => typeof x === 'string')
+            : [],
+        };
+      }
+      sanitized.lessonProgress = cleanLessonProgress;
+    }
+
+    // 38. summaries (<= 400 chars)
+    if (
+      candidate.summaries &&
+      typeof candidate.summaries === 'object' &&
+      !Array.isArray(candidate.summaries)
+    ) {
+      const cleanSummaries: Record<string, string> = {};
+      for (const [cId, val] of Object.entries(candidate.summaries as Record<string, unknown>)) {
+        if (typeof val === 'string') {
+          cleanSummaries[cId] = val.slice(0, 400);
+        }
+      }
+      sanitized.summaries = cleanSummaries;
+    }
+
+    // 39. taskDone (booleans)
     if (
       candidate.taskDone &&
       typeof candidate.taskDone === 'object' &&
@@ -489,11 +771,52 @@ export function validateAndParseSaveJSON(
     ) {
       const cleanTaskDone: Record<string, boolean> = {};
       for (const [cId, val] of Object.entries(candidate.taskDone as Record<string, unknown>)) {
-        if (val === true) {
-          cleanTaskDone[cId] = true;
+        if (typeof val === 'boolean') {
+          cleanTaskDone[cId] = val;
         }
       }
       sanitized.taskDone = cleanTaskDone;
+    }
+
+    // 40. reviewQueue ({ box: 0..4, due: YYYY-MM-DD })
+    if (
+      candidate.reviewQueue &&
+      typeof candidate.reviewQueue === 'object' &&
+      !Array.isArray(candidate.reviewQueue)
+    ) {
+      const cleanReviewQueue: Record<string, { box: number; due: string }> = {};
+      for (const [itemId, val] of Object.entries(
+        candidate.reviewQueue as Record<string, unknown>
+      )) {
+        if (!val || typeof val !== 'object' || Array.isArray(val)) continue;
+        const obj = val as Record<string, unknown>;
+        if (typeof obj.box !== 'number' || !Number.isFinite(obj.box)) continue;
+        if (typeof obj.due !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(obj.due.trim())) continue;
+        cleanReviewQueue[itemId] = {
+          box: Math.max(0, Math.min(4, Math.floor(obj.box))),
+          due: obj.due.trim(),
+        };
+      }
+      sanitized.reviewQueue = cleanReviewQueue;
+    }
+
+    // 41. settings ({ intervalScale: 0.5..2 })
+    if (
+      candidate.settings &&
+      typeof candidate.settings === 'object' &&
+      !Array.isArray(candidate.settings)
+    ) {
+      const rawSettings = candidate.settings as Record<string, unknown>;
+      if (
+        typeof rawSettings.intervalScale === 'number' &&
+        Number.isFinite(rawSettings.intervalScale)
+      ) {
+        const clampedScale = Math.max(
+          0.5,
+          Math.min(2, Math.round(rawSettings.intervalScale * 10) / 10)
+        );
+        sanitized.settings = { intervalScale: clampedScale };
+      }
     }
 
     return { valid: true, data: sanitized };
@@ -504,3 +827,4 @@ export function validateAndParseSaveJSON(
     };
   }
 }
+

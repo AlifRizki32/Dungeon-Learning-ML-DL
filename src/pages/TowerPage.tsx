@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ALL_RELICS, ALL_TOPICS, FLOORS } from '../data/roadmap.js';
 import { useGameStore } from '../store/useGameStore';
 import { getLevelProgress, isFloorUnlocked } from '../game/formulas';

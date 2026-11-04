@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AVATARS } from '../data/roadmap.js';
 import { useGameStore } from '../store/useGameStore';
-import { getLocalDateKey } from '../game/campTracker';
+import { MAX_SAVE_FILE_BYTES, getLocalDateKey } from '../game/campTracker';
 import { AvatarSprite } from '../components/PixelSprites';
 import { MusicSettingsPanel } from '../components/MusicControls';
 import { useSound } from '../hooks/useSound.js';
@@ -117,6 +117,14 @@ export const SettingsPage: React.FC = () => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > MAX_SAVE_FILE_BYTES) {
+      setTransferStatus({
+        type: 'error',
+        message: 'Ukuran file terlalu besar (maksimal 1 MB). File simpanan ditolak.',
+      });
+      e.target.value = '';
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
       const content = typeof reader.result === 'string' ? reader.result : '';

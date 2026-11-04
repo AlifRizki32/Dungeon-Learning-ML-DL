@@ -152,16 +152,16 @@ test('useGameStore and migrateStateToV3 preserve save data and normalize music/s
 
   assert.equal(migratedLegacy.playerName, 'Arsitek Lama');
   assert.equal(migratedLegacy.xp, 500);
-  assert.equal(migratedLegacy.musicEnabled, true);
+  assert.equal(migratedLegacy.musicEnabled, false);
   assert.equal(migratedLegacy.musicVolume, 0.35);
   assert.equal(migratedLegacy.sfxVolume, 0.75);
 
   const migratedCustom = migrateStateToV3({
-    musicEnabled: false,
+    musicEnabled: true,
     musicVolume: 0.6,
     sfxVolume: 0.4,
   });
-  assert.equal(migratedCustom.musicEnabled, false);
+  assert.equal(migratedCustom.musicEnabled, true);
   assert.equal(migratedCustom.musicVolume, 0.6);
   assert.equal(migratedCustom.sfxVolume, 0.4);
 

@@ -17,6 +17,7 @@ import {
   WEEKLY_BONUS_XP,
   getLocalDateKey,
   getWeekStartDateKey,
+  isValidFloorNodeId,
   validateAndParseSaveJSON,
 } from '../game/campTracker';
 import {
@@ -285,7 +286,7 @@ const INITIAL_PERSISTED_STATE = {
   } as Record<number, string>,
   soundEnabled: false,
   sfxVolume: 0.75,
-  musicEnabled: true,
+  musicEnabled: false,
   musicVolume: 0.35,
   reduceMotion: false,
   lessonProgress: {} as Record<string, LessonChunkProgress>,
@@ -507,8 +508,8 @@ export function migrateStateToV3(rawState: Record<string, unknown>) {
     !Array.isArray(rawState.taskDone)
   ) {
     for (const [cId, val] of Object.entries(rawState.taskDone as Record<string, unknown>)) {
-      if (val === true) {
-        normalizedTaskDone[cId] = true;
+      if (typeof val === 'boolean') {
+        normalizedTaskDone[cId] = val;
       }
     }
   }
@@ -522,15 +523,48 @@ export function migrateStateToV3(rawState: Record<string, unknown>) {
     for (const [itemId, val] of Object.entries(rawState.reviewQueue as Record<string, unknown>)) {
       if (val && typeof val === 'object' && !Array.isArray(val)) {
         const obj = val as Partial<ReviewQueueEntry>;
-        if (typeof obj.due === 'string' && obj.due.trim()) {
+        if (
+          typeof obj.box === 'number' &&
+          Number.isFinite(obj.box) &&
+          typeof obj.due === 'string' &&
+          /^\d{4}-\d{2}-\d{2}$/.test(obj.due.trim())
+        ) {
           normalizedReviewQueue[itemId] = {
-            box:
-              typeof obj.box === 'number'
-                ? Math.max(0, Math.min(4, Math.floor(obj.box)))
-                : 0,
+            box: Math.max(0, Math.min(4, Math.floor(obj.box))),
             due: obj.due.trim(),
           };
         }
+      }
+    }
+  }
+
+  const normalizedActiveFloorId =
+    typeof rawState.activeFloorId === 'number' &&
+    Number.isInteger(rawState.activeFloorId) &&
+    rawState.activeFloorId >= 1 &&
+    rawState.activeFloorId <= 6
+      ? rawState.activeFloorId
+      : INITIAL_PERSISTED_STATE.activeFloorId;
+
+  const normalizedActiveNodeByFloor: Record<number, string> = {
+    ...INITIAL_PERSISTED_STATE.activeNodeByFloor,
+  };
+  if (
+    rawState.activeNodeByFloor &&
+    typeof rawState.activeNodeByFloor === 'object' &&
+    !Array.isArray(rawState.activeNodeByFloor)
+  ) {
+    for (const [fKey, nodeVal] of Object.entries(
+      rawState.activeNodeByFloor as Record<string, unknown>
+    )) {
+      const floorNum = Number(fKey);
+      if (
+        Number.isInteger(floorNum) &&
+        floorNum >= 1 &&
+        floorNum <= 5 &&
+        isValidFloorNodeId(floorNum, nodeVal)
+      ) {
+        normalizedActiveNodeByFloor[floorNum] = nodeVal;
       }
     }
   }
@@ -546,7 +580,7 @@ export function migrateStateToV3(rawState: Record<string, unknown>) {
   );
 
   const normalizedMusicEnabled =
-    typeof rawState.musicEnabled === 'boolean' ? rawState.musicEnabled : true;
+    typeof rawState.musicEnabled === 'boolean' ? rawState.musicEnabled : false;
   const normalizedMusicVolume =
     typeof rawState.musicVolume === 'number' && !Number.isNaN(rawState.musicVolume)
       ? Math.max(0, Math.min(1, Number(rawState.musicVolume.toFixed(2))))
@@ -576,6 +610,8 @@ export function migrateStateToV3(rawState: Record<string, unknown>) {
         : {},
     bossProgress: bossProgressMap,
     evidenceNotes: normalizedNotes,
+    activeFloorId: normalizedActiveFloorId,
+    activeNodeByFloor: normalizedActiveNodeByFloor,
     lessonProgress: normalizedLessonProgress,
     summaries: normalizedSummaries,
     taskDone: normalizedTaskDone,
@@ -1491,6 +1527,9 @@ export const useGameStore = create<GameState>()(
             activeFloorId: s.activeFloorId,
             activeNodeByFloor: s.activeNodeByFloor,
             soundEnabled: s.soundEnabled,
+            sfxVolume: s.sfxVolume,
+            musicEnabled: s.musicEnabled,
+            musicVolume: s.musicVolume,
             reduceMotion: s.reduceMotion,
             lessonProgress: s.lessonProgress,
             summaries: s.summaries,

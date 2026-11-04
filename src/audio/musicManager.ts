@@ -32,7 +32,7 @@ type Listener = (snapshot: MusicManagerSnapshot) => void;
 
 class BackgroundMusicManager {
   private currentThemeId: MusicThemeId = 'title';
-  private musicEnabled = true;
+  private musicEnabled = false;
   private musicVolume = DEFAULT_MUSIC_VOLUME;
   private masterGain: GainNode | null = null;
   private activeSequencer: ChiptuneTrackSequencer | null = null;

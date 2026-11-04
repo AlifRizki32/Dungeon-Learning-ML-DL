@@ -16,8 +16,12 @@ import {
 } from '../game/formulas';
 import { getLocalDateKey } from '../game/campTracker';
 import { getDueReviewItems } from '../game/lessonEngine';
-import { getWeakestTopics } from '../game/quizEngine';
-import { FLOOR6_CONTENT, getTopicContent, TOWER_RELICS } from '../game/spellbookEngine';
+import {
+  FLOOR6_CONTENT,
+  getTopicContent,
+  getWeakestTopics,
+  TOWER_RELICS,
+} from '../game/spellbookEngine';
 import { AvatarSprite, BadgeSprite, RelicSprite } from '../components/PixelSprites';
 import { useSound } from '../hooks/useSound.js';
 

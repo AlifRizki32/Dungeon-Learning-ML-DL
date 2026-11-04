@@ -4,6 +4,7 @@ import floor3ContentRaw from '../data/floor3.content.json';
 import floor4ContentRaw from '../data/floor4.content.json';
 import floor5ContentRaw from '../data/floor5.content.json';
 import floor6ContentRaw from '../data/floor6.content.json';
+import { ALL_TOPICS } from '../data/roadmap.js';
 
 export interface Floor1Spell {
   id: string;
@@ -1141,4 +1142,112 @@ export function formatCertificateSummaryText(input: CertificateSummaryInput): st
     cert.closing,
   ].join('\n');
 }
+
+const MONSTER_DIALOGUE_BY_TOPIC: Record<string, string> = {
+  'topic-1':
+    'Hahaha! Banyak petualang tersesat saat melihat rumus panjang, padahal rahasianya hanya menyederhanakan pecahan dan membaca kemiringan grafik!',
+  'topic-2':
+    'Jangan tertipu oleh angka rata-rata semata! Buktikan dulu apakah kamu tahu cara memperbarui peluang lewat Teorema Bayes saat bukti baru muncul!',
+  'topic-3':
+    'Nilai p-value kecil sering disalahartikan oleh pemula yang terburu-buru! Beranikah kamu menjelaskan maknanya tanpa terjebak ilusi kebetulan?',
+  'topic-4':
+    'Setiap baris dan kolom di tubuhku adalah ruang vektor! Jika kamu tak paham mengapa matriks dikalikan, langkahmu di dunia ML akan terhenti di sini!',
+  'topic-5':
+    'Rasakan curamnya lereng fungsi ini! Tanpa arah gradien dan aturan rantai, kamu hanya akan berputar-putar di puncak bukit error!',
+  'topic-6':
+    'Tabel dataku penuh nilai kosong dan angka berantakan! Bersihkan aku dengan NumPy dan pandas, lalu tunjukkan wujud asliku lewat grafik matplotlib!',
+  'topic-7':
+    'Akar-akarku membelah tanah menjadi kawasan latih, validasi, dan uji yang tak boleh saling bocor! Beranikah kau melangkah tanpa mengintip masa depan?',
+  'topic-8':
+    'Di hutan yang timpang ini, akurasi semu hanyalah fatamorgana daun kering! Tunjukkan keseimbangan presisi dan recall-mu sebelum melintas!',
+  'topic-9':
+    'Setiap dahan di tubuhku bercabang mengikuti penurunan impuritas Gini! Tebaslah ambang batas keputusanku jika kau paham rahasia kurva sigmoid!',
+  'topic-10':
+    'Kayu mentah takkan menjadi perisai kokoh tanpa pembersihan dan penyetaraan skala! Hanya fitur yang diolah tanpa kebocoran yang sanggup menembus kulitku!',
+  'topic-11':
+    'Tanpa label penunjuk jalan, gugus-gugus spora di rimba ini berkumpul menurut jarak terdekat! Temukan pusat klaster dan sumbu variansi utamaku!',
+  'topic-12':
+    'Denyut sinapsisku memadukan bobot dan bias sebelum membangkitkan gerbang aktivasi non-linear! Tanpa aktivasi yang tepat, lapisanku hanyalah bayangan garis lurus biasa!',
+  'topic-13':
+    'Aliran gradien di tubuhku tak pernah lupa dijumlahkan jika kau lalai mengosongkannya! Tunjukkan ritme lima langkah latihan PyTorch sebelum melangkah lebih dalam!',
+  'topic-14':
+    'Mataku memindai setiap petak piksel dengan filter lokal yang berbagi bobot di seluruh ruang! Bisakah kau menghitung ukuran peta fiturku setelah melintasi stride dan pooling?',
+  'topic-15':
+    'Ingatanku mengalir dari langkah waktu ke langkah waktu melalui keadaan tersembunyi yang berantai! Waspadalah terhadap gradien yang meredup di lorong urutan panjang ini!',
+  'topic-16':
+    'Setiap kepalaku menimbang Query dan Key untuk memusatkan perhatian langsung ke bagian urutan terpenting! Bagi skor dot-product dengan akar dimensi agar bobot softmax-ku tidak membeku!',
+  'topic-17':
+    'Hanya penjadwalan laju belajar, pencari AdamW, dan perisai regularisasi yang sanggup menjaga latihanku tetap stabil! Buktikan kau mampu meredam overfitting di kuil terdalam ini!',
+  'topic-18':
+    'Kontainer serverku hanya menerima model yang dikemas rapi beserta langkah prapemrosesannya! Waspadalah terhadap pergeseran distribusi data saat sistemmu berjalan di produksi!',
+  'topic-19':
+    'Sirkuit mikrokontrolerku hanya menyediakan ruang kilobyte yang sempit di flash dan RAM! Padatkan bobot float32-mu menjadi int8 dan pastikan tensor arena muat sebelum melintas!',
+  'topic-20':
+    'Dari pembacaan sensor hingga aksi perangkat, setiap milidetik dihitung dalam anggaran latensi total! Bangunlah pipa ujung-ke-ujung yang tangguh dan temukan penghambat utamanya!',
+  'topic-21':
+    'Satu commit raksasa tanpa pesan jelas atau kunci rahasia yang bocor di riwayat Git akan mengacaukan proyekmu! Tunjukkan cabang yang rapi dan barisan tes otomatis yang lulus!',
+  'topic-22':
+    'Data sensor dunia nyata penuh nilai hilang, derau, dan kelas yang timpang! Selidiki penyebab kejanggalan data dan catat kualitasnya sebelum kau berani melatih model!',
+  'topic-23':
+    'Tegangan ADC, kalibrasi dua titik, dan tingkat QoS MQTT menentukan apakah perangkatmu bertahan 24 jam! Hitung daya bateraimu dengan cermat sebelum sirkuit ini padam!',
+  'topic-24':
+    'Skor tinggi tanpa pembanding hanyalah ilusi jika kalah oleh baseline sederhana! Buktikan peningkatan relatif modelmu dan catat seed eksperimen agar hasilnya jujur serta dapat diulang!',
+  'topic-25':
+    'Semakin banyak komponen saat demo, semakin besar peluang ada yang gagal di panggung! Siapkan log yang jelas, langkah reproduksi minimal, serta rekaman cadangan sebelum hari-H!',
+  'topic-26':
+    'Waktu sepuluh menit di panggung akan habis jika kau tenggelam dalam tabel mentah! Sampaikan satu pesan per slide dan jawab pertanyaan sulit dengan jujur beserta data analisis kesalahan!',
+  'topic-27':
+    'Fitur tambahan yang terus menyelinap akan menenggelamkan proyek solomu sebelum selesai! Kunci rencana satu halaman dengan batas lingkup tertulis dan fokuslah menuntaskan MVP!',
+  'topic-28':
+    'Kata sandi bawaan dan broker terbuka adalah celah empuk bagi penyusup perangkat IoT! Terapkan enkripsi, minimisasi data pengguna, dan siapkan jawaban keamanan untuk setiap proyekmu!',
+};
+
+/**
+ * Retrieve the Floor monster's short in-world dialogue (<= 2 sentences) if available.
+ */
+export function getMonsterDialogue(topicId: string, fallbackFlavor: string = ''): string {
+  return MONSTER_DIALOGUE_BY_TOPIC[topicId] || fallbackFlavor;
+}
+
+export interface WeakTopicSummary {
+  topicId: string;
+  number: number;
+  floorId: number;
+  name: string;
+  bestScorePercent: number;
+  needsReview: boolean;
+}
+
+/**
+ * Build the sorted list of lowest-scoring attempted topics for the Dashboard "Kelemahan" section.
+ */
+export function getWeakestTopics(
+  quizBestScores: Record<string, number>,
+  maxItems = 5
+): WeakTopicSummary[] {
+  const entries = Object.entries(quizBestScores)
+    .map(([topicId, bestScorePercent]) => {
+      const topic = ALL_TOPICS.find((t) => t.id === topicId);
+      if (!topic) return null;
+      return {
+        topicId,
+        number: topic.number,
+        floorId: topic.floorId,
+        name: topic.name,
+        bestScorePercent,
+        needsReview: bestScorePercent < 100,
+      };
+    })
+    .filter((item): item is WeakTopicSummary => item !== null);
+
+  entries.sort((a, b) => {
+    if (a.bestScorePercent !== b.bestScorePercent) {
+      return a.bestScorePercent - b.bestScorePercent;
+    }
+    return a.number - b.number;
+  });
+
+  return entries.slice(0, maxItems);
+}
+
 

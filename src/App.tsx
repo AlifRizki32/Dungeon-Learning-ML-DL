@@ -15,9 +15,14 @@ import { DashboardPage } from './pages/DashboardPage';
 import { TowerPage } from './pages/TowerPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { ReviewPage } from './pages/ReviewPage';
-import { AIChatbot } from './components/AIChatbot/AIChatbot';
-import { Dungeon3D } from './components/Dungeon3D/Dungeon3D';
 import { useBackgroundMusic } from './hooks/useBackgroundMusic';
+
+const LazyAIChatbot = React.lazy(() =>
+  import('./components/AIChatbot/AIChatbot').then((m) => ({ default: m.AIChatbot }))
+);
+const LazyDungeon3D = React.lazy(() =>
+  import('./components/Dungeon3D/Dungeon3D').then((m) => ({ default: m.Dungeon3D }))
+);
 
 export default function App() {
   const currentView = useGameStore((s) => s.currentView);
@@ -113,15 +118,21 @@ export default function App() {
           <BossModal />
           <LevelUpModal />
           <StandaloneScrollModal />
-          <Dungeon3D
-            isOpen={is3DDungeonOpen}
-            onClose={() => setIs3DDungeonOpen(false)}
-          />
+          {is3DDungeonOpen && (
+            <React.Suspense fallback={null}>
+              <LazyDungeon3D
+                isOpen={is3DDungeonOpen}
+                onClose={() => setIs3DDungeonOpen(false)}
+              />
+            </React.Suspense>
+          )}
         </div>
       )}
 
       {/* Floating AI Dungeon Mentor Assistant */}
-      <AIChatbot />
+      <React.Suspense fallback={null}>
+        <LazyAIChatbot />
+      </React.Suspense>
     </div>
   );
 }

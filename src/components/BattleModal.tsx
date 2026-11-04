@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FLOORS } from '../data/roadmap.js';
 import { useGameStore } from '../store/useGameStore';
 import { calculateRoomXP } from '../game/formulas';
-import { getMonsterDialogue } from '../game/quizEngine';
 import {
   ECHO_BONUS_XP,
   MAX_HEARTS,
@@ -14,6 +13,7 @@ import {
   buildBattleDeck,
   calculateRoomCritBonusXP,
   evaluateFloor1Battle,
+  getMonsterDialogue,
   getTopicContent,
 } from '../game/spellbookEngine';
 import {

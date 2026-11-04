@@ -73,7 +73,7 @@ export interface MusicHudIndicatorProps {
 export const MusicHudIndicator: React.FC<MusicHudIndicatorProps> = ({
   compact = false,
 }) => {
-  const musicEnabled = useGameStore((s) => s.musicEnabled ?? true);
+  const musicEnabled = useGameStore((s) => s.musicEnabled ?? false);
   const toggleMusic = useGameStore((s) => s.toggleMusic);
   const snapshot = useMusicSnapshot();
   const { playClick } = useSound();
@@ -127,7 +127,7 @@ export const MusicHudIndicator: React.FC<MusicHudIndicatorProps> = ({
  * Full Music & SFX volume/toggle controls for SettingsPage.tsx.
  */
 export const MusicSettingsPanel: React.FC = () => {
-  const musicEnabled = useGameStore((s) => s.musicEnabled ?? true);
+  const musicEnabled = useGameStore((s) => s.musicEnabled ?? false);
   const musicVolume = useGameStore((s) => s.musicVolume ?? 0.35);
   const sfxVolume = useGameStore((s) => s.sfxVolume ?? 0.75);
   const soundEnabled = useGameStore((s) => s.soundEnabled);
