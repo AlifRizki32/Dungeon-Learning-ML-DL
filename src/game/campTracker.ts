@@ -482,6 +482,19 @@ export function validateAndParseSaveJSON(
     if (typeof candidate.reduceMotion === 'boolean') {
       sanitized.reduceMotion = candidate.reduceMotion;
     }
+    if (
+      candidate.taskDone &&
+      typeof candidate.taskDone === 'object' &&
+      !Array.isArray(candidate.taskDone)
+    ) {
+      const cleanTaskDone: Record<string, boolean> = {};
+      for (const [cId, val] of Object.entries(candidate.taskDone as Record<string, unknown>)) {
+        if (val === true) {
+          cleanTaskDone[cId] = true;
+        }
+      }
+      sanitized.taskDone = cleanTaskDone;
+    }
 
     return { valid: true, data: sanitized };
   } catch {

@@ -10,6 +10,16 @@ function countWords(text) {
   if (typeof text !== 'string') return 0;
   const trimmed = text.trim();
   if (!trimmed) return 0;
+  // Count tokens that contain at least one letter or digit (excluding standalone math operator symbols like =, ×, −, +)
+  return trimmed
+    .split(/\s+/)
+    .filter((tok) => /[\p{L}\p{N}]/u.test(tok)).length;
+}
+
+function countRawTokens(text) {
+  if (typeof text !== 'string') return 0;
+  const trimmed = text.trim();
+  if (!trimmed) return 0;
   return trimmed.split(/\s+/).filter(Boolean).length;
 }
 
@@ -118,13 +128,27 @@ function checkLessonFile(filePath) {
   let practiceCount = 0;
   let reviewItemCount = 0;
 
-  const topics = Array.isArray(data.topics) ? data.topics : [];
-  for (const topic of topics) {
+  const entries = [
+    ...(Array.isArray(data.topics)
+      ? data.topics.map((t) => ({
+          entryLabel: `Topic ${t.topicId}`,
+          chunks: t.chunks,
+        }))
+      : []),
+    ...(Array.isArray(data.quests)
+      ? data.quests.map((q) => ({
+          entryLabel: `Quest ${q.questId}`,
+          chunks: q.chunks,
+        }))
+      : []),
+  ];
+
+  for (const entry of entries) {
     topicCount++;
-    const chunks = Array.isArray(topic.chunks) ? topic.chunks : [];
+    const chunks = Array.isArray(entry.chunks) ? entry.chunks : [];
     for (const chunk of chunks) {
       chunkCount++;
-      const label = `[${fileName} · Topic ${topic.topicId} · ${chunk.chunkId || 'unknown'}]`;
+      const label = `[${fileName} · ${entry.entryLabel} · ${chunk.chunkId || 'unknown'}]`;
 
       // Required chunk fields: goal, formula.readAloud, commonMistake, reviewItems >= 1
       if (typeof chunk.goal !== 'string' || !chunk.goal.trim()) {
@@ -195,8 +219,13 @@ function checkLessonFile(filePath) {
       const steps = Array.isArray(chunk.steps) ? chunk.steps : [];
       steps.forEach((step, sIdx) => {
         const wc = countWords(step.text);
+        const rawWc = countRawTokens(step.text);
         if (wc > 30) {
           errors.push(`${label} step #${sIdx + 1}: exceeds 30 words (${wc} words): "${step.text}"`);
+        } else if (rawWc > 30) {
+          warnings.push(
+            `${label} step #${sIdx + 1}: ${rawWc} whitespace-split tokens (${wc} lexical words excluding standalone math symbols): "${step.text}"`
+          );
         }
         const highlights = Array.isArray(step.highlight) ? step.highlight : [];
         for (const token of highlights) {

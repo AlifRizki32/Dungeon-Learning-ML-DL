@@ -7,6 +7,7 @@ import {
   LinePlotVisual,
   MatrixGridVisual,
   formatBarValue,
+  formatMatrixCell,
 } from '../game/lessonEngine';
 
 interface LessonVisualRendererProps {
@@ -204,7 +205,7 @@ const DotGridRenderer: React.FC<{
       {/* Accessible Legend with non-color symbol/pattern + count */}
       <div
         aria-label="Legenda Kelompok Petak"
-        className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-[#2b2352]"
+        className="grid grid-cols-1 gap-2 pt-2 border-t border-[#2b2352]"
       >
         {groups.map((g) => {
           const st = groupStyleMap.get(g.id) || GROUP_PALETTE[0];
@@ -237,7 +238,7 @@ const DotGridRenderer: React.FC<{
                 >
                   {st.symbol}
                 </span>
-                <div className="truncate font-vt text-base sm:text-lg">
+                <div className="break-words leading-snug font-vt text-base sm:text-lg">
                   <span>{g.label}</span>
                   {parentGroup && (
                     <span className="text-xs text-[#b3aad1] ml-1">
@@ -384,16 +385,23 @@ const LinePlotRenderer: React.FC<{
     }
     const xs = points.map((p) => Number(p[0]) || 0);
     const ys = points.map((p) => Number(p[1]) || 0);
+    const pointMinX = Math.min(...xs);
+    const pointMaxX = Math.max(...xs);
     if (lineDef) {
-      const minX = Math.min(...xs);
-      const maxX = Math.max(...xs);
-      ys.push(lineDef.m * minX + lineDef.c, lineDef.m * maxX + lineDef.c);
+      ys.push(lineDef.m * pointMinX + lineDef.c, lineDef.m * pointMaxX + lineDef.c);
     }
     const minX = Math.min(0, ...xs);
     const maxX = Math.max(1, ...xs);
     const minY = Math.min(0, ...ys);
     const maxY = Math.max(1, ...ys);
-    return { minX, maxX, minY, maxY };
+    return {
+      minX,
+      maxX,
+      minY,
+      maxY,
+      lineStartX: points.length >= 2 ? pointMinX : minX,
+      lineEndX: points.length >= 2 ? pointMaxX : maxX,
+    };
   }, [points, lineDef]);
 
   const width = 320;
@@ -435,7 +443,8 @@ const LinePlotRenderer: React.FC<{
                 : 'bg-[#120d26] border-[#3a306e] text-[#38d864]'
             }`}
           >
-            Garis: y = {lineDef.m}·x + {lineDef.c}
+            Garis: y = {lineDef.m}·x{' '}
+            {lineDef.c < 0 ? `− ${Math.abs(lineDef.c)}` : `+ ${lineDef.c}`}
           </span>
         )}
       </div>
@@ -446,33 +455,35 @@ const LinePlotRenderer: React.FC<{
         role="img"
         aria-label="Grafik koordinat titik dan garis"
       >
-        {/* Axes */}
+        {/* Plot Frame & Zero-Crossing Axes */}
         <line
-          x1={padLeft}
+          data-testid="lineplot-axis-y"
+          x1={toSvgX(0)}
           y1={padTop}
-          x2={padLeft}
+          x2={toSvgX(0)}
           y2={padTop + plotH}
           stroke="#5c4e99"
           strokeWidth="2"
         />
         <line
+          data-testid="lineplot-axis-x"
           x1={padLeft}
-          y1={padTop + plotH}
+          y1={toSvgY(0)}
           x2={padLeft + plotW}
-          y2={padTop + plotH}
+          y2={toSvgY(0)}
           stroke="#5c4e99"
           strokeWidth="2"
         />
 
-        {/* Optional y = m*x + c line */}
+        {/* Optional y = m*x + c line drawn across the x-range of the points */}
         {lineDef && (
           <line
             data-testid="lineplot-formula-line"
             data-highlighted={highlightLine ? 'true' : 'false'}
-            x1={toSvgX(bounds.minX)}
-            y1={toSvgY(lineDef.m * bounds.minX + lineDef.c)}
-            x2={toSvgX(bounds.maxX)}
-            y2={toSvgY(lineDef.m * bounds.maxX + lineDef.c)}
+            x1={toSvgX(bounds.lineStartX ?? bounds.minX)}
+            y1={toSvgY(lineDef.m * (bounds.lineStartX ?? bounds.minX) + lineDef.c)}
+            x2={toSvgX(bounds.lineEndX ?? bounds.maxX)}
+            y2={toSvgY(lineDef.m * (bounds.lineEndX ?? bounds.maxX) + lineDef.c)}
             stroke={highlightLine ? '#f5b935' : '#38d864'}
             strokeWidth={highlightLine ? '3.5' : '2'}
             strokeDasharray={highlightLine ? undefined : '4 2'}
@@ -616,6 +627,8 @@ const MatrixGridRenderer: React.FC<{
               key={mat.id}
               data-testid={`matrix-${mat.id}`}
               className={`bg-[#120d26] border-2 p-2.5 overflow-x-auto ${
+                hasRowLabels || hasColLabels ? 'w-full' : ''
+              } ${
                 matHasHighlight ? 'border-[#f5b935]' : 'border-[#3a306e]'
               } ${hasAnyActive && !matHasHighlight ? 'opacity-50' : 'opacity-100'}`}
             >
@@ -648,7 +661,7 @@ const MatrixGridRenderer: React.FC<{
                               : 'bg-[#070510] text-[#f4f1ea] border-[#5c4e99]'
                           }`}
                         >
-                          {val}
+                          {formatMatrixCell(val)}
                         </div>
                       );
                     })
@@ -658,9 +671,9 @@ const MatrixGridRenderer: React.FC<{
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: `${hasRowLabels ? 'minmax(64px, auto) ' : ''}repeat(${colsCount}, minmax(44px, auto))`,
+                    gridTemplateColumns: `${hasRowLabels ? 'minmax(76px, 1.1fr) ' : ''}repeat(${colsCount}, minmax(64px, 1fr))`,
                     gap: '6px',
-                    alignItems: 'center',
+                    alignItems: 'stretch',
                   }}
                   className="px-1 py-1"
                 >
@@ -677,7 +690,7 @@ const MatrixGridRenderer: React.FC<{
                             key={`col-label-${c1}`}
                             data-testid={`matrix-col-label-${mat.id}-c${c1}`}
                             data-highlighted={colActive ? 'true' : 'false'}
-                            className={`px-2 py-1 text-center font-mono text-xs border ${
+                            className={`px-2 py-1 text-center font-mono text-xs border break-words leading-snug flex items-center justify-center ${
                               colActive
                                 ? 'bg-[#1f193d] text-[#f5b935] border-[#f5b935] font-bold'
                                 : 'bg-[#0d0a1a] text-[#3ac5eb] border-[#3a306e]'
@@ -701,7 +714,7 @@ const MatrixGridRenderer: React.FC<{
                           <div
                             data-testid={`matrix-row-label-${mat.id}-r${r1}`}
                             data-highlighted={rowActive ? 'true' : 'false'}
-                            className={`px-2.5 py-1.5 text-right font-mono text-xs border ${
+                            className={`px-2.5 py-1.5 text-right font-mono text-xs border break-words leading-snug flex items-center justify-end ${
                               rowActive
                                 ? 'bg-[#1f193d] text-[#f5b935] border-[#f5b935] font-bold'
                                 : 'bg-[#0d0a1a] text-[#b3aad1] border-[#3a306e]'
@@ -728,7 +741,7 @@ const MatrixGridRenderer: React.FC<{
                                   : 'bg-[#070510] text-[#f4f1ea] border-[#5c4e99]'
                               }`}
                             >
-                              {val}
+                              {formatMatrixCell(val)}
                             </div>
                           );
                         })}
@@ -782,17 +795,21 @@ const CodeBlockRenderer: React.FC<{
             const lineNum = idx + 1;
             const isHighlighted = activeLineNumbers.has(lineNum);
             const dimmed = hasAnyActive && !isHighlighted;
+            const isComment = lineText.trimStart().startsWith('#');
 
             return (
               <div
                 key={lineNum}
                 data-testid={`codeblock-line-l${lineNum}`}
                 data-highlighted={isHighlighted ? 'true' : 'false'}
+                data-comment={isComment ? 'true' : 'false'}
                 className={`flex items-start gap-2.5 px-2 py-1 border-l-4 ${
                   isHighlighted
                     ? 'bg-[#1f193d] border-[#f5b935] text-[#f4f1ea] font-bold'
+                    : isComment
+                    ? 'bg-transparent border-transparent text-[#8e84b8] italic opacity-75'
                     : 'bg-transparent border-transparent text-[#d9d2f0]'
-                } ${dimmed ? 'opacity-40' : 'opacity-100'}`}
+                } ${dimmed ? 'opacity-40' : ''}`}
               >
                 <span className="w-6 text-right text-[#f5b935] select-none shrink-0 tabular-nums">
                   {isHighlighted ? `▶${lineNum}` : lineNum}

@@ -1,0 +1,999 @@
+{
+  "reviewStatus": "needs-human-review",
+  "floor": 5,
+  "lessonVersion": 3,
+  "guide": { "name": "Rune", "role": "Pemandu dungeon" },
+  "topics": [
+    {
+      "topicId": 21,
+      "chunks": [
+        {
+          "chunkId": "t21c1",
+          "title": "Git: simpan, cabang, abaikan",
+          "goal": "Setelah ini kamu bisa menyimpan perubahan dengan commit yang jelas, memakai cabang, dan memilih berkas yang diabaikan.",
+          "terms": [
+            { "term": "commit", "plain": "satu catatan perubahan di riwayat proyek" },
+            { "term": "cabang", "plain": "jalur kerja terpisah dari cabang utama" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Proyek kristalmu berubah tiap hari. Tanpa catatan, kamu tidak tahu apa yang berubah dan kapan." },
+            { "who": "Kamu", "text": "Jadi aku perlu buku harian proyek?" },
+            { "who": "Rune", "text": "Itulah Git." }
+          ],
+          "guess": { "question": "Kamu memperbaiki bug pembacaan kelembapan. Pesan commit mana yang paling jelas?", "options": ["Perbaiki pembacaan kelembapan yang selalu 0", "perbaikan", "update2", "coba lagi"], "correctIndex": 0, "reveal": "Pesan yang spesifik memudahkan penelusuran. Kita lihat alurnya." },
+          "visual": { "type": "codeBlock", "lines": ["git status", "git add src/normalisasi.py", "git commit -m \"Tambah normalisasi z-score untuk sensor suhu\"", "git switch -c fitur-normalisasi", "git switch main", "git merge fitur-normalisasi"] },
+          "steps": [
+            { "text": "git status menunjukkan berkas mana yang berubah.", "highlight": ["l1"] },
+            { "text": "git add menandai berkas yang akan disimpan. git commit menyimpannya dengan sebuah pesan.", "highlight": ["l2", "l3"] },
+            { "text": "Pesan yang baik menjelaskan apa yang berubah, bukan sekadar 'update'.", "highlight": ["l3"] },
+            { "text": "Cabang membuat jalur baru: git switch -c fitur-normalisasi. Percobaanmu terpisah dari cabang main.", "highlight": ["l4"] },
+            { "text": "Misalkan main punya 3 commit. Di cabang fitur kamu membuat 2 commit, dan main belum berubah.", "highlight": [] },
+            { "text": "Setelah merge tanpa konflik, main punya 3 + 2 = 5 commit.", "highlight": ["l5", "l6"] },
+            { "text": "Berkas .gitignore memuat hal yang tidak boleh masuk repositori, seperti .env (rahasia) dan data mentah besar.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t21c1p1", "type": "fillNumber", "question": "Main punya 4 commit. Cabang fitur membuat 3 commit baru, dan main tidak berubah. Berapa commit di main setelah merge?", "answer": 7, "tolerance": 0, "unit": "", "why": "4 + 3 = 7." },
+            { "id": "t21c1p2", "type": "choice", "question": "Mana yang sebaiknya masuk .gitignore?", "options": [".env berisi kunci API", "src/normalisasi.py", "README.md", "tes/test_normalisasi.py"], "correctIndex": 0, "why": "Berkas rahasia tidak boleh masuk repositori. Kode dan dokumentasi justru perlu disimpan." },
+            { "id": "t21c1p3", "type": "order", "question": "Urutkan alur menyimpan perubahan.", "items": ["git status: lihat berkas yang berubah", "git add: pilih berkas yang disimpan", "git commit -m: simpan dengan pesan jelas", "git merge: gabungkan cabang ke main"], "why": "Lihat, pilih, simpan, lalu gabungkan setelah siap." }
+          ],
+          "formula": { "lines": ["git add → git commit -m 'pesan jelas'", "cabang untuk percobaan; gabungkan setelah siap", ".gitignore: .env, data mentah besar, berkas sementara"], "readAloud": "Simpan dengan pesan yang jelas, kerjakan percobaan di cabang, dan jangan masukkan rahasia ke repositori." },
+          "commonMistake": "Satu commit raksasa berpesan 'update' yang juga menyertakan berkas rahasia.",
+          "realTask": "Buat repositori kecil, lakukan 3 commit dengan pesan jelas, dan tambahkan berkas .gitignore.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa pesan commit harus spesifik?",
+          "reviewItems": [ { "id": "t21c1r1", "front": "Apa yang dimasukkan ke .gitignore?", "back": "Rahasia (misalnya .env), data mentah besar, dan berkas sementara." } ]
+        },
+        {
+          "chunkId": "t21c2",
+          "title": "Tes otomatis",
+          "goal": "Setelah ini kamu bisa menulis tes kecil yang menjaga fungsi tetap benar.",
+          "terms": [
+            { "term": "tes otomatis", "plain": "kode kecil yang memeriksa apakah fungsi lain bekerja sesuai harapan" },
+            { "term": "kasus tepi", "plain": "situasi di batas, misalnya pembagian dengan nol" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Kamu mengubah satu rumus. Apakah bagian lain masih jalan?" },
+            { "who": "Rune", "text": "Memeriksa satu per satu dengan tangan itu lambat. Biarkan tes yang memeriksa." }
+          ],
+          "guess": { "question": "Fungsi normalisasi(20, 10, 30) harus mengembalikan...", "options": ["0,5", "0,2", "2", "1"], "correctIndex": 0, "reveal": "Hitung dulu: (20 − 10) ÷ (30 − 10)." },
+          "visual": { "type": "codeBlock", "lines": ["# fungsi", "def normalisasi(x, mn, mx):", "    return (x - mn) / (mx - mn)", "", "# tes (jalankan dengan: pytest)", "def test_nilai_tengah():", "    assert normalisasi(20, 10, 30) == 0.5", "", "def test_batas_bawah():", "    assert normalisasi(10, 10, 30) == 0.0"] },
+          "steps": [
+            { "text": "Tes adalah fungsi kecil yang memeriksa perilaku fungsi lain. Namanya diawali test_ agar pytest menemukannya.", "highlight": ["l6", "l9"] },
+            { "text": "test_nilai_tengah: (20 − 10) ÷ (30 − 10) = 0,5, sehingga assert benar.", "highlight": ["l7"] },
+            { "text": "test_batas_bawah: (10 − 10) ÷ 20 = 0,0, sehingga assert benar.", "highlight": ["l10"] },
+            { "text": "Jalankan pytest. Jika kedua tes lulus, ringkasannya '2 passed'.", "highlight": [] },
+            { "text": "Jika seseorang mengubah rumus menjadi (x − mn) ÷ mx, tes pertama gagal dan memberi tahu kamu.", "highlight": ["l3"] },
+            { "text": "Kasus tepi: normalisasi(5, 10, 10) membagi dengan nol. Tambahkan tes untuk kasus itu.", "highlight": [] },
+            { "text": "Persen lulus = lulus ÷ total × 100. Dari 12 tes, 11 lulus: sekitar 91,7%.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t21c2p1", "type": "fillNumber", "question": "Dari 25 tes, 23 lulus. Berapa persen lulus?", "answer": 92, "tolerance": 0, "unit": "%", "why": "23 ÷ 25 = 0,92 = 92%." },
+            { "id": "t21c2p2", "type": "choice", "question": "Nama fungsi tes mana yang dikenali pytest?", "options": ["test_nilai_tengah", "nilai_tengah_tes", "cek nilai tengah", "tes-nilai-tengah"], "correctIndex": 0, "why": "pytest mencari fungsi yang namanya diawali test_." },
+            { "id": "t21c2p3", "type": "choice", "question": "Rumus diubah menjadi (x − mn) ÷ mx. Tes mana yang menangkap kesalahan ini?", "options": ["assert normalisasi(20, 10, 30) == 0.5", "Mengganti nama variabel", "Menambah komentar", "Mengubah spasi"], "correctIndex": 0, "why": "Dengan rumus salah: (20 − 10) ÷ 30 ≈ 0,33, bukan 0,5, sehingga tes gagal." }
+          ],
+          "formula": { "lines": ["assert hasil_nyata == hasil_diharapkan", "persen lulus = lulus ÷ total × 100"], "readAloud": "Tes memastikan hasil nyata sama dengan yang diharapkan. Persen lulus adalah yang lulus dibagi total, dikali seratus." },
+          "commonMistake": "Menulis tes hanya untuk kasus yang mudah dan melupakan kasus tepi.",
+          "realTask": "Tulis dua tes untuk satu fungsi pra-pemrosesan milikmu, lalu jalankan pytest.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa gunanya tes saat kode diubah?",
+          "reviewItems": [ { "id": "t21c2r1", "front": "Apa gunanya tes otomatis?", "back": "Perubahan kode yang tidak sengaja merusak perilaku langsung ketahuan." } ]
+        },
+        {
+          "chunkId": "t21c3",
+          "title": "Terminal Linux dasar",
+          "goal": "Setelah ini kamu bisa berpindah folder, melihat isi berkas, dan mencari teks di terminal.",
+          "terms": [
+            { "term": "terminal", "plain": "layar tempat kamu mengetik perintah" },
+            { "term": "folder", "plain": "tempat berkas dikelompokkan" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Banyak perangkat IoT tidak punya layar bergambar. Kamu bekerja lewat terminal." },
+            { "who": "Rune", "text": "Anggap terminal seperti bertanya pada penjaga lewat tulisan pendek." }
+          ],
+          "guess": { "question": "Perintah mana yang menampilkan folder tempatmu berada sekarang?", "options": ["pwd", "ls", "cd", "grep"], "correctIndex": 0, "reveal": "Mari kita lihat perintah dasarnya." },
+          "visual": { "type": "codeBlock", "lines": ["pwd                    # tampilkan folder saat ini", "ls                     # daftar isi folder", "cd proyek              # pindah ke folder proyek", "mkdir data             # buat folder baru", "cat catatan.txt        # tampilkan isi berkas", "grep \"ERROR\" log.txt   # cari baris yang memuat ERROR"] },
+          "steps": [
+            { "text": "pwd menampilkan lokasimu. ls menampilkan isi folder itu.", "highlight": ["l1", "l2"] },
+            { "text": "cd proyek memindahkanmu ke folder bernama proyek.", "highlight": ["l3"] },
+            { "text": "mkdir data membuat folder baru bernama data.", "highlight": ["l4"] },
+            { "text": "cat catatan.txt menampilkan isi berkas teks.", "highlight": ["l5"] },
+            { "text": "grep \"ERROR\" log.txt menampilkan hanya baris yang memuat kata ERROR.", "highlight": ["l6"] },
+            { "text": "Misalkan log.txt punya 800 baris dan 16 baris memuat ERROR. 16 ÷ 800 = 0,02 = 2%.", "highlight": [] },
+            { "text": "Jadi beberapa perintah pendek sudah cukup untuk menjelajah, memeriksa, dan mencari.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t21c3p1", "type": "fillNumber", "question": "log.txt punya 500 baris dan 15 baris memuat ERROR. Berapa persen?", "answer": 3, "tolerance": 0, "unit": "%", "why": "15 ÷ 500 = 0,03 = 3%." },
+            { "id": "t21c3p2", "type": "match", "question": "Cocokkan perintah dengan fungsinya.", "pairs": [ { "left": "pwd", "right": "menampilkan folder saat ini" }, { "left": "ls", "right": "menampilkan isi folder" }, { "left": "cd", "right": "berpindah folder" }, { "left": "grep", "right": "mencari baris yang memuat teks" } ], "why": "Itulah fungsi dasar tiap perintah." },
+            { "id": "t21c3p3", "type": "choice", "question": "Kamu ingin melihat baris log yang memuat kata WARNING. Perintah yang cocok?", "options": ["grep \"WARNING\" log.txt", "mkdir WARNING", "pwd WARNING", "cd log.txt"], "correctIndex": 0, "why": "grep mencari baris yang memuat teks tertentu." }
+          ],
+          "formula": { "lines": ["pwd, ls, cd, mkdir, cat, grep"], "readAloud": "Lokasi, isi folder, pindah, buat folder, lihat berkas, dan cari teks." },
+          "commonMistake": "Mengetik perintah destruktif tanpa memeriksa lokasi dengan pwd lebih dulu.",
+          "realTask": "Buka terminal, buat folder proyek, pindah ke dalamnya, dan cari satu kata dalam berkas teks dengan grep.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: kapan kamu memakai grep?",
+          "reviewItems": [ { "id": "t21c3r1", "front": "Fungsi pwd, ls, cd, grep?", "back": "Folder saat ini, isi folder, pindah folder, dan mencari baris yang memuat teks." } ]
+        },
+        {
+          "chunkId": "t21c4",
+          "title": "API dasar: permintaan dan jawaban",
+          "goal": "Setelah ini kamu bisa membaca kode status API dan menjelaskan arti tiap kode umum.",
+          "terms": [
+            { "term": "kode status", "plain": "angka pendek dalam jawaban server yang memberi tahu hasil permintaan" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Program lain ingin memanggil modelmu." },
+            { "who": "Rune", "text": "Mereka mengirim permintaan, dan kamu mengirim jawaban beserta sebuah kode status." }
+          ],
+          "guess": { "question": "Klien memanggil alamat yang tidak ada di layananmu. Kode status yang sesuai?", "options": ["404", "200", "500", "400"], "correctIndex": 0, "reveal": "Kita lihat arti kode-kodenya." },
+          "visual": { "type": "codeBlock", "lines": ["# permintaan dari klien", "GET /health", "# jawaban server", "200 OK  {\"status\": \"ok\"}", "# permintaan ke alamat yang tidak ada", "GET /halaman-tidak-ada", "404 Not Found"] },
+          "steps": [
+            { "text": "Klien mengirim permintaan, misalnya GET /health. Server membalas dengan data dan kode status.", "highlight": ["l2", "l4"] },
+            { "text": "200 berarti sukses.", "highlight": ["l4"] },
+            { "text": "400 berarti permintaan salah, misalnya masukan tidak valid.", "highlight": [] },
+            { "text": "404 berarti alamat tidak ditemukan.", "highlight": ["l7"] },
+            { "text": "500 berarti ada galat di sisi server.", "highlight": [] },
+            { "text": "Misalkan dari 200 permintaan, 6 menghasilkan 500. 6 ÷ 200 = 0,03 = 3%.", "highlight": [] },
+            { "text": "Jadi kode status memberi tahu klien dengan cepat apakah permintaannya berhasil dan siapa yang bermasalah.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t21c4p1", "type": "fillNumber", "question": "Dari 250 permintaan, 5 menghasilkan kode 500. Berapa persen?", "answer": 2, "tolerance": 0, "unit": "%", "why": "5 ÷ 250 = 0,02 = 2%." },
+            { "id": "t21c4p2", "type": "match", "question": "Cocokkan kode dengan artinya.", "pairs": [ { "left": "200", "right": "sukses" }, { "left": "400", "right": "permintaan salah" }, { "left": "404", "right": "alamat tidak ditemukan" }, { "left": "500", "right": "galat di server" } ], "why": "Itulah arti kode yang paling umum." },
+            { "id": "t21c4p3", "type": "choice", "question": "Klien mengirim suhu 900, yang tidak valid. Kode yang paling sesuai?", "options": ["400", "200", "404", "500"], "correctIndex": 0, "why": "Masalahnya ada pada permintaan klien, jadi 400 yang cocok." }
+          ],
+          "formula": { "lines": ["200 sukses, 400 permintaan salah, 404 tidak ditemukan, 500 galat server"], "readAloud": "Dua ratus sukses. Empat ratus permintaan salah. Empat ratus empat tidak ditemukan. Lima ratus galat server." },
+          "commonMistake": "Mengembalikan 200 untuk semua jawaban, termasuk saat masukan salah.",
+          "realTask": "Buat satu endpoint /health sederhana yang mengembalikan 200, lalu panggil dari terminal.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa beda kode 400 dan 500?",
+          "reviewItems": [ { "id": "t21c4r1", "front": "Arti kode 200, 400, 404, 500?", "back": "Sukses, permintaan salah, tidak ditemukan, galat server." } ]
+        }
+      ]
+    },
+    {
+      "topicId": 22,
+      "chunks": [
+        {
+          "chunkId": "t22c1",
+          "title": "Data kotor: kosong, macet, duplikat",
+          "goal": "Setelah ini kamu bisa mengenali dan mengukur masalah umum pada data sensor.",
+          "terms": [
+            { "term": "outlier", "plain": "nilai yang jauh berbeda dari kebanyakan data" },
+            { "term": "duplikat", "plain": "baris yang sama tercatat lebih dari sekali" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Data dari sensor sungguhan tidak pernah rapi." },
+            { "who": "Rune", "text": "Ada yang kosong, ada yang macet, ada yang ganda." }
+          ],
+          "guess": { "question": "Sensor mencatat 1 data per menit. Berapa data dalam sehari?", "options": ["1.440", "24", "3.600", "86.400"], "correctIndex": 0, "reveal": "Kita hitung dan lihat masalahnya." },
+          "visual": { "type": "dotGrid", "total": 100, "columns": 10, "groups": [ { "id": "lengkap", "count": 95, "label": "Data lengkap (95%)" }, { "id": "hilang", "count": 5, "label": "Data kosong (5%)" } ] },
+          "steps": [
+            { "text": "Sensor mencatat 1 data per menit. Sehari ada 24 × 60 = 1.440 data.", "highlight": [] },
+            { "text": "Hari ini 72 data kosong. 72 ÷ 1.440 = 0,05, atau 5%.", "highlight": ["hilang"] },
+            { "text": "Sensor macet: nilai 24,2 berulang tiap menit selama 30 menit. Nilai yang persis sama selama itu mencurigakan.", "highlight": [] },
+            { "text": "Duplikat: dari 1.000 baris, 40 adalah duplikat. Sisa baris unik: 960.", "highlight": [] },
+            { "text": "Outlier: 85 °C di ruang yang biasanya 10 sampai 40 °C. Jangan langsung dibuang, karena bisa jadi kejadian nyata.", "highlight": [] },
+            { "text": "Jadi periksa dulu, tandai penyebabnya, lalu putuskan: perbaiki, buang, atau simpan.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t22c1p1", "type": "fillNumber", "question": "Sensor mencatat 1 data tiap 5 menit. Berapa data dalam sehari?", "answer": 288, "tolerance": 0, "unit": "", "why": "Sejam ada 12 data. 24 × 12 = 288." },
+            { "id": "t22c1p2", "type": "fillNumber", "question": "Dari 2.000 baris, 100 adalah duplikat. Berapa baris unik?", "answer": 1900, "tolerance": 0, "unit": "", "why": "2.000 − 100 = 1.900." },
+            { "id": "t22c1p3", "type": "choice", "question": "Satu nilai 85 muncul di ruang yang biasanya 10 sampai 40. Langkah terbaik?", "options": ["Selidiki dulu apakah itu kejadian nyata atau galat sensor", "Hapus tanpa melihat", "Ganti dengan rata-rata tanpa mencatat", "Abaikan semua data hari itu"], "correctIndex": 0, "why": "Outlier bisa jadi kejadian penting. Selidiki sebelum memutuskan." }
+          ],
+          "formula": { "lines": ["persen kosong = data kosong ÷ total × 100", "baris unik = total − duplikat"], "readAloud": "Persen kosong adalah data kosong dibagi total, dikali seratus." },
+          "commonMistake": "Membuang outlier tanpa mencari tahu penyebabnya.",
+          "realTask": "Ambil data sensor sehari, hitung persen data kosong dan temukan satu nilai yang mencurigakan.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa outlier tidak langsung dibuang?",
+          "reviewItems": [ { "id": "t22c1r1", "front": "Apa tanda sensor macet?", "back": "Nilai yang persis sama berulang dalam waktu lama." } ]
+        },
+        {
+          "chunkId": "t22c2",
+          "title": "Label yang konsisten",
+          "goal": "Setelah ini kamu bisa mengukur kesepakatan antar pelabel dan memperbaikinya.",
+          "terms": [
+            { "term": "pelabel", "plain": "orang yang memberi label pada data" },
+            { "term": "kesepakatan", "plain": "persentase contoh yang diberi label sama oleh dua pelabel" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Dua penjaga menilai 10 monster: 'getar tinggi' atau 'getar normal'." },
+            { "who": "Rune", "text": "Mereka tidak selalu sependapat." }
+          ],
+          "guess": { "question": "Mereka sama pada 7 dari 10 contoh. Berapa kesepakatan mereka?", "options": ["70%", "7%", "30%", "100%"], "correctIndex": 0, "reveal": "Kita hitung dan perbaiki." },
+          "visual": { "type": "dotGrid", "total": 10, "columns": 5, "groups": [ { "id": "setuju", "count": 7, "label": "Label sama" }, { "id": "beda", "count": 3, "label": "Label berbeda" } ] },
+          "steps": [
+            { "text": "Dua pelabel memberi label pada 10 contoh yang sama.", "highlight": [] },
+            { "text": "Mereka sama pada 7 contoh dan berbeda pada 3.", "highlight": ["setuju", "beda"] },
+            { "text": "Kesepakatan = 7 ÷ 10 = 0,7 = 70%.", "highlight": ["setuju"] },
+            { "text": "Bahas ketiga contoh yang berbeda, lalu tulis pedoman pelabelan yang lebih jelas.", "highlight": ["beda"] },
+            { "text": "Label 10 contoh baru dengan pedoman itu. Jika sama pada 9 contoh, kesepakatan = 90%.", "highlight": [] },
+            { "text": "Catatan: persen kesepakatan belum memperhitungkan kesepakatan karena kebetulan. Untuk mulai, ukuran ini sudah berguna.", "highlight": [] },
+            { "text": "Jadi pedoman tertulis dan pengukuran ulang membuat label lebih konsisten.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t22c2p1", "type": "fillNumber", "question": "Dua pelabel sama pada 15 dari 20 contoh. Berapa persen kesepakatan?", "answer": 75, "tolerance": 0, "unit": "%", "why": "15 ÷ 20 = 0,75 = 75%." },
+            { "id": "t22c2p2", "type": "fillNumber", "question": "Setelah pedoman diperbaiki, mereka sama pada 18 dari 20. Berapa persen?", "answer": 90, "tolerance": 0, "unit": "%", "why": "18 ÷ 20 = 0,9 = 90%." },
+            { "id": "t22c2p3", "type": "choice", "question": "Dua pelabel berbeda pada 4 dari 10 contoh. Langkah terbaik?", "options": ["Bahas contoh itu, perbarui pedoman, lalu ukur kesepakatan lagi", "Pilih salah satu label secara acak", "Hapus semua label", "Pakai label pelabel yang paling cepat"], "correctIndex": 0, "why": "Pedoman yang jelas dan pengukuran ulang meningkatkan konsistensi." }
+          ],
+          "formula": { "lines": ["kesepakatan = contoh dengan label sama ÷ total contoh × 100"], "readAloud": "Kesepakatan adalah jumlah contoh yang labelnya sama dibagi total, dikali seratus." },
+          "commonMistake": "Melabel tanpa pedoman tertulis, sehingga tiap pelabel punya standar sendiri.",
+          "realTask": "Minta satu temanmu melabel 20 contoh yang sama denganmu, lalu hitung kesepakatannya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa pedoman pelabelan perlu ditulis?",
+          "reviewItems": [ { "id": "t22c2r1", "front": "Cara meningkatkan konsistensi label?", "back": "Tulis pedoman, bahas contoh yang berbeda, lalu ukur kesepakatan lagi." } ]
+        },
+        {
+          "chunkId": "t22c3",
+          "title": "Kelas tidak seimbang dan bobot kelas",
+          "goal": "Setelah ini kamu bisa menghitung bobot kelas 'balanced' dan menjelaskan mengapa akurasi menyesatkan.",
+          "terms": [
+            { "term": "kelas minoritas", "plain": "kelas yang jauh lebih jarang daripada yang lain" },
+            { "term": "bobot kelas", "plain": "angka pengali yang membuat kelas jarang lebih diperhatikan" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Di 1.000 catatan mesin, hanya 50 yang berisi kerusakan." },
+            { "who": "Rune", "text": "Detektor malas selalu bilang 'normal'. Berapa nilainya?" }
+          ],
+          "guess": { "question": "Detektor selalu menjawab 'normal'. Berapa akurasinya?", "options": ["95%", "50%", "5%", "100%"], "correctIndex": 0, "reveal": "Tinggi, tetapi menipu. Mari kita ukur." },
+          "visual": { "type": "dotGrid", "total": 100, "columns": 10, "groups": [ { "id": "normal", "count": 95, "label": "Normal (tiap kotak = 10 catatan)" }, { "id": "rusak", "count": 5, "label": "Rusak (tiap kotak = 10 catatan)" } ] },
+          "steps": [
+            { "text": "Dari 1.000 catatan: 950 normal, 50 rusak.", "highlight": ["normal", "rusak"] },
+            { "text": "Detektor selalu 'normal': benar pada 950 dari 1.000. Akurasi = 95%.", "highlight": ["normal"] },
+            { "text": "Tetapi dari 50 kerusakan, yang tertangkap 0. Recall kelas rusak = 0%.", "highlight": ["rusak"] },
+            { "text": "Bobot kelas balanced = total ÷ (jumlah kelas × jumlah anggota kelas).", "highlight": [] },
+            { "text": "Bobot kelas rusak = 1.000 ÷ (2 × 50) = 10. Bobot kelas normal = 1.000 ÷ (2 × 950) ≈ 0,53.", "highlight": [] },
+            { "text": "Cek: 950 × 0,526 ≈ 500 dan 50 × 10 = 500. Kedua kelas kini punya pengaruh yang sama.", "highlight": [] },
+            { "text": "Jadi bobot membuat kelas langka lebih diperhatikan, dan akurasi saja tidak cukup untuk menilai.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t22c3p1", "type": "fillNumber", "question": "500 sampel: 400 normal dan 100 anomali. Berapa bobot balanced untuk anomali?", "answer": 2.5, "tolerance": 0.001, "unit": "", "why": "500 ÷ (2 × 100) = 2,5." },
+            { "id": "t22c3p2", "type": "fillNumber", "question": "Pada data yang sama, berapa bobot balanced untuk kelas normal?", "answer": 0.625, "tolerance": 0.001, "unit": "", "why": "500 ÷ (2 × 400) = 0,625." },
+            { "id": "t22c3p3", "type": "choice", "question": "Detektor selalu menebak 'normal' pada data itu (400 normal, 100 anomali). Hasilnya?", "options": ["Akurasi 80%, tetapi recall anomali 0%", "Akurasi 20%, recall 100%", "Akurasi 100%", "Akurasi 50%, recall 50%"], "correctIndex": 0, "why": "400 dari 500 benar (80%), tetapi tidak satu pun anomali tertangkap." }
+          ],
+          "formula": { "lines": ["bobot balanced = n_sampel ÷ (n_kelas × n_sampel_kelas)"], "readAloud": "Bobot kelas sama dengan total sampel dibagi jumlah kelas kali anggota kelas itu." },
+          "commonMistake": "Hanya melihat akurasi ketika satu kelas jauh lebih sedikit daripada yang lain.",
+          "realTask": "Hitung proporsi tiap kelas di datamu dan tulis bobot balanced untuk tiap kelas.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa akurasi 95% bisa tidak berguna?",
+          "reviewItems": [ { "id": "t22c3r1", "front": "Rumus bobot kelas balanced?", "back": "n_sampel ÷ (n_kelas × n_sampel_kelas)" } ]
+        }
+      ]
+    },
+    {
+      "topicId": 23,
+      "chunks": [
+        {
+          "chunkId": "t23c1",
+          "title": "ADC: dari tegangan ke angka",
+          "goal": "Setelah ini kamu bisa mengubah bacaan ADC menjadi tegangan.",
+          "terms": [
+            { "term": "ADC", "plain": "bagian yang mengubah tegangan menjadi angka yang bisa dibaca program" },
+            { "term": "V_ref", "plain": "tegangan acuan; batas atas yang bisa diukur ADC" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Sensor analog mengeluarkan tegangan, bukan angka." },
+            { "who": "Rune", "text": "ADC adalah penerjemah: tegangan masuk, angka keluar." }
+          ],
+          "guess": { "question": "ADC 12-bit punya berapa level?", "options": ["4.096", "1.024", "12", "2.048"], "correctIndex": 0, "reveal": "Kita hitung 2 pangkat 12." },
+          "visual": { "type": "linePlot", "points": [[0, 0], [1024, 0.825], [2048, 1.65], [3072, 2.475]] },
+          "steps": [
+            { "text": "ADC N-bit membagi rentang tegangan menjadi 2^N level. Untuk 12-bit: 2^12 = 4.096.", "highlight": [] },
+            { "text": "Rumus tegangan: bacaan ÷ 4.096 × V_ref.", "highlight": [] },
+            { "text": "Dengan V_ref 3,3 V dan bacaan 2048: 2048 ÷ 4096 × 3,3 = 1,65 V.", "highlight": ["x2048"] },
+            { "text": "Bacaan 3072: 3072 ÷ 4096 = 0,75. Lalu 0,75 × 3,3 = 2,475 V.", "highlight": ["x3072"] },
+            { "text": "Satu langkah ADC = 3,3 ÷ 4096 ≈ 0,0008 V, atau sekitar 0,8 mV.", "highlight": [] },
+            { "text": "Jadi makin banyak bit, makin halus langkahnya. Bacaan maksimum 4.095, sedikit di bawah V_ref.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t23c1p1", "type": "fillNumber", "question": "ADC 10-bit, V_ref 5 V, bacaan 256. Berapa tegangannya?", "answer": 1.25, "tolerance": 0.001, "unit": "V", "why": "256 ÷ 1024 × 5 = 1,25." },
+            { "id": "t23c1p2", "type": "fillNumber", "question": "Berapa level yang dimiliki ADC 8-bit?", "answer": 256, "tolerance": 0, "unit": "", "why": "2^8 = 256." },
+            { "id": "t23c1p3", "type": "fillNumber", "question": "ADC 12-bit, V_ref 3,3 V, bacaan 512. Berapa tegangannya? (empat angka desimal)", "answer": 0.4125, "tolerance": 0.001, "unit": "V", "why": "512 ÷ 4096 × 3,3 = 0,4125." }
+          ],
+          "formula": { "lines": ["jumlah level = 2^N", "tegangan = bacaan ÷ 2^N × V_ref"], "readAloud": "Tegangan sama dengan bacaan dibagi dua pangkat N, dikali tegangan acuan." },
+          "commonMistake": "Lupa menyesuaikan V_ref saat mengganti papan atau sensor.",
+          "realTask": "Baca satu sensor analog, catat bacaan mentahnya, lalu hitung tegangannya dengan rumus di atas.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang dilakukan ADC?",
+          "reviewItems": [ { "id": "t23c1r1", "front": "Rumus tegangan dari bacaan ADC?", "back": "bacaan ÷ 2^N × V_ref" } ]
+        },
+        {
+          "chunkId": "t23c2",
+          "title": "Kalibrasi dua titik",
+          "goal": "Setelah ini kamu bisa mengubah bacaan sensor menjadi nilai sebenarnya dengan kalibrasi dua titik.",
+          "terms": [
+            { "term": "kalibrasi", "plain": "menyesuaikan bacaan sensor dengan nilai acuan yang benar" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Sensormu membaca 12 saat air es (0 °C) dan 92 saat air 40 °C." },
+            { "who": "Kamu", "text": "Berarti bacaannya tidak langsung sama dengan suhu." },
+            { "who": "Rune", "text": "Betul. Kita petakan dengan garis lurus." }
+          ],
+          "guess": { "question": "Dari dua titik itu, saat bacaan naik 80 (12 ke 92), suhu naik 40. Tiap kenaikan 1 bacaan = berapa °C?", "options": ["0,5", "2", "40", "80"], "correctIndex": 0, "reveal": "Itu kemiringan garisnya. Kita lanjutkan." },
+          "visual": { "type": "linePlot", "points": [[12, 0], [92, 40]], "line": { "m": 0.5, "c": -6 } },
+          "steps": [
+            { "text": "Dua titik acuan: bacaan 12 ↔ 0 °C dan bacaan 92 ↔ 40 °C.", "highlight": [] },
+            { "text": "Kemiringan a = (40 − 0) ÷ (92 − 12) = 40 ÷ 80 = 0,5.", "highlight": ["line"] },
+            { "text": "Titik awal b = 0 − 0,5 × 12 = −6.", "highlight": [] },
+            { "text": "Rumus kalibrasi: suhu = 0,5 × bacaan − 6.", "highlight": ["line"] },
+            { "text": "Untuk bacaan 52: suhu = 0,5 × 52 − 6 = 26 − 6 = 20 °C.", "highlight": [] },
+            { "text": "Cek dengan titik acuan: bacaan 92 memberi 0,5 × 92 − 6 = 40 °C. Cocok.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t23c2p1", "type": "fillNumber", "question": "Bacaan 20 saat 0 °C dan 220 saat 100 °C. Berapa suhu untuk bacaan 120?", "answer": 50, "tolerance": 0.001, "unit": "°C", "why": "a = 100 ÷ 200 = 0,5. b = 0 − 0,5×20 = −10. Suhu = 0,5×120 − 10 = 50." },
+            { "id": "t23c2p2", "type": "fillNumber", "question": "Bacaan 5 saat 10 °C dan 45 saat 30 °C. Berapa kemiringan a?", "answer": 0.5, "tolerance": 0.001, "unit": "", "why": "a = (30 − 10) ÷ (45 − 5) = 20 ÷ 40 = 0,5." },
+            { "id": "t23c2p3", "type": "choice", "question": "Mengapa titik acuan kalibrasi harus berasal dari alat atau kondisi yang benar?", "options": ["Karena garis kalibrasi mewarisi kesalahan acuannya", "Agar bacaan lebih besar", "Agar sensor lebih murah", "Agar tidak perlu rumus"], "correctIndex": 0, "why": "Jika acuan salah, seluruh hasil kalibrasi ikut salah." }
+          ],
+          "formula": { "lines": ["a = (y2 − y1) ÷ (x2 − x1)", "b = y1 − a·x1", "nilai sebenarnya = a·bacaan + b"], "readAloud": "Kemiringan adalah selisih nilai sebenarnya dibagi selisih bacaan. Titik awal dihitung dari titik pertama." },
+          "commonMistake": "Memakai satu titik acuan saja, padahal sensor bisa meleset berbeda di rentang yang berbeda.",
+          "realTask": "Ukur dua kondisi dengan acuan yang kamu percaya, lalu hitung a dan b untuk sensormu.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa arti angka a dan b pada kalibrasi?",
+          "reviewItems": [ { "id": "t23c2r1", "front": "Rumus kalibrasi dua titik?", "back": "a = (y2 − y1) ÷ (x2 − x1); b = y1 − a·x1; nilai = a·bacaan + b" } ]
+        },
+        {
+          "chunkId": "t23c3",
+          "title": "MQTT: topik dan QoS",
+          "goal": "Setelah ini kamu bisa menyusun topik MQTT dan memilih QoS yang sesuai.",
+          "terms": [
+            { "term": "broker", "plain": "kantor pos yang menerima dan meneruskan pesan MQTT" },
+            { "term": "QoS", "plain": "tingkat jaminan pengiriman pesan" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Banyak sensor, banyak pembaca. Mereka tidak bicara langsung." },
+            { "who": "Rune", "text": "Semua lewat broker, seperti kantor pos yang meneruskan surat ke yang berlangganan." }
+          ],
+          "guess": { "question": "Ada 3 sensor, tiap sensor mengirim 1 pesan per detik. Berapa pesan per detik di broker?", "options": ["3", "1", "30", "86.400"], "correctIndex": 0, "reveal": "Mari kita hitung dan lihat tingkat jaminannya." },
+          "visual": { "type": "codeBlock", "lines": ["# topik disusun bertingkat dengan garis miring", "pabrik/mesin1/suhu", "pabrik/mesin1/getar", "pabrik/mesin2/suhu", "# berlangganan semua suhu: pabrik/+/suhu"] },
+          "steps": [
+            { "text": "Sensor mengirim (publish) pesan ke sebuah topik. Pembaca berlangganan (subscribe) ke topik itu.", "highlight": [] },
+            { "text": "Topik disusun bertingkat, misalnya pabrik/mesin1/suhu.", "highlight": ["l2"] },
+            { "text": "Tanda + menggantikan satu tingkat. Langganan pabrik/+/suhu menerima suhu dari semua mesin.", "highlight": ["l5"] },
+            { "text": "QoS 0: paling banyak sekali, pesan bisa hilang. QoS 1: minimal sekali, pesan bisa dobel. QoS 2: tepat sekali.", "highlight": [] },
+            { "text": "Jumlah pesan: 2 sensor × 1 pesan per detik × 3.600 detik = 7.200 pesan per jam.", "highlight": [] },
+            { "text": "Pilih QoS menurut taruhannya. Data rutin yang boleh hilang cukup QoS 0. Perintah yang tidak boleh dobel butuh QoS 2.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t23c3p1", "type": "fillNumber", "question": "4 sensor, tiap sensor 1 pesan per detik. Berapa pesan per jam?", "answer": 14400, "tolerance": 0, "unit": "", "why": "4 × 3.600 = 14.400." },
+            { "id": "t23c3p2", "type": "match", "question": "Cocokkan QoS dengan artinya.", "pairs": [ { "left": "QoS 0", "right": "paling banyak sekali (bisa hilang)" }, { "left": "QoS 1", "right": "minimal sekali (bisa dobel)" }, { "left": "QoS 2", "right": "tepat sekali" } ], "why": "Makin tinggi QoS, makin kuat jaminannya dan makin berat prosesnya." },
+            { "id": "t23c3p3", "type": "choice", "question": "Log suhu dikirim tiap detik, dan kehilangan satu-dua pesan tidak masalah. QoS paling ringan yang cukup?", "options": ["QoS 0", "QoS 1", "QoS 2", "Tidak perlu QoS"], "correctIndex": 0, "why": "Data rutin yang boleh hilang tidak perlu jaminan yang berat." }
+          ],
+          "formula": { "lines": ["QoS 0 = paling banyak sekali; QoS 1 = minimal sekali; QoS 2 = tepat sekali", "pesan per jam = sensor × pesan per detik × 3.600"], "readAloud": "QoS nol bisa hilang, satu bisa dobel, dua tepat sekali." },
+          "commonMistake": "Memakai QoS 0 untuk perintah penting lewat jaringan yang tidak stabil.",
+          "realTask": "Susun tiga topik MQTT untuk proyekmu, lalu pilih QoS untuk tiap topik beserta alasannya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa tidak semua pesan memakai QoS 2?",
+          "reviewItems": [ { "id": "t23c3r1", "front": "Arti QoS 0, 1, 2 pada MQTT?", "back": "Paling banyak sekali, minimal sekali, tepat sekali." } ]
+        },
+        {
+          "chunkId": "t23c4",
+          "title": "I²C: dua jalur, banyak perangkat",
+          "goal": "Setelah ini kamu bisa menjelaskan cara kerja alamat I²C dan mencegah benturan alamat.",
+          "terms": [
+            { "term": "SDA dan SCL", "plain": "dua jalur I²C: SDA untuk data, SCL untuk jam" },
+            { "term": "alamat", "plain": "nomor pengenal tiap perangkat di jalur I²C" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Satu jalan, banyak rumah. Tiap rumah punya nomor." },
+            { "who": "Rune", "text": "Begitu I²C: dua jalur dipakai bersama, dan tiap perangkat punya alamat." }
+          ],
+          "guess": { "question": "Dua sensor memakai alamat yang sama di satu jalur. Apa yang terjadi?", "options": ["Terjadi benturan: keduanya menjawab bersamaan", "Tidak ada masalah", "Perangkat lebih cepat", "Dua jalur bertambah"], "correctIndex": 0, "reveal": "Kita lihat cara menghindarinya." },
+          "visual": { "type": "codeBlock", "lines": ["# contoh hasil pemindaian alamat (angka hanya contoh)", "0x3C  layar kecil", "0x76  sensor suhu A", "0x77  sensor suhu B"] },
+          "steps": [
+            { "text": "I²C memakai dua jalur: SDA (data) dan SCL (jam). Banyak perangkat berbagi jalur yang sama.", "highlight": [] },
+            { "text": "Tiap perangkat punya alamat. Pemindaian menunjukkan alamat yang ada di jalur.", "highlight": ["l2", "l3", "l4"] },
+            { "text": "Alamat 7-bit punya 2^7 = 128 kemungkinan nilai.", "highlight": [] },
+            { "text": "Jika dua sensor beralamat sama, benturan terjadi. Pilih tipe dengan alamat berbeda, atau atur pin alamat bila ada.", "highlight": [] },
+            { "text": "Jalur I²C butuh resistor pull-up agar jalur kembali tinggi saat tidak ditarik turun.", "highlight": [] },
+            { "text": "Jadi jika pemindaian tidak menemukan perangkat, periksa kabel SDA dan SCL, alamat, dan pull-up.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t23c4p1", "type": "fillNumber", "question": "Berapa kemungkinan nilai alamat I²C 7-bit (2^7)?", "answer": 128, "tolerance": 0, "unit": "", "why": "2^7 = 128." },
+            { "id": "t23c4p2", "type": "choice", "question": "Dua sensor memakai alamat yang sama di satu jalur I²C. Solusi masuk akal?", "options": ["Pilih tipe atau pengaturan dengan alamat berbeda", "Tambahkan lebih banyak sensor", "Putus jalur SCL", "Abaikan"], "correctIndex": 0, "why": "Tiap perangkat di satu jalur harus punya alamat yang berbeda." },
+            { "id": "t23c4p3", "type": "choice", "question": "Pemindaian I²C tidak menemukan perangkat apa pun. Hal pertama yang diperiksa?", "options": ["Sambungan SDA, SCL, daya, dan pull-up", "Warna kabel", "Ukuran model", "Learning rate"], "correctIndex": 0, "why": "Kebanyakan masalah I²C berasal dari sambungan, alamat, atau pull-up." }
+          ],
+          "formula": { "lines": ["I²C: SDA (data) + SCL (jam); tiap perangkat punya alamat; jalur butuh pull-up"], "readAloud": "Dua jalur dipakai bersama. Tiap perangkat punya alamat sendiri." },
+          "commonMistake": "Memasang dua perangkat beralamat sama di satu jalur.",
+          "realTask": "Sambungkan satu sensor I²C dan jalankan pemindaian alamat. Catat alamat yang muncul.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa tiap perangkat I²C butuh alamat berbeda?",
+          "reviewItems": [ { "id": "t23c4r1", "front": "Apa dua jalur I²C?", "back": "SDA (data) dan SCL (jam)." } ]
+        },
+        {
+          "chunkId": "t23c5",
+          "title": "Daya baterai dan duty cycle",
+          "goal": "Setelah ini kamu bisa memperkirakan umur baterai dari arus rata-rata.",
+          "terms": [
+            { "term": "mAh", "plain": "kapasitas baterai: berapa mA yang bisa dialirkan selama satu jam" },
+            { "term": "duty cycle", "plain": "persentase waktu perangkat aktif" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Sensor jarak jauh memakai baterai. Ia tidak perlu terjaga terus-menerus." },
+            { "who": "Rune", "text": "Ia bisa tidur, bangun sebentar, mengukur, lalu tidur lagi." }
+          ],
+          "guess": { "question": "Baterai 2.000 mAh dengan arus rata-rata 50 mA. Perkiraan umur?", "options": ["40 jam", "100 jam", "4 jam", "25 jam"], "correctIndex": 0, "reveal": "Mari kita lihat dengan tidur." },
+          "steps": [
+            { "text": "Umur (jam) ≈ kapasitas (mAh) ÷ arus rata-rata (mA). Contoh: 2.000 ÷ 50 = 40 jam.", "highlight": [] },
+            { "text": "Sekarang pakai tidur. Perangkat aktif 100 mA selama 10% waktu, dan tidur 1 mA selama 90% waktu.", "highlight": [] },
+            { "text": "Arus rata-rata = 0,1 × 100 + 0,9 × 1 = 10 + 0,9 = 10,9 mA.", "highlight": [] },
+            { "text": "Umur ≈ 2.000 ÷ 10,9 ≈ 183,5 jam, atau sekitar 7,6 hari.", "highlight": [] },
+            { "text": "Tanpa tidur (selalu 100 mA): 2.000 ÷ 100 = 20 jam. Tidur membuat umur sekitar 9 kali lebih panjang.", "highlight": [] },
+            { "text": "Catatan: ini perkiraan kasar. Suhu dan penuaan baterai memengaruhi umur sebenarnya.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t23c5p1", "type": "fillNumber", "question": "Baterai 1.500 mAh, arus rata-rata 30 mA. Berapa jam umurnya?", "answer": 50, "tolerance": 0, "unit": "jam", "why": "1.500 ÷ 30 = 50." },
+            { "id": "t23c5p2", "type": "fillNumber", "question": "Aktif 80 mA selama 25% waktu dan tidur 2 mA selama 75% waktu. Berapa arus rata-ratanya?", "answer": 21.5, "tolerance": 0.001, "unit": "mA", "why": "0,25 × 80 + 0,75 × 2 = 20 + 1,5 = 21,5." },
+            { "id": "t23c5p3", "type": "choice", "question": "Cara paling efektif memperpanjang umur baterai?", "options": ["Menurunkan arus rata-rata, misalnya dengan tidur lebih lama", "Menaikkan arus aktif", "Mengurangi kapasitas baterai", "Mengirim data lebih sering"], "correctIndex": 0, "why": "Umur berbanding terbalik dengan arus rata-rata." }
+          ],
+          "formula": { "lines": ["umur (jam) ≈ kapasitas (mAh) ÷ arus rata-rata (mA)", "arus rata-rata = Σ (arus × bagian waktu)"], "readAloud": "Umur baterai sama dengan kapasitas dibagi arus rata-rata." },
+          "commonMistake": "Memakai arus saat aktif sebagai arus rata-rata.",
+          "realTask": "Ukur arus aktif dan arus tidur perangkatmu, lalu hitung perkiraan umur baterainya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa tidur memperpanjang umur baterai?",
+          "reviewItems": [ { "id": "t23c5r1", "front": "Rumus perkiraan umur baterai?", "back": "kapasitas (mAh) ÷ arus rata-rata (mA)" } ]
+        },
+        {
+          "chunkId": "t23c6",
+          "title": "Laju sampling (Nyquist)",
+          "goal": "Setelah ini kamu bisa menentukan laju sampling minimal dan mengenali aliasing.",
+          "terms": [
+            { "term": "laju sampling", "plain": "berapa kali per detik sensor diambil sampelnya" },
+            { "term": "aliasing", "plain": "sinyal cepat tampak sebagai frekuensi yang lebih rendah karena sampling terlalu lambat" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Roda kereta di film kadang tampak berputar mundur." },
+            { "who": "Rune", "text": "Kamera mengambil gambar terlalu jarang, jadi gerakan cepat tampak lain." }
+          ],
+          "guess": { "question": "Getaran 50 Hz. Laju sampling minimal agar tidak salah baca?", "options": ["100 Hz", "50 Hz", "25 Hz", "10 Hz"], "correctIndex": 0, "reveal": "Itu aturan Nyquist." },
+          "steps": [
+            { "text": "Aturan Nyquist: laju sampling harus minimal 2 kali frekuensi tertinggi sinyal.", "highlight": [] },
+            { "text": "Getaran 50 Hz butuh sampling minimal 2 × 50 = 100 Hz.", "highlight": [] },
+            { "text": "Jika disampel hanya 60 Hz, sinyal 50 Hz tampak sebagai |50 − 60| = 10 Hz. Itu aliasing.", "highlight": [] },
+            { "text": "Maka data 10 Hz itu palsu, dan model akan belajar pola yang tidak ada.", "highlight": [] },
+            { "text": "Dalam praktik, pakai margin lebih dari 2 kali, karena sinyal nyata tidak sempurna.", "highlight": [] },
+            { "text": "Jadi tentukan frekuensi tertinggi yang penting, lalu atur sampling di atas dua kalinya.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t23c6p1", "type": "fillNumber", "question": "Getaran 120 Hz. Berapa laju sampling minimal?", "answer": 240, "tolerance": 0, "unit": "Hz", "why": "2 × 120 = 240." },
+            { "id": "t23c6p2", "type": "fillNumber", "question": "Sampling 100 Hz. Berapa frekuensi tertinggi yang masih aman?", "answer": 50, "tolerance": 0, "unit": "Hz", "why": "100 ÷ 2 = 50." },
+            { "id": "t23c6p3", "type": "fillNumber", "question": "Sinyal 70 Hz disampel 100 Hz. Tampak sebagai berapa Hz?", "answer": 30, "tolerance": 0, "unit": "Hz", "why": "|70 − 100| = 30 Hz (aliasing)." }
+          ],
+          "formula": { "lines": ["laju sampling ≥ 2 × frekuensi tertinggi"], "readAloud": "Laju sampling minimal dua kali frekuensi tertinggi sinyal." },
+          "commonMistake": "Menetapkan laju sampling dari kebiasaan tanpa memeriksa frekuensi sinyal yang penting.",
+          "realTask": "Catat frekuensi tertinggi yang penting di sensormu, lalu hitung laju sampling minimalnya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa sampling yang terlalu lambat menghasilkan data palsu?",
+          "reviewItems": [ { "id": "t23c6r1", "front": "Aturan Nyquist?", "back": "Laju sampling minimal 2 kali frekuensi tertinggi sinyal." } ]
+        }
+      ]
+    },
+    {
+      "topicId": 24,
+      "chunks": [
+        {
+          "chunkId": "t24c1",
+          "title": "Baseline dan peningkatan",
+          "goal": "Setelah ini kamu bisa menentukan baseline dan menghitung seberapa besar model memperbaikinya.",
+          "terms": [
+            { "term": "baseline", "plain": "tebakan atau aturan sederhana sebagai pembanding" },
+            { "term": "peningkatan relatif", "plain": "seberapa banyak galat berkurang dibanding galat baseline" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Modelmu mendapat MAE 0,8. Bagus atau tidak?" },
+            { "who": "Rune", "text": "Jawabannya tergantung pembandingnya." }
+          ],
+          "guess": { "question": "MAE baseline 1,0 dan MAE model 0,8. Berapa persen peningkatannya?", "options": ["20%", "80%", "8%", "125%"], "correctIndex": 0, "reveal": "Kita hitung." },
+          "visual": { "type": "bars", "items": [ { "id": "base", "label": "MAE baseline", "value": 1 }, { "id": "model", "label": "MAE model", "value": 0.8 } ] },
+          "steps": [
+            { "text": "Baseline contoh: tebakan kelas mayoritas, atau nilai terakhir pada time series.", "highlight": [] },
+            { "text": "Jika 90% data adalah kelas A, baseline mayoritas mendapat akurasi 90%.", "highlight": [] },
+            { "text": "MAE baseline 1,0 dan MAE model 0,8. Selisih = 1,0 − 0,8 = 0,2.", "highlight": ["base", "model"] },
+            { "text": "Peningkatan relatif = 0,2 ÷ 1,0 × 100 = 20%.", "highlight": [] },
+            { "text": "Jika MAE model lebih besar dari baseline, modelmu lebih buruk daripada tebakan sederhana.", "highlight": [] },
+            { "text": "Jadi selalu laporkan baseline, supaya angka model punya makna.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t24c1p1", "type": "fillNumber", "question": "Dataset 85% kelas A. Berapa akurasi baseline yang selalu menebak A?", "answer": 85, "tolerance": 0, "unit": "%", "why": "Menebak A benar pada 85% contoh." },
+            { "id": "t24c1p2", "type": "fillNumber", "question": "MAE baseline 3,0 dan MAE model 2,1. Berapa persen peningkatannya?", "answer": 30, "tolerance": 0.01, "unit": "%", "why": "(3,0 − 2,1) ÷ 3,0 = 0,3 = 30%." },
+            { "id": "t24c1p3", "type": "choice", "question": "MAE baseline 1,5 dan MAE model 1,8. Kesimpulan?", "options": ["Model lebih buruk daripada baseline", "Model lebih baik", "Keduanya sama", "Tidak bisa dibandingkan"], "correctIndex": 0, "why": "Galat model lebih besar daripada baseline." }
+          ],
+          "formula": { "lines": ["peningkatan relatif = (galat baseline − galat model) ÷ galat baseline × 100"], "readAloud": "Selisih galat dibagi galat baseline, dikali seratus." },
+          "commonMistake": "Melaporkan skor model tanpa baseline.",
+          "realTask": "Hitung baseline sederhana untuk proyekmu dan bandingkan dengan modelmu.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa skor model butuh baseline?",
+          "reviewItems": [ { "id": "t24c1r1", "front": "Rumus peningkatan relatif?", "back": "(galat baseline − galat model) ÷ galat baseline × 100" } ]
+        },
+        {
+          "chunkId": "t24c2",
+          "title": "Analisis kesalahan",
+          "goal": "Setelah ini kamu bisa mengelompokkan kesalahan dan memilih perbaikan yang paling berdampak.",
+          "terms": [
+            { "term": "analisis kesalahan", "plain": "mengelompokkan kesalahan untuk mencari pola" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Modelmu salah pada 40 dari 200 contoh uji." },
+            { "who": "Kamu", "text": "Aku harus memperbaiki apa?" },
+            { "who": "Rune", "text": "Jangan menebak. Lihat di mana salahnya." }
+          ],
+          "guess": { "question": "Dari 40 galat, 34 terjadi pada data malam. Perbaikan mana yang paling berdampak?", "options": ["Fokus pada kondisi malam", "Fokus pada kondisi siang", "Menambah fitur acak", "Menunggu"], "correctIndex": 0, "reveal": "Kita buktikan dengan angka." },
+          "visual": { "type": "bars", "items": [ { "id": "siang", "label": "Galat siang", "value": 6 }, { "id": "malam", "label": "Galat malam", "value": 34 } ] },
+          "steps": [
+            { "text": "Data uji: 200 contoh, 100 siang dan 100 malam. Model salah 40 kali.", "highlight": [] },
+            { "text": "Galat total = 40 ÷ 200 = 20%.", "highlight": [] },
+            { "text": "Kelompokkan: siang 6 galat, malam 34 galat.", "highlight": ["siang", "malam"] },
+            { "text": "Galat siang = 6 ÷ 100 = 6%. Galat malam = 34 ÷ 100 = 34%.", "highlight": ["siang", "malam"] },
+            { "text": "Dari 40 galat, 34 terjadi malam: 34 ÷ 40 = 85%.", "highlight": ["malam"] },
+            { "text": "Jadi perbaiki kondisi malam dulu. Jika galat malam turun jadi 17, total galat 6 + 17 = 23, atau 11,5%.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t24c2p1", "type": "fillNumber", "question": "Dari 200 data uji, 30 salah. Berapa persen galat?", "answer": 15, "tolerance": 0, "unit": "%", "why": "30 ÷ 200 = 0,15 = 15%." },
+            { "id": "t24c2p2", "type": "fillNumber", "question": "Galat siang 6 dan malam 34 dari 200 data. Jika galat malam turun jadi 17, berapa persen galat total?", "answer": 11.5, "tolerance": 0.01, "unit": "%", "why": "(6 + 17) ÷ 200 = 0,115 = 11,5%." },
+            { "id": "t24c2p3", "type": "choice", "question": "Apa tujuan analisis kesalahan?", "options": ["Menemukan pola galat terbesar agar perbaikan tepat sasaran", "Menyembunyikan hasil buruk", "Menambah data uji", "Menaikkan learning rate"], "correctIndex": 0, "why": "Mengetahui di mana model paling sering salah mengarahkan usaha." }
+          ],
+          "formula": { "lines": ["galat kelompok = galat di kelompok ÷ jumlah kelompok × 100", "bagian galat = galat kelompok ÷ galat total × 100"], "readAloud": "Hitung galat tiap kelompok dan seberapa besar kontribusinya pada galat total." },
+          "commonMistake": "Memperbaiki secara acak tanpa mengetahui di mana galat terbesar.",
+          "realTask": "Kelompokkan galat modelmu menurut satu kondisi (misalnya waktu atau jenis data) dan tulis kelompok terbesarnya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kita mengelompokkan galat?",
+          "reviewItems": [ { "id": "t24c2r1", "front": "Apa tujuan analisis kesalahan?", "back": "Menemukan pola kesalahan terbesar agar perbaikan paling berdampak." } ]
+        },
+        {
+          "chunkId": "t24c3",
+          "title": "Hasil yang bisa diulang",
+          "goal": "Setelah ini kamu bisa mencatat pengaturan agar hasil bisa diulang dan melaporkan hasil dari beberapa seed.",
+          "terms": [
+            { "term": "seed", "plain": "angka awal yang mengatur keacakan" },
+            { "term": "rentang", "plain": "selisih nilai terbesar dan terkecil" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Kamu menjalankan eksperimen yang sama tiga kali. Hasilnya sedikit berbeda." },
+            { "who": "Kamu", "text": "Mana yang kulaporkan?" },
+            { "who": "Rune", "text": "Jangan memilih yang terbaik saja." }
+          ],
+          "guess": { "question": "Tiga seed memberi F1 0,80; 0,84; 0,82. Cara melaporkan yang jujur?", "options": ["Rata-rata dan rentangnya", "Hanya 0,84", "Hanya 0,80", "Tidak melaporkan"], "correctIndex": 0, "reveal": "Kita hitung." },
+          "steps": [
+            { "text": "Catat seed, versi data, versi kode, dan versi library tiap eksperimen.", "highlight": [] },
+            { "text": "Jalankan dengan 3 seed: 0,80; 0,84; 0,82.", "highlight": [] },
+            { "text": "Rata-rata = (0,80 + 0,84 + 0,82) ÷ 3 = 2,46 ÷ 3 = 0,82.", "highlight": [] },
+            { "text": "Rentang = 0,84 − 0,80 = 0,04.", "highlight": [] },
+            { "text": "Laporkan: 0,82 dengan rentang 0,80 sampai 0,84.", "highlight": [] },
+            { "text": "Melaporkan hanya 0,84 membesar-besarkan hasil, karena itu seed yang paling beruntung.", "highlight": [] },
+            { "text": "Jadi catatan lengkap dan laporan beberapa seed membuat hasilmu bisa dipercaya dan diulang.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t24c3p1", "type": "fillNumber", "question": "Empat seed memberi F1 0,76; 0,80; 0,78; 0,82. Berapa rata-ratanya?", "answer": 0.79, "tolerance": 0.001, "unit": "", "why": "(0,76 + 0,80 + 0,78 + 0,82) ÷ 4 = 3,16 ÷ 4 = 0,79." },
+            { "id": "t24c3p2", "type": "fillNumber", "question": "Berapa rentang dari empat nilai itu?", "answer": 0.06, "tolerance": 0.001, "unit": "", "why": "0,82 − 0,76 = 0,06." },
+            { "id": "t24c3p3", "type": "choice", "question": "Cara melaporkan hasil yang paling jujur?", "options": ["Rata-rata dan rentang dari beberapa seed, plus versi data dan kode", "Hanya hasil terbaik", "Hanya hasil pertama", "Tanpa catatan apa pun"], "correctIndex": 0, "why": "Memperlihatkan variasi dan menyertakan versi membuat hasil bisa diperiksa." }
+          ],
+          "formula": { "lines": ["rata-rata = jumlah ÷ banyaknya", "rentang = terbesar − terkecil"], "readAloud": "Laporkan rata-rata dan rentang dari beberapa seed." },
+          "commonMistake": "Melaporkan hanya seed terbaik.",
+          "realTask": "Jalankan eksperimenmu dengan 3 seed berbeda dan catat rata-rata serta rentangnya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kita tidak melaporkan hanya hasil terbaik?",
+          "reviewItems": [ { "id": "t24c3r1", "front": "Apa yang dicatat agar hasil bisa diulang?", "back": "Seed, versi data, versi kode, dan versi library." } ]
+        }
+      ]
+    },
+    {
+      "topicId": 25,
+      "chunks": [
+        {
+          "chunkId": "t25c1",
+          "title": "Membaca log dan mereproduksi bug",
+          "goal": "Setelah ini kamu bisa membaca log, menghitung tingkat galat, dan mereproduksi bug dengan langkah minimal.",
+          "terms": [
+            { "term": "log", "plain": "catatan kejadian program, lengkap dengan waktu dan tingkat penting" },
+            { "term": "reproduksi bug", "plain": "membuat bug muncul lagi dengan langkah yang jelas" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Aplikasimu sesekali berhenti tanpa pesan." },
+            { "who": "Rune", "text": "Menebak-nebak itu lambat. Biarkan log bercerita." }
+          ],
+          "guess": { "question": "Dari tiga baris log, baris mana yang paling mendesak?", "options": ["ERROR", "INFO", "WARNING", "Ketiganya sama"], "correctIndex": 0, "reveal": "Mari kita baca." },
+          "visual": { "type": "codeBlock", "lines": ["10:15:02 INFO     sensor terhubung", "10:15:07 WARNING  nilai suhu kosong, memakai nilai terakhir", "10:15:09 ERROR    gagal kirim ke broker (timeout)"] },
+          "steps": [
+            { "text": "Log memuat waktu, tingkat (INFO, WARNING, ERROR), dan pesan.", "highlight": ["l1", "l2", "l3"] },
+            { "text": "INFO: kejadian biasa. WARNING: ada yang janggal tetapi masih jalan. ERROR: sesuatu gagal.", "highlight": [] },
+            { "text": "Baris ERROR pukul 10:15:09: gagal kirim ke broker. Lihat apa yang terjadi sebelumnya, yaitu nilai suhu kosong pukul 10:15:07.", "highlight": ["l2", "l3"] },
+            { "text": "Hitung dampaknya: dari 1.000 baris, 25 ERROR. 25 ÷ 1.000 = 2,5%.", "highlight": [] },
+            { "text": "Reproduksi bug: cari langkah paling sedikit yang membuat ERROR itu muncul lagi.", "highlight": [] },
+            { "text": "Ubah satu hal pada satu waktu, lalu uji lagi. Catat penyebab dan perbaikannya.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t25c1p1", "type": "fillNumber", "question": "Log 2.000 baris memuat 30 baris ERROR. Berapa persen?", "answer": 1.5, "tolerance": 0.001, "unit": "%", "why": "30 ÷ 2.000 = 0,015 = 1,5%." },
+            { "id": "t25c1p2", "type": "order", "question": "Urutkan langkah debugging.", "items": ["Baca log di sekitar waktu masalah", "Cari langkah minimal yang memunculkan bug", "Ubah satu hal lalu uji lagi", "Catat penyebab dan perbaikannya"], "why": "Baca, reproduksi, ubah satu hal, lalu catat." },
+            { "id": "t25c1p3", "type": "choice", "question": "Mengapa log perlu mencatat waktu dan konteks?", "options": ["Agar kamu bisa menelusuri urutan kejadian sebelum masalah", "Agar log lebih pendek", "Agar program lebih cepat", "Agar tidak perlu tes"], "correctIndex": 0, "why": "Waktu dan konteks membuat penyebab lebih mudah ditemukan." }
+          ],
+          "formula": { "lines": ["baca log → reproduksi minimal → ubah satu hal → catat penyebab"], "readAloud": "Baca log, ulangi masalah dengan langkah sekecil mungkin, ubah satu hal, lalu catat." },
+          "commonMistake": "Mengubah banyak hal sekaligus sehingga tidak tahu perubahan mana yang memperbaiki.",
+          "realTask": "Tambahkan log dengan waktu dan tingkat ke program kecilmu, lalu picu satu ERROR dengan sengaja dan telusuri.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kita mengubah satu hal pada satu waktu?",
+          "reviewItems": [ { "id": "t25c1r1", "front": "Langkah debugging yang tertata?", "back": "Baca log, reproduksi minimal, ubah satu hal, lalu catat penyebabnya." } ]
+        },
+        {
+          "chunkId": "t25c2",
+          "title": "Peluang demo berhasil",
+          "goal": "Setelah ini kamu bisa menghitung peluang demo berhasil dan manfaat cadangan.",
+          "terms": [
+            { "term": "independen", "plain": "kegagalan satu bagian tidak memengaruhi bagian lain" },
+            { "term": "cadangan", "plain": "jalur lain yang dipakai bila jalur utama gagal" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Demo bergantung pada beberapa bagian: jaringan, sensor, dan perangkat." },
+            { "who": "Rune", "text": "Semuanya harus berhasil. Seberapa besar peluangnya?" }
+          ],
+          "guess": { "question": "Jaringan berhasil 90% dan sensor 95% (independen). Peluang keduanya berhasil?", "options": ["85,5%", "92,5%", "95%", "90%"], "correctIndex": 0, "reveal": "Kita kalikan." },
+          "steps": [
+            { "text": "Jika semua bagian harus berhasil dan independen, kalikan peluangnya.", "highlight": [] },
+            { "text": "Jaringan 0,9 dan sensor 0,95: 0,9 × 0,95 = 0,855 = 85,5%.", "highlight": [] },
+            { "text": "Peluang gabungan lebih kecil daripada bagian mana pun. Makin banyak bagian, makin kecil.", "highlight": [] },
+            { "text": "Sekarang cadangan: dua jalur independen masing-masing berhasil 70%. Peluang keduanya gagal = 0,3 × 0,3 = 0,09.", "highlight": [] },
+            { "text": "Peluang minimal satu berhasil = 1 − 0,09 = 0,91 = 91%.", "highlight": [] },
+            { "text": "Catatan: perhitungan ini mengandaikan kegagalan independen. Jika dua jalur memakai jaringan yang sama, cadangan itu kurang berguna.", "highlight": [] },
+            { "text": "Jadi cadangan yang benar-benar terpisah menaikkan peluang demo berjalan.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t25c2p1", "type": "fillNumber", "question": "Jaringan 85% dan sensor 95% (independen). Berapa persen peluang keduanya berhasil?", "answer": 80.75, "tolerance": 0.01, "unit": "%", "why": "0,85 × 0,95 = 0,8075 = 80,75%." },
+            { "id": "t25c2p2", "type": "fillNumber", "question": "Dua jalur independen masing-masing berhasil 60%. Berapa persen peluang minimal satu berhasil?", "answer": 84, "tolerance": 0.01, "unit": "%", "why": "Keduanya gagal: 0,4 × 0,4 = 0,16. Minimal satu berhasil: 1 − 0,16 = 0,84." },
+            { "id": "t25c2p3", "type": "choice", "question": "Makin banyak bagian yang semuanya harus berhasil, peluang demo...", "options": ["Makin kecil", "Makin besar", "Tetap", "Tidak berubah"], "correctIndex": 0, "why": "Mengalikan angka di bawah 1 menghasilkan angka yang lebih kecil." }
+          ],
+          "formula": { "lines": ["semua berhasil = p1 × p2 × ...", "minimal satu berhasil (jalur independen) = 1 − (1 − p1) × (1 − p2)"], "readAloud": "Semua berhasil: kalikan peluangnya. Minimal satu berhasil: satu kurang peluang semuanya gagal." },
+          "commonMistake": "Mengira dua cadangan yang memakai sumber daya yang sama bebas dari risiko yang sama.",
+          "realTask": "Daftar bagian-bagian demo proyekmu, tulis perkiraan peluang tiap bagian, dan hitung peluang gabungannya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa cadangan harus benar-benar terpisah?",
+          "reviewItems": [ { "id": "t25c2r1", "front": "Peluang semua bagian berhasil?", "back": "Kalikan peluang tiap bagian (jika independen)." } ]
+        },
+        {
+          "chunkId": "t25c3",
+          "title": "Rencana cadangan dan latihan",
+          "goal": "Setelah ini kamu bisa menyiapkan cadangan untuk tiap kemungkinan gagal dan menjadwalkan latihan.",
+          "terms": [
+            { "term": "rencana cadangan", "plain": "langkah yang disiapkan sebelumnya untuk dipakai saat sesuatu gagal" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Saat demo, kejutan pasti muncul. Jaringan putus, sensor macet, perangkat mati." },
+            { "who": "Rune", "text": "Petualang yang baik membawa tiga obor cadangan." }
+          ],
+          "guess": { "question": "Jaringan putus saat demo. Cadangan paling masuk akal?", "options": ["Mode offline atau data tersimpan lokal", "Berhenti presentasi", "Mengganti topik", "Menunggu jaringan"], "correctIndex": 0, "reveal": "Kita susun daftarnya." },
+          "steps": [
+            { "text": "Daftarkan kemungkinan gagal: jaringan, sensor, dan perangkat.", "highlight": [] },
+            { "text": "Jaringan gagal: pakai mode offline atau data tersimpan lokal.", "highlight": [] },
+            { "text": "Sensor gagal: putar ulang rekaman data sensor.", "highlight": [] },
+            { "text": "Perangkat gagal: tunjukkan video demo yang sudah direkam.", "highlight": [] },
+            { "text": "Latih tiap skenario kegagalan. 3 skenario × 2 kali × 8 menit = 48 menit.", "highlight": [] },
+            { "text": "Rekam video cadangan saat demo berjalan baik, jangan menunggu hari-H.", "highlight": [] },
+            { "text": "Jadi siapkan cadangan untuk tiap kemungkinan gagal dan latih dengan sengaja.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t25c3p1", "type": "fillNumber", "question": "4 skenario kegagalan × 2 kali latihan × 5 menit. Berapa menit total?", "answer": 40, "tolerance": 0, "unit": "menit", "why": "4 × 2 × 5 = 40." },
+            { "id": "t25c3p2", "type": "match", "question": "Cocokkan kegagalan dengan cadangannya.", "pairs": [ { "left": "Jaringan putus", "right": "mode offline atau data lokal" }, { "left": "Sensor macet", "right": "putar ulang rekaman data" }, { "left": "Perangkat mati", "right": "video demo cadangan" } ], "why": "Tiap kegagalan punya jalan keluar yang disiapkan lebih dulu." },
+            { "id": "t25c3p3", "type": "choice", "question": "Kapan paling baik merekam video demo cadangan?", "options": ["Saat demo berjalan baik, sebelum hari-H", "Setelah demo gagal", "Tidak perlu", "Di tengah presentasi"], "correctIndex": 0, "why": "Video cadangan hanya berguna jika sudah ada sebelum kamu membutuhkannya." }
+          ],
+          "formula": { "lines": ["daftar kemungkinan gagal → siapkan cadangan tiap daftar → latih tiap skenario"], "readAloud": "Daftarkan kemungkinan gagal, siapkan cadangan, lalu latih." },
+          "commonMistake": "Mencoba demo pertama kali di hari-H.",
+          "realTask": "Rekam video demo cadangan proyekmu dan simpan salinan data untuk pemutaran ulang.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa cadangan perlu dilatih, bukan hanya disiapkan?",
+          "reviewItems": [ { "id": "t25c3r1", "front": "Cadangan untuk jaringan, sensor, dan perangkat?", "back": "Mode offline atau data lokal, rekaman data, dan video demo." } ]
+        }
+      ]
+    },
+    {
+      "topicId": 26,
+      "chunks": [
+        {
+          "chunkId": "t26c1",
+          "title": "Anggaran waktu presentasi",
+          "goal": "Setelah ini kamu bisa membagi waktu presentasi dan menyisakan waktu tanya jawab.",
+          "terms": [
+            { "term": "anggaran waktu", "plain": "pembagian menit untuk tiap bagian presentasi" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Slot presentasimu 15 menit." },
+            { "who": "Rune", "text": "Jika kamu memakai semuanya untuk bicara, tidak ada waktu untuk pertanyaan." }
+          ],
+          "guess": { "question": "Slot 15 menit, presentasi 10 menit. Berapa menit untuk tanya jawab?", "options": ["5", "10", "3", "0"], "correctIndex": 0, "reveal": "Kita susun anggarannya." },
+          "steps": [
+            { "text": "Slot 15 menit, presentasi 10 menit, sisa tanya jawab 15 − 10 = 5 menit.", "highlight": [] },
+            { "text": "Bagi 10 menit: masalah 1, data 1,5, metode 2, hasil 2,5, demo 2, penutup 1.", "highlight": [] },
+            { "text": "Jumlah: 1 + 1,5 + 2 + 2,5 + 2 + 1 = 10 menit.", "highlight": [] },
+            { "text": "Bagian demo = 2 ÷ 10 = 20% dari waktu presentasi.", "highlight": [] },
+            { "text": "Jika waktu hampir habis, pertahankan hasil dan demo. Persingkat bagian metode.", "highlight": [] },
+            { "text": "Jadi susun anggaran sebelum menyusun slide, agar bagian terpenting tidak terpotong.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t26c1p1", "type": "fillNumber", "question": "Slot 25 menit, presentasi 15 menit. Berapa menit tanya jawab?", "answer": 10, "tolerance": 0, "unit": "menit", "why": "25 − 15 = 10." },
+            { "id": "t26c1p2", "type": "fillNumber", "question": "Bagian: masalah 1, data 2, metode 2, hasil 3, demo 3, penutup 1. Berapa total menit?", "answer": 12, "tolerance": 0, "unit": "menit", "why": "1 + 2 + 2 + 3 + 3 + 1 = 12." },
+            { "id": "t26c1p3", "type": "choice", "question": "Waktu hampir habis dan demo belum dimulai. Apa yang dipertahankan?", "options": ["Hasil dan demo; persingkat metode", "Semua detail metode", "Hanya slide pembuka", "Tidak ada"], "correctIndex": 0, "why": "Hasil dan demo adalah bukti yang paling dicari audiens." }
+          ],
+          "formula": { "lines": ["sisa tanya jawab = slot − durasi presentasi", "jumlah semua bagian ≤ durasi presentasi"], "readAloud": "Sisa tanya jawab adalah slot dikurangi presentasi. Jumlah bagian tidak boleh melebihi durasi." },
+          "commonMistake": "Menjelaskan semua detail teknis sampai kehabisan waktu sebelum hasil dan demo.",
+          "realTask": "Tulis anggaran waktu presentasi 10 menit untuk proyekmu dan latih dengan penghitung waktu.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: bagian mana yang akan kamu persingkat jika waktu mepet?",
+          "reviewItems": [ { "id": "t26c1r1", "front": "Bagian mana yang dipertahankan saat waktu mepet?", "back": "Hasil dan demo." } ]
+        },
+        {
+          "chunkId": "t26c2",
+          "title": "Satu slide, satu pesan",
+          "goal": "Setelah ini kamu bisa membuat slide hasil dengan satu pesan yang jelas.",
+          "terms": [
+            { "term": "pesan slide", "plain": "satu kesimpulan yang ingin diingat audiens dari slide itu" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Dua slide hasil. Slide A berisi tabel 40 baris. Slide B berisi satu grafik dan satu kalimat." },
+            { "who": "Kamu", "text": "Slide B pasti lebih mudah dipahami." }
+          ],
+          "guess": { "question": "Judul slide mana yang paling jelas pesannya?", "options": ["Model mengurangi galat 50% dibanding baseline", "Hasil", "Tabel metrik", "Lihat halaman berikutnya"], "correctIndex": 0, "reveal": "Kita periksa angkanya." },
+          "visual": { "type": "bars", "items": [ { "id": "base", "label": "Galat baseline (MAE)", "value": 2 }, { "id": "model", "label": "Galat model (MAE)", "value": 1 } ] },
+          "steps": [
+            { "text": "Satu slide membawa satu pesan. Pesannya ditulis sebagai judul.", "highlight": [] },
+            { "text": "Contoh data: MAE baseline 2,0 dan MAE model 1,0.", "highlight": ["base", "model"] },
+            { "text": "Penurunan = (2,0 − 1,0) ÷ 2,0 = 0,5 = 50%.", "highlight": [] },
+            { "text": "Judul: 'Model mengurangi galat 50% dibanding baseline'.", "highlight": [] },
+            { "text": "Tunjukkan grafik dua batang berlabel, bukan tabel 40 baris.", "highlight": ["base", "model"] },
+            { "text": "Jadi judul yang berisi pesan dan satu grafik membuat audiens menangkap hasilnya dalam hitungan detik.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t26c2p1", "type": "fillNumber", "question": "MAE baseline 2,0 dan MAE model 1,2. Berapa persen galat berkurang?", "answer": 40, "tolerance": 0.01, "unit": "%", "why": "(2,0 − 1,2) ÷ 2,0 = 0,4 = 40%." },
+            { "id": "t26c2p2", "type": "choice", "question": "Judul slide hasil mana yang paling baik?", "options": ["Model mengurangi galat 40% dibanding baseline", "Hasil", "Slide 7", "Tabel lengkap di halaman lampiran"], "correctIndex": 0, "why": "Judul yang menyatakan pesan membantu audiens langsung memahami." },
+            { "id": "t26c2p3", "type": "order", "question": "Urutkan alur presentasi.", "items": ["Masalah", "Data dan metode", "Hasil dibanding baseline", "Demo lalu batasan dan langkah berikutnya"], "why": "Dari konteks, ke bukti, lalu ke demo dan batasan." }
+          ],
+          "formula": { "lines": ["satu slide = satu pesan", "judul = pesan; visual = bukti"], "readAloud": "Satu slide satu pesan. Judul menyatakan pesan dan visual menjadi buktinya." },
+          "commonMistake": "Menaruh tabel metrik panjang di slide tanpa pesan yang jelas.",
+          "realTask": "Buat satu slide hasil untuk proyekmu dengan judul berisi pesan dan satu grafik perbandingan.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa pesan dari slide hasilmu?",
+          "reviewItems": [ { "id": "t26c2r1", "front": "Aturan satu slide?", "back": "Satu pesan, ditulis sebagai judul, dengan satu visual sebagai bukti." } ]
+        },
+        {
+          "chunkId": "t26c3",
+          "title": "Menjawab pertanyaan sulit",
+          "goal": "Setelah ini kamu bisa menjawab pertanyaan yang belum kamu ketahui jawabannya dengan jujur dan tertata.",
+          "terms": [
+            { "term": "pertanyaan sulit", "plain": "pertanyaan yang jawabannya belum kamu ketahui atau yang menyoroti kelemahan" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Seorang penguji bertanya: 'Mengapa model gagal pada malam hari?'" },
+            { "who": "Rune", "text": "Kamu belum tahu jawabannya." }
+          ],
+          "guess": { "question": "Respons yang paling baik?", "options": ["Mengakui belum tahu, menunjukkan data yang ada, dan menjelaskan langkah menyelidikinya", "Mengarang penjelasan", "Mengganti topik", "Berpura-pura tidak mendengar"], "correctIndex": 0, "reveal": "Kita susun polanya." },
+          "steps": [
+            { "text": "Langkah 1: akui dengan jujur bagian yang belum kamu ketahui.", "highlight": [] },
+            { "text": "Langkah 2: tunjukkan data yang kamu punya, misalnya galat malam 34% dibanding siang 6%.", "highlight": [] },
+            { "text": "Langkah 3: jelaskan langkah menyelidiki, misalnya memeriksa kualitas sensor malam hari.", "highlight": [] },
+            { "text": "Contoh kalimat: 'Saya belum tahu pasti. Datanya menunjukkan galat malam lebih tinggi. Saya akan memeriksa sensor malam.'", "highlight": [] },
+            { "text": "Jika slot tanya jawab 5 menit dan ada 5 pertanyaan, rata-rata tiap pertanyaan 1 menit.", "highlight": [] },
+            { "text": "Jadi jawaban yang jujur, berbasis data, dan berujung rencana membangun kepercayaan.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t26c3p1", "type": "fillNumber", "question": "Tanya jawab 6 menit dengan 3 pertanyaan. Berapa menit rata-rata per pertanyaan?", "answer": 2, "tolerance": 0, "unit": "menit", "why": "6 ÷ 3 = 2." },
+            { "id": "t26c3p2", "type": "order", "question": "Urutkan pola menjawab pertanyaan yang belum kamu ketahui.", "items": ["Akui bagian yang belum diketahui", "Tunjukkan data atau analisis yang ada", "Jelaskan langkah untuk menyelidiki", "Tutup dengan ringkas dan lanjut ke pertanyaan berikutnya"], "why": "Jujur, bukti, rencana, lalu lanjut." },
+            { "id": "t26c3p3", "type": "choice", "question": "Mengapa menyebut batasan sistem secara terbuka itu baik?", "options": ["Membangun kepercayaan dan menunjukkan kamu paham kapan model bisa gagal", "Membuat penguji bosan", "Menurunkan nilai pasti", "Tidak ada manfaat"], "correctIndex": 0, "why": "Kejujuran tentang batasan menunjukkan pemahaman." }
+          ],
+          "formula": { "lines": ["akui → tunjukkan data → rencana penyelidikan"], "readAloud": "Akui, tunjukkan data, lalu jelaskan rencana." },
+          "commonMistake": "Mengarang jawaban saat tidak tahu.",
+          "realTask": "Tulis lima pertanyaan tersulit tentang proyekmu, lalu latih menjawabnya dengan pola tiga langkah.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa mengakui belum tahu lebih baik daripada mengarang?",
+          "reviewItems": [ { "id": "t26c3r1", "front": "Pola menjawab pertanyaan yang belum diketahui?", "back": "Akui, tunjukkan data, jelaskan rencana penyelidikan." } ]
+        }
+      ]
+    },
+    {
+      "topicId": 27,
+      "chunks": [
+        {
+          "chunkId": "t27c1",
+          "title": "Menghitung jam efektif",
+          "goal": "Setelah ini kamu bisa menghitung jam efektif proyek dengan buffer.",
+          "terms": [
+            { "term": "buffer", "plain": "cadangan waktu untuk hal tak terduga" },
+            { "term": "jam efektif", "plain": "jam kerja nyata yang bisa dijanjikan setelah buffer" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Kamu punya 8 jam per minggu selama 6 minggu." },
+            { "who": "Rune", "text": "Tapi rencana jarang berjalan mulus. Sisihkan buffer." }
+          ],
+          "guess": { "question": "8 jam/minggu × 6 minggu dengan buffer 20%. Berapa jam efektif?", "options": ["38,4", "48", "40", "28,8"], "correctIndex": 0, "reveal": "Kita hitung." },
+          "steps": [
+            { "text": "Total jam = 8 × 6 = 48 jam.", "highlight": [] },
+            { "text": "Buffer 20% dari 48 = 9,6 jam.", "highlight": [] },
+            { "text": "Jam efektif = 48 − 9,6 = 38,4 jam. Cara cepat: 48 × 0,8 = 38,4.", "highlight": [] },
+            { "text": "Jika tugasmu butuh 50 jam, ada kekurangan 50 − 38,4 = 11,6 jam.", "highlight": [] },
+            { "text": "Kekurangan itu diatasi dengan memotong lingkup, bukan dengan mengurangi tidur.", "highlight": [] },
+            { "text": "Jadi hitung jam efektif sebelum menyetujui lingkup.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t27c1p1", "type": "fillNumber", "question": "6 jam/minggu × 8 minggu dengan buffer 25%. Berapa jam efektif?", "answer": 36, "tolerance": 0, "unit": "jam", "why": "6 × 8 = 48. 48 × 0,75 = 36." },
+            { "id": "t27c1p2", "type": "fillNumber", "question": "10 jam/minggu × 4 minggu dengan buffer 20%. Berapa jam efektif?", "answer": 32, "tolerance": 0, "unit": "jam", "why": "40 × 0,8 = 32." },
+            { "id": "t27c1p3", "type": "choice", "question": "Tugas butuh 50 jam sedangkan jam efektif 36. Langkah yang tepat?", "options": ["Potong lingkup ke MVP", "Kurangi tidur", "Abaikan tes", "Tambah tugas baru"], "correctIndex": 0, "why": "Lingkup harus disesuaikan dengan waktu yang realistis." }
+          ],
+          "formula": { "lines": ["jam efektif = jam per minggu × jumlah minggu × (1 − buffer)"], "readAloud": "Jam per minggu dikali jumlah minggu, dikali satu kurang buffer." },
+          "commonMistake": "Menghitung semua jam tanpa buffer.",
+          "realTask": "Hitung jam efektif proyekmu dan bandingkan dengan perkiraan jam tugas.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kita menyisihkan buffer?",
+          "reviewItems": [ { "id": "t27c1r1", "front": "Rumus jam efektif?", "back": "jam per minggu × minggu × (1 − buffer)" } ]
+        },
+        {
+          "chunkId": "t27c2",
+          "title": "MVP dan prioritas",
+          "goal": "Setelah ini kamu bisa memilih tugas inti yang masuk MVP dan menunda yang tambahan.",
+          "terms": [
+            { "term": "MVP", "plain": "versi terkecil yang sudah menjalankan alur utama dari awal sampai akhir" },
+            { "term": "tugas inti", "plain": "tugas yang wajib ada agar alur utama berjalan" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Kamu punya empat tugas dan waktu yang terbatas." },
+            { "who": "Rune", "text": "Tidak semua tugas sama pentingnya bagi alur utama." }
+          ],
+          "guess": { "question": "Jam efektif 28. Tugas inti totalnya 24 jam. Apakah semua tugas inti muat?", "options": ["Muat, dengan sisa 4 jam", "Tidak muat", "Tepat pas", "Tidak bisa dihitung"], "correctIndex": 0, "reveal": "Kita lihat tugasnya." },
+          "visual": { "type": "bars", "items": [ { "id": "A", "label": "A: ambil data sensor (inti)", "value": 10 }, { "id": "B", "label": "B: latih model sederhana (inti)", "value": 8 }, { "id": "D", "label": "D: catat hasil (inti)", "value": 6 }, { "id": "C", "label": "C: dashboard cantik (tambahan)", "value": 12 } ] },
+          "steps": [
+            { "text": "Tugas inti: A (10 jam), B (8 jam), D (6 jam). Tugas tambahan: C (12 jam).", "highlight": ["A", "B", "D", "C"] },
+            { "text": "Total tugas inti = 10 + 8 + 6 = 24 jam.", "highlight": ["A", "B", "D"] },
+            { "text": "Jam efektif 28. Sisa setelah tugas inti: 28 − 24 = 4 jam.", "highlight": [] },
+            { "text": "Tugas C butuh 12 jam, sedangkan sisanya hanya 4. Kekurangan 12 − 4 = 8 jam.", "highlight": ["C"] },
+            { "text": "Jadi C ditunda ke daftar 'nanti'. MVP berisi A, B, dan D yang menjalankan alur utama.", "highlight": [] },
+            { "text": "Jika masih ada waktu, tugas tambahan dikerjakan sesudah MVP selesai.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t27c2p1", "type": "fillNumber", "question": "Tugas inti 9 + 7 + 5 jam dan jam efektif 30. Berapa jam sisa?", "answer": 9, "tolerance": 0, "unit": "jam", "why": "Total inti 21. Sisa 30 − 21 = 9." },
+            { "id": "t27c2p2", "type": "fillNumber", "question": "Tugas tambahan 15 jam dan sisa 9 jam. Berapa jam kekurangannya?", "answer": 6, "tolerance": 0, "unit": "jam", "why": "15 − 9 = 6." },
+            { "id": "t27c2p3", "type": "choice", "question": "Apa itu MVP dalam proyek ini?", "options": ["Versi terkecil yang menjalankan alur utama dari awal sampai akhir", "Versi dengan semua fitur", "Versi tanpa data", "Versi yang paling indah"], "correctIndex": 0, "why": "MVP membuktikan alur utama berjalan sebelum fitur tambahan." }
+          ],
+          "formula": { "lines": ["sisa = jam efektif − jam tugas inti", "tugas tambahan masuk hanya jika jam butuh ≤ sisa"], "readAloud": "Kurangi jam efektif dengan jam tugas inti. Tugas tambahan masuk jika muat di sisa." },
+          "commonMistake": "Mengerjakan fitur tambahan sebelum alur utama berjalan.",
+          "realTask": "Daftar tugas proyekmu, tandai mana yang inti dan tambahan, lalu hitung sisa jam.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa dashboard cantik ditunda?",
+          "reviewItems": [ { "id": "t27c2r1", "front": "Apa itu MVP?", "back": "Versi terkecil yang menjalankan alur utama dari awal sampai akhir." } ]
+        },
+        {
+          "chunkId": "t27c3",
+          "title": "Rencana satu halaman dan catatan keputusan",
+          "goal": "Setelah ini kamu bisa menyusun rencana satu halaman dan mencatat keputusan penting.",
+          "terms": [
+            { "term": "catatan keputusan", "plain": "catatan singkat: keputusan, alasan, dan alternatif yang ditolak" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Dua bulan lagi kamu tidak akan ingat mengapa memilih model A, bukan model B." },
+            { "who": "Rune", "text": "Karena itu, tulis saat memutuskannya." }
+          ],
+          "guess": { "question": "Mana yang paling berguna ditulis saat memutuskan?", "options": ["Keputusan, alasan, dan alternatif yang ditolak", "Hanya tanggal", "Hanya nama file", "Tidak perlu menulis"], "correctIndex": 0, "reveal": "Kita lihat bentuknya." },
+          "steps": [
+            { "text": "Rencana satu halaman memuat tujuan, MVP, tonggak mingguan, risiko, dan rencana cadangan.", "highlight": [] },
+            { "text": "Catatan keputusan: 'Memilih model sederhana. Alasan: muat di perangkat. Alternatif ditolak: model besar (tidak muat).'", "highlight": [] },
+            { "text": "Risiko dihitung ke jadwal. Tugas 20 jam dengan buffer risiko 25%: 20 × 1,25 = 25 jam.", "highlight": [] },
+            { "text": "Tulis tonggak mingguan, misalnya minggu 1 data, minggu 2 baseline, minggu 3 model.", "highlight": [] },
+            { "text": "Tinjau rencana tiap minggu. Jika meleset, kurangi lingkup lebih awal.", "highlight": [] },
+            { "text": "Jadi satu halaman rencana dan catatan keputusan menjaga proyek solomu tetap terarah.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t27c3p1", "type": "fillNumber", "question": "Tugas 20 jam dengan buffer risiko 25%. Berapa jam yang dijadwalkan?", "answer": 25, "tolerance": 0, "unit": "jam", "why": "20 × 1,25 = 25." },
+            { "id": "t27c3p2", "type": "order", "question": "Urutkan bagian rencana satu halaman.", "items": ["Tujuan proyek", "MVP: versi terkecil yang berjalan", "Tonggak mingguan", "Risiko dan rencana cadangan"], "why": "Dari tujuan, ke inti, ke jadwal, lalu risiko." },
+            { "id": "t27c3p3", "type": "choice", "question": "Dokumentasi yang paling berguna saat proyek berjalan?", "options": ["Catatan singkat tiap keputusan penting beserta alasannya, ditulis saat terjadi", "Menunggu sampai akhir proyek", "Hanya komentar kode", "Tidak ada"], "correctIndex": 0, "why": "Alasan keputusan mudah terlupa jika tidak ditulis saat itu juga." }
+          ],
+          "formula": { "lines": ["jam dijadwalkan = jam tugas × (1 + buffer risiko)"], "readAloud": "Jam tugas dikali satu tambah buffer risiko." },
+          "commonMistake": "Menulis dokumentasi hanya di akhir proyek.",
+          "realTask": "Tulis rencana satu halaman untuk proyekmu dengan batas lingkup tertulis, termasuk apa yang TIDAK dikerjakan.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kita menulis keputusan saat itu juga?",
+          "reviewItems": [ { "id": "t27c3r1", "front": "Isi rencana satu halaman?", "back": "Tujuan, MVP, tonggak mingguan, risiko, dan rencana cadangan." } ]
+        }
+      ]
+    },
+    {
+      "topicId": 28,
+      "chunks": [
+        {
+          "chunkId": "t28c1",
+          "title": "Menjaga kunci rahasia",
+          "goal": "Setelah ini kamu bisa menyimpan kunci rahasia di luar kode dan menangani kunci yang bocor.",
+          "terms": [
+            { "term": "kredensial", "plain": "kata sandi atau kunci yang membuktikan siapa kamu" },
+            { "term": "variabel lingkungan", "plain": "nilai yang disimpan di luar kode dan dibaca program saat berjalan" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Kunci ruang harta karun tertulis langsung di kode, lalu kode diunggah ke repositori publik." },
+            { "who": "Rune", "text": "Siapa pun yang membuka repositori itu kini memegang kuncimu." }
+          ],
+          "guess": { "question": "Kunci API sudah terlanjur ter-commit di repositori publik. Langkah pertama?", "options": ["Cabut kunci itu dan buat yang baru", "Hapus berkasnya saja", "Biarkan", "Ganti nama repositori"], "correctIndex": 0, "reveal": "Kita lihat alasannya." },
+          "visual": { "type": "codeBlock", "lines": ["# berkas .env (JANGAN di-commit)", "API_KEY=contoh-rahasia", "", "# berkas .gitignore", ".env", "", "# di kode", "import os", "kunci = os.environ[\"API_KEY\"]"] },
+          "steps": [
+            { "text": "Simpan kunci di berkas .env atau variabel lingkungan, bukan di kode.", "highlight": ["l1", "l2"] },
+            { "text": "Masukkan .env ke .gitignore agar tidak ikut ter-commit.", "highlight": ["l5"] },
+            { "text": "Kode membaca kunci dari lingkungan: os.environ[\"API_KEY\"].", "highlight": ["l9"] },
+            { "text": "Jika kunci terlanjur ter-commit, riwayat Git tetap menyimpannya, jadi menghapus berkas tidak cukup.", "highlight": [] },
+            { "text": "Anggap kunci itu bocor. Cabut kunci lama, buat kunci baru, lalu simpan di .env.", "highlight": [] },
+            { "text": "Jadi pencegahan dan penggantian kunci lebih aman daripada berharap tidak ada yang melihat.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t28c1p1", "type": "order", "question": "Urutkan langkah saat kunci bocor.", "items": ["Cabut kunci lama", "Buat kunci baru", "Simpan kunci baru di .env", "Tambahkan .env ke .gitignore"], "why": "Hentikan kebocoran dulu, ganti kunci, lalu cegah terulang." },
+            { "id": "t28c1p2", "type": "choice", "question": "Menghapus berkas berisi kunci dari commit terbaru. Apakah cukup?", "options": ["Tidak, riwayat Git masih menyimpannya sehingga kunci harus diganti", "Ya, kunci pasti aman", "Ya, jika repositori privat selamanya", "Tidak perlu apa pun"], "correctIndex": 0, "why": "Commit lama tetap berisi kunci, jadi kunci harus dianggap bocor." },
+            { "id": "t28c1p3", "type": "choice", "question": "Tempat paling tepat menyimpan kunci API?", "options": [".env atau variabel lingkungan yang masuk .gitignore", "Di dalam kode sumber", "Di README", "Di nama berkas"], "correctIndex": 0, "why": "Kunci disimpan di luar kode dan tidak masuk repositori." }
+          ],
+          "formula": { "lines": ["rahasia di .env + .env di .gitignore + kode membaca dari lingkungan"], "readAloud": "Simpan rahasia di luar kode dan jangan masukkan ke repositori." },
+          "commonMistake": "Menghapus kunci dari berkas saja tanpa mencabutnya.",
+          "realTask": "Pindahkan satu kunci rahasia dari kodemu ke .env dan pastikan .env ada di .gitignore.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa menghapus berkas tidak cukup saat kunci bocor?",
+          "reviewItems": [ { "id": "t28c1r1", "front": "Apa yang dilakukan saat kunci terlanjur ter-commit?", "back": "Cabut kunci lama, buat yang baru, dan simpan di luar kode." } ]
+        },
+        {
+          "chunkId": "t28c2",
+          "title": "Mengunci jalur data",
+          "goal": "Setelah ini kamu bisa menjelaskan mengapa jalur data perlu TLS dan kredensial unik per perangkat.",
+          "terms": [
+            { "term": "TLS", "plain": "enkripsi yang membuat data yang dikirim tidak bisa dibaca orang lain" },
+            { "term": "kredensial unik", "plain": "kata sandi yang berbeda untuk tiap perangkat" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Broker MQTT-mu terbuka tanpa kata sandi." },
+            { "who": "Rune", "text": "Siapa pun di jaringan bisa membaca semua data dan mengirim perintah palsu." }
+          ],
+          "guess": { "question": "50 perangkat memakai satu kata sandi yang sama dan kata sandi itu bocor. Berapa perangkat yang harus diganti?", "options": ["50", "1", "25", "0"], "correctIndex": 0, "reveal": "Bandingkan dengan kredensial unik." },
+          "steps": [
+            { "text": "Tanpa enkripsi, data di jaringan bisa dibaca. TLS mengenkripsi data saat dikirim.", "highlight": [] },
+            { "text": "Autentikasi memastikan hanya klien sah yang boleh terhubung ke broker.", "highlight": [] },
+            { "text": "Kredensial bersama: satu kebocoran memaksa 50 perangkat diganti.", "highlight": [] },
+            { "text": "Kredensial unik: satu kebocoran hanya memengaruhi 1 perangkat, sedangkan 49 perangkat lain aman.", "highlight": [] },
+            { "text": "Ganti kata sandi bawaan pabrik, karena kata sandi seperti itu mudah ditebak.", "highlight": [] },
+            { "text": "Jadi TLS, autentikasi, dan kredensial unik memperkecil dampak jika ada yang bocor.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t28c2p1", "type": "fillNumber", "question": "100 perangkat, tiap perangkat punya kredensial unik. Satu bocor. Berapa perangkat yang perlu diganti?", "answer": 1, "tolerance": 0, "unit": "", "why": "Hanya perangkat yang kredensialnya bocor." },
+            { "id": "t28c2p2", "type": "fillNumber", "question": "100 perangkat memakai satu kredensial bersama yang bocor. Berapa perangkat yang perlu diganti?", "answer": 100, "tolerance": 0, "unit": "", "why": "Semua perangkat memakai kredensial yang sama." },
+            { "id": "t28c2p3", "type": "choice", "question": "Mengapa data sensor lewat MQTT sebaiknya dilindungi TLS dan autentikasi?", "options": ["Agar pihak lain tidak bisa membaca atau mengubah data, dan hanya klien sah yang bisa terhubung", "Agar baterai hemat", "Agar data lebih kecil", "Agar QoS tidak perlu"], "correctIndex": 0, "why": "Enkripsi melindungi isi data, dan autentikasi membatasi siapa yang boleh terhubung." }
+          ],
+          "formula": { "lines": ["TLS: data terenkripsi saat dikirim", "kredensial unik: satu kebocoran = satu perangkat terdampak"], "readAloud": "Enkripsi melindungi data. Kredensial unik membatasi dampak kebocoran." },
+          "commonMistake": "Membiarkan broker terbuka atau memakai satu kata sandi untuk semua perangkat.",
+          "realTask": "Aktifkan autentikasi di broker MQTT-mu dan beri tiap perangkat kredensial unik.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa keuntungan kredensial unik per perangkat?",
+          "reviewItems": [ { "id": "t28c2r1", "front": "Apa fungsi TLS pada jalur data?", "back": "Mengenkripsi data saat dikirim agar tidak bisa dibaca orang lain." } ]
+        },
+        {
+          "chunkId": "t28c3",
+          "title": "Pembaruan firmware yang aman",
+          "goal": "Setelah ini kamu bisa menjelaskan pembaruan firmware yang aman dan merencanakan peluncuran bertahap.",
+          "terms": [
+            { "term": "tanda tangan digital", "plain": "bukti bahwa pembaruan benar-benar dari pembuatnya dan tidak diubah" },
+            { "term": "peluncuran bertahap", "plain": "memasang pembaruan ke sebagian kecil perangkat dulu" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Perangkat memeriksa pembaruan baru. Siapa yang menjamin pembaruan itu asli?" },
+            { "who": "Rune", "text": "Tanpa pemeriksaan, penyerang bisa mengirim firmware palsu." }
+          ],
+          "guess": { "question": "Cara paling aman memasang pembaruan baru?", "options": ["Memeriksa tanda tangan digital sebelum memasang", "Memasang apa pun yang diterima", "Memasang tanpa memeriksa", "Menolak semua pembaruan selamanya"], "correctIndex": 0, "reveal": "Mari kita lihat alurnya." },
+          "steps": [
+            { "text": "Pembuat menandatangani pembaruan dengan tanda tangan digital.", "highlight": [] },
+            { "text": "Perangkat memeriksa tanda tangan sebelum memasang. Jika tidak cocok, pembaruan ditolak.", "highlight": [] },
+            { "text": "Kirim lewat kanal terenkripsi agar tidak diubah di perjalanan.", "highlight": [] },
+            { "text": "Peluncuran bertahap: dari 200 perangkat, pasang dulu ke 5% = 10 perangkat.", "highlight": [] },
+            { "text": "Jika bermasalah, hanya 10 perangkat terdampak. Jika baik, lanjutkan ke sisanya.", "highlight": [] },
+            { "text": "Jadi pembaruan yang ditandatangani dan diluncurkan bertahap menambal celah tanpa membuka celah baru.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t28c3p1", "type": "fillNumber", "question": "200 perangkat, pilot 5%. Berapa perangkat dipasang lebih dulu?", "answer": 10, "tolerance": 0, "unit": "", "why": "0,05 × 200 = 10." },
+            { "id": "t28c3p2", "type": "fillNumber", "question": "500 perangkat, pilot 10%. Berapa perangkat dipasang lebih dulu?", "answer": 50, "tolerance": 0, "unit": "", "why": "0,1 × 500 = 50." },
+            { "id": "t28c3p3", "type": "order", "question": "Urutkan alur pembaruan yang aman.", "items": ["Pembuat menandatangani pembaruan", "Pembaruan dikirim lewat kanal terenkripsi", "Perangkat memeriksa tanda tangan", "Perangkat memasang jika sah"], "why": "Tanda tangan, kirim aman, periksa, lalu pasang." }
+          ],
+          "formula": { "lines": ["tanda tangan sah → pasang; tidak sah → tolak", "pilot = persen × jumlah perangkat"], "readAloud": "Pasang hanya pembaruan yang tanda tangannya sah, dan luncurkan bertahap." },
+          "commonMistake": "Memasang pembaruan ke semua perangkat sekaligus tanpa pilot.",
+          "realTask": "Tulis rencana pembaruan untuk perangkatmu: siapa yang menandatangani, bagaimana memeriksa, dan berapa perangkat pilot.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa pembaruan perlu diperiksa tanda tangannya?",
+          "reviewItems": [ { "id": "t28c3r1", "front": "Dua pengaman pembaruan firmware?", "back": "Tanda tangan digital yang diperiksa perangkat, dan peluncuran bertahap." } ]
+        },
+        {
+          "chunkId": "t28c4",
+          "title": "Minimisasi data dan etika",
+          "goal": "Setelah ini kamu bisa mengumpulkan data seminimal mungkin dan menjawab pertanyaan etika sederhana tentang proyekmu.",
+          "terms": [
+            { "term": "minimisasi data", "plain": "mengumpulkan hanya data yang benar-benar diperlukan" },
+            { "term": "data mentah", "plain": "data asli sebelum diringkas" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Mikrofon di mesin merekam suara untuk mendeteksi kerusakan." },
+            { "who": "Rune", "text": "Tapi ia juga bisa merekam percakapan orang di sekitarnya." }
+          ],
+          "guess": { "question": "Apa yang sebaiknya disimpan untuk mendeteksi kerusakan mesin dari suara?", "options": ["Ringkasan frekuensi (fitur), bukan rekaman percakapan", "Seluruh rekaman selamanya", "Rekaman plus nama karyawan", "Tidak ada"], "correctIndex": 0, "reveal": "Kita bandingkan ukurannya." },
+          "steps": [
+            { "text": "Contoh angka: audio mentah 16.000 sampel per detik, 2 byte per sampel.", "highlight": [] },
+            { "text": "Per detik: 16.000 × 2 = 32.000 byte. Per jam: 32.000 × 3.600 = 115.200.000 byte, sekitar 115,2 MB.", "highlight": [] },
+            { "text": "Jika hanya satu angka ringkasan (4 byte) per detik: 4 × 3.600 = 14.400 byte per jam, sekitar 14,4 KB.", "highlight": [] },
+            { "text": "Perbandingannya 115.200.000 ÷ 14.400 = 8.000 kali lebih kecil.", "highlight": [] },
+            { "text": "Data yang lebih sedikit berarti risiko privasi lebih kecil, dan tidak menyimpan percakapan.", "highlight": [] },
+            { "text": "Jika ada data pribadi yang tidak sengaja terekam, hentikan perekaman bagian itu, kurangi data, beri tahu pemilik data, dan minta persetujuan.", "highlight": [] },
+            { "text": "Jadi simpan seperlunya, sependek mungkin, dan jelaskan dengan jujur kepada pemilik data.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t28c4p1", "type": "fillNumber", "question": "Satu angka ringkasan 4 byte per detik selama 1 jam. Berapa byte?", "answer": 14400, "tolerance": 0, "unit": "byte", "why": "4 × 3.600 = 14.400." },
+            { "id": "t28c4p2", "type": "fillNumber", "question": "Berapa kali lebih kecil 14.400 byte dibanding 115.200.000 byte?", "answer": 8000, "tolerance": 0, "unit": "kali", "why": "115.200.000 ÷ 14.400 = 8.000." },
+            { "id": "t28c4p3", "type": "choice", "question": "Proyekmu tidak sengaja merekam percakapan karyawan. Tindakan etis?", "options": ["Hentikan perekaman percakapan, kurangi data, beri tahu dan minta persetujuan", "Simpan semua rekaman", "Jual datanya", "Tidak melakukan apa pun"], "correctIndex": 0, "why": "Kurangi data pribadi seminimal mungkin, transparan, dan minta persetujuan." }
+          ],
+          "formula": { "lines": ["ukuran data = frekuensi × byte per nilai × durasi", "jawaban singkat per proyek: data apa, disimpan di mana, siapa mengakses, risiko apa"], "readAloud": "Hitung ukuran data dari frekuensi, ukuran tiap nilai, dan lamanya." },
+          "commonMistake": "Menyimpan data mentah selamanya hanya karena mungkin berguna nanti.",
+          "realTask": "Tulis jawaban singkat untuk proyekmu: data apa yang dikumpulkan, disimpan di mana, siapa yang bisa mengakses, dan risiko utamanya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa menyimpan lebih sedikit data lebih aman?",
+          "reviewItems": [ { "id": "t28c4r1", "front": "Apa itu minimisasi data?", "back": "Mengumpulkan hanya data yang diperlukan dan menyimpannya sesingkat mungkin." } ]
+        }
+      ]
+    }
+  ]
+}

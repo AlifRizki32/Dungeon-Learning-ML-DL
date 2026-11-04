@@ -1,0 +1,459 @@
+{
+  "reviewStatus": "needs-human-review",
+  "floor": 4,
+  "lessonVersion": 3,
+  "guide": { "name": "Rune", "role": "Pemandu dungeon" },
+  "topics": [
+    {
+      "topicId": 18,
+      "chunks": [
+        {
+          "chunkId": "t18c1",
+          "title": "Mencatat eksperimen",
+          "goal": "Setelah ini kamu bisa mencatat sebuah eksperimen agar hasilnya bisa diulang.",
+          "terms": [
+            { "term": "run", "plain": "satu kali percobaan melatih model dengan satu set pengaturan" },
+            { "term": "reproduksi", "plain": "mengulang percobaan dan mendapat hasil yang sama" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Kamu melatih model tiga kali dengan learning rate berbeda." },
+            { "who": "Rune", "text": "Dua bulan kemudian, kamu lupa pengaturan mana yang menghasilkan skor terbaik." },
+            { "who": "Kamu", "text": "Bagaimana agar tidak lupa?" }
+          ],
+          "guess": { "question": "Dari tiga run (F1 0,82; 0,85; 0,80), run mana yang terbaik?", "options": ["Run dengan F1 0,85", "Run dengan F1 0,82", "Run dengan F1 0,80", "Tidak bisa dibandingkan"], "correctIndex": 0, "reveal": "Betul. Tapi tanpa catatan, kamu tidak tahu pengaturannya." },
+          "visual": { "type": "bars", "items": [ { "id": "runA", "label": "Run A: lr 0,01", "value": 0.82 }, { "id": "runB", "label": "Run B: lr 0,001", "value": 0.85 }, { "id": "runC", "label": "Run C: lr 0,0001", "value": 0.8 } ] },
+          "steps": [
+            { "text": "Satu run adalah satu percobaan. Catat empat hal: versi kode, versi data, parameter, dan metrik.", "highlight": [] },
+            { "text": "Run A: kode a1b2, data v3, learning rate 0,01, F1 0,82.", "highlight": ["runA"] },
+            { "text": "Run B: kode a1b2, data v3, learning rate 0,001, F1 0,85.", "highlight": ["runB"] },
+            { "text": "Run C: kode a1b2, data v3, learning rate 0,0001, F1 0,80.", "highlight": ["runC"] },
+            { "text": "Run B terbaik. Selisihnya dengan run A: 0,85 − 0,82 = 0,03.", "highlight": ["runA", "runB"] },
+            { "text": "Karena semuanya tercatat, enam bulan kemudian kamu bisa mengulang run B persis seperti dulu.", "highlight": ["runB"] },
+            { "text": "Jadi mencatat kode, data, parameter, dan metrik membuat hasil bisa direproduksi.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t18c1p1", "type": "fillNumber", "question": "Tiga run punya F1 0,78; 0,84; 0,81. Berapa F1 terbaik?", "answer": 0.84, "tolerance": 0.001, "unit": "", "why": "Nilai terbesar adalah 0,84." },
+            { "id": "t18c1p2", "type": "fillNumber", "question": "Run X punya F1 0,70 dan run Y punya F1 0,76. Berapa selisihnya?", "answer": 0.06, "tolerance": 0.001, "unit": "", "why": "0,76 − 0,70 = 0,06." },
+            { "id": "t18c1p3", "type": "choice", "question": "Apa yang sebaiknya dicatat untuk tiap run agar hasilnya bisa diulang?", "options": ["Versi kode, versi data, parameter, dan metrik", "Hanya file model", "Hanya skor akhir", "Hanya tanggal"], "correctIndex": 0, "why": "Hasil bergantung pada kombinasi kode, data, dan parameter." }
+          ],
+          "formula": { "lines": ["catat tiap run: versi kode + versi data + parameter + metrik + artefak model"], "readAloud": "Untuk tiap percobaan, catat kodenya, datanya, pengaturannya, dan hasilnya." },
+          "commonMistake": "Hanya menyimpan file model tanpa mencatat versi data, kode, dan parameter yang menghasilkannya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa file model saja tidak cukup?",
+          "reviewItems": [ { "id": "t18c1r1", "front": "Apa yang dicatat tiap run?", "back": "Versi kode, versi data, parameter, dan metrik (plus artefak model)." } ]
+        },
+        {
+          "chunkId": "t18c2",
+          "title": "Membungkus model jadi layanan",
+          "goal": "Setelah ini kamu bisa menjelaskan alur sebuah layanan prediksi dan menghitung kapasitasnya.",
+          "terms": [
+            { "term": "API", "plain": "pintu yang memungkinkan program lain memanggil modelmu" },
+            { "term": "validasi", "plain": "memeriksa masukan sebelum dipakai model" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Modelmu bagus di notebook. Tapi program lain tidak bisa membuka notebook-mu." },
+            { "who": "Kamu", "text": "Jadi kita beri model sebuah pintu?" },
+            { "who": "Rune", "text": "Betul. Dan penjaga pintu yang memeriksa tiap tamu." }
+          ],
+          "guess": { "question": "Sensor mengirim suhu 900 (jelas salah). Apa yang sebaiknya dilakukan layanan?", "options": ["Menolak dengan pesan galat karena nilainya di luar rentang wajar", "Tetap memprediksi", "Mematikan model", "Mengubah 900 menjadi 0"], "correctIndex": 0, "reveal": "Mari kita lihat alurnya." },
+          "visual": { "type": "codeBlock", "lines": ["# kode contoh yang disederhanakan, bukan kode siap pakai", "def predict(request):", "    suhu = request['suhu']", "    getar = request['getar']", "    if not (0 <= suhu <= 150):", "        return {'galat': 'suhu di luar rentang'}", "    skor = model.predict([suhu, getar])", "    return {'skor': skor}"] },
+          "steps": [
+            { "text": "Layanan menerima permintaan berisi fitur: suhu dan getar.", "highlight": ["l3", "l4"] },
+            { "text": "Pertama validasi. Suhu wajar 0 sampai 150. Jika di luar itu, kembalikan galat.", "highlight": ["l5", "l6"] },
+            { "text": "Jika masukan valid, model menghitung skor.", "highlight": ["l7"] },
+            { "text": "Layanan mengirim jawaban berisi skor.", "highlight": ["l8"] },
+            { "text": "Kapasitas: jika satu permintaan butuh 50 ms, satu pekerja melayani 1.000 ÷ 50 = 20 permintaan per detik.", "highlight": [] },
+            { "text": "Dengan 3 pekerja yang berjalan bersamaan: 3 × 20 = 60 permintaan per detik (perkiraan disederhanakan).", "highlight": [] },
+            { "text": "Jadi layanan = pintu yang memeriksa masukan, memanggil model, dan mengirim jawaban.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t18c2p1", "type": "fillNumber", "question": "Satu permintaan butuh 40 ms. Berapa permintaan per detik untuk satu pekerja?", "answer": 25, "tolerance": 0, "unit": "", "why": "1.000 ÷ 40 = 25." },
+            { "id": "t18c2p2", "type": "fillNumber", "question": "Satu pekerja melayani 20 permintaan per detik. Berapa total untuk 4 pekerja bersamaan?", "answer": 80, "tolerance": 0, "unit": "", "why": "4 × 20 = 80 (perkiraan disederhanakan)." },
+            { "id": "t18c2p3", "type": "choice", "question": "Mengapa model dibungkus sebagai layanan dengan skema masukan yang jelas?", "options": ["Agar aplikasi lain bisa memanggil model lewat antarmuka yang jelas dengan masukan yang divalidasi", "Agar model tidak perlu dilatih", "Agar akurasi pasti naik", "Agar data tidak perlu dibersihkan"], "correctIndex": 0, "why": "API memisahkan pemanggil dari detail model dan memudahkan validasi." }
+          ],
+          "formula": { "lines": ["permintaan per detik per pekerja ≈ 1.000 ÷ waktu per permintaan (ms)"], "readAloud": "Seribu dibagi waktu satu permintaan dalam milidetik." },
+          "commonMistake": "Langsung memanggil model tanpa memvalidasi masukan.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa masukan perlu divalidasi sebelum masuk ke model?",
+          "reviewItems": [ { "id": "t18c2r1", "front": "Alur layanan prediksi?", "back": "Terima permintaan, validasi masukan, model menghitung, kirim jawaban." } ]
+        },
+        {
+          "chunkId": "t18c3",
+          "title": "Memantau galat dan pergeseran data",
+          "goal": "Setelah ini kamu bisa menghitung tingkat galat dan pergeseran data (drift).",
+          "terms": [
+            { "term": "data drift", "plain": "data di produksi berubah dari data yang dipakai melatih" },
+            { "term": "ambang alarm", "plain": "batas yang kamu tetapkan; melewatinya memicu peringatan" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Layanan sudah berjalan. Tapi dunia terus berubah." },
+            { "who": "Rune", "text": "Sensor diganti, musim berubah, pabrik pindah. Datamu ikut bergeser." }
+          ],
+          "guess": { "question": "Data latih: suhu rata-rata 40 dengan SD 5. Di produksi, rata-rata menjadi 52. Berapa SD pergeserannya?", "options": ["2,4", "12", "1,3", "0,2"], "correctIndex": 0, "reveal": "Kita hitung." },
+          "visual": { "type": "bars", "items": [ { "id": "latih", "label": "Rata-rata data latih", "value": 40 }, { "id": "produksi", "label": "Rata-rata di produksi", "value": 52 } ] },
+          "steps": [
+            { "text": "Selisih rata-rata: 52 − 40 = 12.", "highlight": ["latih", "produksi"] },
+            { "text": "Bandingkan dengan SD data latih (5): 12 ÷ 5 = 2,4.", "highlight": [] },
+            { "text": "Artinya rata-rata produksi bergeser 2,4 SD dari data latih.", "highlight": [] },
+            { "text": "Tetapkan ambang peringatanmu sendiri. Contoh: beri peringatan jika pergeseran lebih dari 2 SD. Di sini 2,4 > 2, jadi ada peringatan.", "highlight": [] },
+            { "text": "Tingkat galat: dari 1.200 permintaan, 36 gagal. 36 ÷ 1.200 = 3%.", "highlight": [] },
+            { "text": "Alarm menyala jika galat lebih dari 2%. Karena 3% > 2%, alarm menyala.", "highlight": [] },
+            { "text": "Jika yang gagal 24, galatnya tepat 2%. Itu tidak lebih dari 2%, jadi alarm tidak menyala.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t18c3p1", "type": "fillNumber", "question": "Data latih: rata-rata 10, SD 4. Produksi: rata-rata 18. Berapa SD pergeserannya?", "answer": 2, "tolerance": 0.001, "unit": "SD", "why": "(18 − 10) ÷ 4 = 2." },
+            { "id": "t18c3p2", "type": "fillNumber", "question": "Dari 1.500 permintaan, 45 gagal. Berapa tingkat galat dalam persen?", "answer": 3, "tolerance": 0.001, "unit": "%", "why": "45 ÷ 1.500 = 0,03 = 3%." },
+            { "id": "t18c3p3", "type": "choice", "question": "Dari 1.000 permintaan, 20 gagal. Alarm menyala jika galat lebih dari 2%. Hasilnya?", "options": ["Alarm tidak menyala: tepat 2% belum melewati ambang", "Alarm menyala", "Layanan pasti rusak", "Tidak bisa dihitung"], "correctIndex": 0, "why": "20 ÷ 1.000 = 2%. Ambangnya 'lebih dari 2%', jadi belum terlewati." }
+          ],
+          "formula": { "lines": ["pergeseran (SD) = (rata-rata produksi − rata-rata latih) ÷ SD latih", "tingkat galat = gagal ÷ total × 100"], "readAloud": "Selisih rata-rata dibagi simpangan baku data latih. Galat adalah yang gagal dibagi total, dikali seratus." },
+          "commonMistake": "Hanya memantau server hidup atau mati dan tidak memantau kualitas data dan hasil.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa data drift bisa membuat model memburuk diam-diam?",
+          "reviewItems": [
+            { "id": "t18c3r1", "front": "Apa itu data drift?", "back": "Distribusi data di produksi bergeser dari data latih." },
+            { "id": "t18c3r2", "front": "Rumus tingkat galat?", "back": "gagal ÷ total × 100" }
+          ]
+        },
+        {
+          "chunkId": "t18c4",
+          "title": "Rilis aman dan rollback",
+          "goal": "Setelah ini kamu bisa memutuskan kapan mengembalikan versi model sebelumnya.",
+          "terms": [
+            { "term": "registry model", "plain": "tempat menyimpan semua versi model beserta catatannya" },
+            { "term": "rollback", "plain": "mengembalikan versi sebelumnya yang masih tersimpan" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Versi 8 dirilis kemarin. Pagi ini galat produksi naik." },
+            { "who": "Kamu", "text": "Aku harus melatih ulang dari nol?" },
+            { "who": "Rune", "text": "Tidak. Versi 7 masih tersimpan." }
+          ],
+          "guess": { "question": "Galat v7 adalah 2% dan galat v8 adalah 6% dengan ambang 3%. Langkah tercepat?", "options": ["Kembalikan layanan ke v7", "Biarkan v8", "Hapus semua versi", "Latih ulang dari nol dulu"], "correctIndex": 0, "reveal": "Mari kita ikuti urutannya." },
+          "visual": { "type": "bars", "items": [ { "id": "v7", "label": "Galat v7 (%)", "value": 2 }, { "id": "v8", "label": "Galat v8 (%)", "value": 6 }, { "id": "batas", "label": "Ambang alarm (%)", "value": 3 } ] },
+          "steps": [
+            { "text": "Registry menyimpan v6, v7, dan v8 beserta catatan metriknya.", "highlight": [] },
+            { "text": "Galat v7 adalah 2% dan galat v8 adalah 6%. Naik 6 − 2 = 4 poin, atau 6 ÷ 2 = 3 kali lipat.", "highlight": ["v7", "v8"] },
+            { "text": "Ambang alarm 3%. Karena 6% > 3%, v8 melewati ambang.", "highlight": ["v8", "batas"] },
+            { "text": "Langkah 1: kembalikan layanan ke v7 (rollback).", "highlight": [] },
+            { "text": "Langkah 2: pastikan galat turun kembali.", "highlight": [] },
+            { "text": "Langkah 3: baru selidiki v8: data, drift, atau bug. Lalu perbaiki dan rilis v9.", "highlight": [] },
+            { "text": "Jadi pulihkan dulu, selidiki kemudian, karena versi lama yang tersimpan memberi jalan kembali yang cepat.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t18c4p1", "type": "fillNumber", "question": "Galat v7 adalah 1% dan galat v8 adalah 4%. Berapa kali lipat kenaikannya?", "answer": 4, "tolerance": 0, "unit": "kali", "why": "4 ÷ 1 = 4." },
+            { "id": "t18c4p2", "type": "choice", "question": "Ambang alarm 5%. Galat versi baru 7%. Keputusannya?", "options": ["Rollback ke versi sebelumnya lalu selidiki", "Biarkan saja", "Naikkan ambang menjadi 8%", "Hapus versi lama"], "correctIndex": 0, "why": "7% melewati ambang 5%. Pulihkan dulu agar layanan aman." },
+            { "id": "t18c4p3", "type": "order", "question": "Urutkan langkah menangani rilis yang bermasalah.", "items": ["Alarm menyala: galat melewati ambang", "Kembalikan layanan ke versi sebelumnya", "Pastikan galat turun kembali", "Selidiki penyebab di versi baru"], "why": "Pulihkan layanan dulu, lalu cari penyebabnya." }
+          ],
+          "formula": { "lines": ["jika galat > ambang setelah rilis → rollback ke versi sebelumnya yang tersimpan → selidiki"], "readAloud": "Bila galat melewati ambang setelah rilis, kembalikan versi sebelumnya, baru selidiki penyebabnya." },
+          "commonMistake": "Mempertahankan versi baru sambil menyelidiki, padahal pengguna terus terkena galat.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kita pulihkan dulu sebelum menyelidiki?",
+          "reviewItems": [ { "id": "t18c4r1", "front": "Apa itu rollback?", "back": "Mengembalikan versi model sebelumnya yang masih tersimpan, lalu menyelidiki masalahnya." } ]
+        }
+      ]
+    },
+    {
+      "topicId": 19,
+      "chunks": [
+        {
+          "chunkId": "t19c1",
+          "title": "Ukuran model dalam byte",
+          "goal": "Setelah ini kamu bisa menghitung ukuran bobot model dari jumlah parameternya.",
+          "terms": [
+            { "term": "parameter", "plain": "angka yang dipelajari model" },
+            { "term": "byte", "plain": "satuan ukuran data; 1 KB = 1.000 byte dalam pelajaran ini" },
+            { "term": "float32", "plain": "angka desimal yang memakai 4 byte" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Mikrokontroler seperti ransel kecil. Ruangnya sangat terbatas." },
+            { "who": "Rune", "text": "Sebelum memasukkan model, kita ukur dulu berapa besarnya." }
+          ],
+          "guess": { "question": "Model punya 10.000 parameter float32. Berapa byte ukuran bobotnya?", "options": ["40.000", "10.000", "20.000", "80.000"], "correctIndex": 0, "reveal": "Kita hitung." },
+          "visual": { "type": "bars", "items": [ { "id": "mA", "label": "Model A (KB)", "value": 20 }, { "id": "mB", "label": "Model B (KB)", "value": 80 }, { "id": "mC", "label": "Model C (KB)", "value": 400 } ] },
+          "steps": [
+            { "text": "Tiap parameter float32 memakai 4 byte.", "highlight": [] },
+            { "text": "Ukuran = jumlah parameter × 4 byte.", "highlight": [] },
+            { "text": "Model A: 5.000 × 4 = 20.000 byte = 20 KB.", "highlight": ["mA"] },
+            { "text": "Model B: 20.000 × 4 = 80.000 byte = 80 KB.", "highlight": ["mB"] },
+            { "text": "Model C: 100.000 × 4 = 400.000 byte = 400 KB.", "highlight": ["mC"] },
+            { "text": "Jika ruang model di perangkat contoh adalah 256 KB, Model A dan B muat, tetapi Model C tidak.", "highlight": ["mA", "mB", "mC"] },
+            { "text": "Jadi hitung ukuran sebelum berusaha memasukkan model ke perangkat.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t19c1p1", "type": "fillNumber", "question": "Model punya 30.000 parameter float32. Berapa byte ukuran bobotnya?", "answer": 120000, "tolerance": 0, "unit": "byte", "why": "30.000 × 4 = 120.000." },
+            { "id": "t19c1p2", "type": "fillNumber", "question": "Ukuran bobot 250.000 byte. Berapa KB (1 KB = 1.000 byte)?", "answer": 250, "tolerance": 0, "unit": "KB", "why": "250.000 ÷ 1.000 = 250." },
+            { "id": "t19c1p3", "type": "choice", "question": "Ruang model di perangkat adalah 100 KB. Model float32 mana yang muat?", "options": ["20.000 parameter (80 KB)", "30.000 parameter (120 KB)", "50.000 parameter (200 KB)", "100.000 parameter (400 KB)"], "correctIndex": 0, "why": "Hanya 80 KB yang kurang dari 100 KB." }
+          ],
+          "formula": { "lines": ["ukuran (byte) = jumlah parameter × byte per parameter", "float32 = 4 byte per parameter"], "readAloud": "Ukuran sama dengan jumlah parameter dikali byte per parameter." },
+          "commonMistake": "Mengira ukuran model sama dengan jumlah parameternya, lupa mengalikan dengan byte per parameter.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kita menghitung ukuran model sebelum memasukkannya ke perangkat?",
+          "reviewItems": [ { "id": "t19c1r1", "front": "Rumus ukuran bobot model?", "back": "jumlah parameter × byte per parameter (float32 = 4 byte)" } ]
+        },
+        {
+          "chunkId": "t19c2",
+          "title": "Kuantisasi int8: dari 4 byte jadi 1 byte",
+          "goal": "Setelah ini kamu bisa menghitung ukuran setelah kuantisasi dan menjelaskan kehilangan ketelitiannya.",
+          "terms": [
+            { "term": "kuantisasi", "plain": "menyimpan angka dengan lebih sedikit bit" },
+            { "term": "int8", "plain": "bilangan bulat 8 bit, memakai 1 byte" },
+            { "term": "skala", "plain": "angka pengali untuk mengubah bilangan bulat kembali ke perkiraan desimal" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Menulis angka dengan banyak digit memakan tempat." },
+            { "who": "Rune", "text": "Kuantisasi menulisnya dengan lebih sedikit digit, dengan ketelitian yang sedikit berkurang." }
+          ],
+          "guess": { "question": "50.000 parameter diubah dari float32 ke int8. Berapa byte sekarang?", "options": ["50.000", "200.000", "100.000", "25.000"], "correctIndex": 0, "reveal": "Kita hitung dan lihat bagaimana angkanya dipetakan." },
+          "visual": { "type": "bars", "items": [ { "id": "f32", "label": "float32 (byte)", "value": 200000 }, { "id": "i8", "label": "int8 (byte)", "value": 50000 } ] },
+          "steps": [
+            { "text": "float32 memakai 4 byte dan int8 memakai 1 byte. Untuk 50.000 parameter: 200.000 byte menjadi 50.000 byte.", "highlight": ["f32", "i8"] },
+            { "text": "Ukuran jadi 4 kali lebih kecil.", "highlight": ["i8"] },
+            { "text": "Cara memetakan (versi disederhanakan): skala = nilai mutlak terbesar ÷ 127. Misalnya terbesar 2,54, maka skala = 2,54 ÷ 127 = 0,02.", "highlight": [] },
+            { "text": "Bobot 1,00 menjadi 1,00 ÷ 0,02 = 50. Saat dipakai, dibaca 50 × 0,02 = 1,00. Tepat.", "highlight": [] },
+            { "text": "Bobot 0,013 menjadi 0,013 ÷ 0,02 = 0,65, dibulatkan ke 1. Dibaca 1 × 0,02 = 0,02. Galatnya 0,007.", "highlight": [] },
+            { "text": "Selisih kecil per bobot, tetapi jika banyak, hasil model bisa sedikit berubah. Karena itu akurasi harus dicek lagi.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t19c2p1", "type": "fillNumber", "question": "Model 80.000 parameter dikuantisasi ke int8. Berapa byte ukurannya?", "answer": 80000, "tolerance": 0, "unit": "byte", "why": "80.000 × 1 = 80.000." },
+            { "id": "t19c2p2", "type": "fillNumber", "question": "Nilai mutlak terbesar 1,27. Berapa skala = 1,27 ÷ 127?", "answer": 0.01, "tolerance": 0.0001, "unit": "", "why": "1,27 ÷ 127 = 0,01." },
+            { "id": "t19c2p3", "type": "fillNumber", "question": "Dengan skala 0,01, berapa bilangan bulat untuk bobot 0,50?", "answer": 50, "tolerance": 0, "unit": "", "why": "0,50 ÷ 0,01 = 50." }
+          ],
+          "formula": { "lines": ["skala = nilai mutlak terbesar ÷ 127", "bobot int = pembulatan (bobot ÷ skala)", "bobot ≈ bobot int × skala"], "readAloud": "Bagi bobot dengan skala lalu bulatkan. Untuk memakainya, kalikan kembali dengan skala." },
+          "commonMistake": "Mengira kuantisasi tidak mengubah hasil model sama sekali. Ada kehilangan ketelitian.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: dari mana datangnya selisih kecil 0,007 pada bobot 0,013?",
+          "reviewItems": [
+            { "id": "t19c2r1", "front": "Berapa kali lebih kecil ukuran bobot int8 dibanding float32?", "back": "Sekitar 4 kali (4 byte menjadi 1 byte)." },
+            { "id": "t19c2r2", "front": "Mengapa akurasi dicek lagi setelah kuantisasi?", "back": "Pembulatan menimbulkan selisih kecil yang bisa mengubah hasil." }
+          ]
+        },
+        {
+          "chunkId": "t19c3",
+          "title": "Representative dataset dan cek akurasi",
+          "goal": "Setelah ini kamu bisa menjelaskan fungsi representative dataset dan menilai penurunan akurasi.",
+          "terms": [
+            { "term": "aktivasi", "plain": "nilai yang dihasilkan tiap lapisan saat model bekerja" },
+            { "term": "representative dataset", "plain": "contoh data tipikal untuk memperkirakan rentang nilai aktivasi" },
+            { "term": "quantization-aware training", "plain": "melatih model sambil memperhitungkan efek kuantisasi" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Bobot tetap, jadi mudah dipetakan." },
+            { "who": "Rune", "text": "Tapi aktivasi berubah tiap data masuk. Kita harus tahu seberapa besar kira-kira nilainya." }
+          ],
+          "guess": { "question": "Rentang aktivasi diperkirakan 0 sampai 6. Pada data baru muncul nilai 9. Apa yang terjadi?", "options": ["Nilai dipotong ke batas atas (6)", "Nilai tetap 9", "Model berhenti", "Nilai menjadi 0"], "correctIndex": 0, "reveal": "Kita lihat penjelasannya." },
+          "steps": [
+            { "text": "Untuk memetakan aktivasi ke int8, konverter perlu tahu rentang nilainya.", "highlight": [] },
+            { "text": "Karena itu kita beri representative dataset: contoh data tipikal dan beragam.", "highlight": [] },
+            { "text": "Anggap rentang yang diperkirakan adalah 0 sampai 6.", "highlight": [] },
+            { "text": "Nilai 4 aman. Nilai 9 melewati batas, jadi dipotong ke 6. Galatnya 9 − 6 = 3 (versi disederhanakan).", "highlight": [] },
+            { "text": "Jika contohmu kurang beragam, rentang meleset dan lebih banyak nilai terpotong.", "highlight": [] },
+            { "text": "Cek akurasi: float32 92%, int8 88%. Turun 4 poin.", "highlight": [] },
+            { "text": "Bila penurunan melewati batas yang kamu tetapkan, coba contoh data yang lebih beragam atau quantization-aware training.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t19c3p1", "type": "fillNumber", "question": "Akurasi float32 94% dan akurasi int8 91%. Berapa poin penurunannya?", "answer": 3, "tolerance": 0, "unit": "poin", "why": "94 − 91 = 3." },
+            { "id": "t19c3p2", "type": "fillNumber", "question": "Rentang yang diperkirakan sampai 6. Nilai 10 muncul dan dipotong ke 6. Berapa galatnya?", "answer": 4, "tolerance": 0, "unit": "", "why": "10 − 6 = 4." },
+            { "id": "t19c3p3", "type": "choice", "question": "Representative dataset yang baik berisi...", "options": ["Contoh data nyata yang beragam, mirip data di perangkat", "Satu contoh saja", "Data acak yang tidak berkaitan", "Seluruh data uji akhir"], "correctIndex": 0, "why": "Agar rentang aktivasi yang diperkirakan sesuai dengan data sungguhan." }
+          ],
+          "formula": { "lines": ["penurunan akurasi (poin) = akurasi float32 − akurasi int8", "jika penurunan melewati batas: perbaiki representative dataset atau coba QAT"], "readAloud": "Penurunan akurasi sama dengan akurasi sebelum dikurangi akurasi sesudah kuantisasi." },
+          "commonMistake": "Memakai satu atau dua contoh saja sebagai representative dataset.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa rentang aktivasi perlu diperkirakan dari data tipikal?",
+          "reviewItems": [ { "id": "t19c3r1", "front": "Fungsi representative dataset?", "back": "Memperkirakan rentang nilai aktivasi agar bisa dikuantisasi ke int8." } ]
+        },
+        {
+          "chunkId": "t19c4",
+          "title": "Pruning: membuang bobot kecil",
+          "goal": "Setelah ini kamu bisa memangkas bobot kecil dan menghitung tingkat sparsity.",
+          "terms": [
+            { "term": "pruning", "plain": "menjadikan nol bobot yang kecil atau kurang penting" },
+            { "term": "sparsity", "plain": "persentase bobot yang bernilai nol" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Di sebuah pohon, ranting-ranting kecil kadang dipangkas agar pohon lebih ringkas." },
+            { "who": "Rune", "text": "Bobot yang nilainya hampir nol sumbangannya kecil. Kita bisa membuangnya." }
+          ],
+          "guess": { "question": "Dari 6 bobot, 3 diubah menjadi nol. Berapa persen sparsity-nya?", "options": ["50%", "30%", "60%", "3%"], "correctIndex": 0, "reveal": "Kita lihat caranya." },
+          "visual": { "type": "matrixGrid", "matrices": [ { "id": "A", "rows": [[0.8, -0.05, 0.3], [0.01, -0.9, 0.02]] }, { "id": "B", "rows": [[0.8, 0, 0.3], [0, -0.9, 0]] } ] },
+          "steps": [
+            { "text": "Bobot awal (matriks A): 0,8; −0,05; 0,3; 0,01; −0,9; 0,02.", "highlight": [] },
+            { "text": "Aturan pangkas: jika nilai mutlak bobot kurang dari 0,1, jadikan 0.", "highlight": [] },
+            { "text": "Yang kurang dari 0,1: −0,05, 0,01, dan 0,02. Ketiganya menjadi 0 (matriks B).", "highlight": ["A:r1c2", "A:r2c1", "A:r2c3", "B:r1c2", "B:r2c1", "B:r2c3"] },
+            { "text": "Sparsity = 3 ÷ 6 = 0,5 = 50%.", "highlight": [] },
+            { "text": "Catatan: file model baru mengecil jika disimpan atau dikompres dengan cara yang memanfaatkan angka nol.", "highlight": [] },
+            { "text": "Setelah pruning, akurasi harus dicek lagi, karena membuang bobot bisa memengaruhi hasil.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t19c4p1", "type": "fillNumber", "question": "Bobot [0,5; 0,04; −0,02; 0,9; 0,03]. Pangkas yang nilai mutlaknya kurang dari 0,1. Berapa bobot yang menjadi nol?", "answer": 3, "tolerance": 0, "unit": "", "why": "0,04, −0,02, dan 0,03 kurang dari 0,1." },
+            { "id": "t19c4p2", "type": "fillNumber", "question": "Dari soal itu, berapa persen sparsity-nya?", "answer": 60, "tolerance": 0, "unit": "%", "why": "3 ÷ 5 = 0,6 = 60%." },
+            { "id": "t19c4p3", "type": "choice", "question": "Mengapa akurasi dicek lagi setelah pruning?", "options": ["Karena membuang bobot bisa memengaruhi hasil model", "Karena pruning menambah bobot", "Karena pruning mengubah data uji", "Tidak perlu dicek"], "correctIndex": 0, "why": "Bobot kecil pun punya sumbangan, jadi dampaknya harus diukur." }
+          ],
+          "formula": { "lines": ["sparsity = jumlah bobot nol ÷ jumlah semua bobot × 100"], "readAloud": "Sparsity adalah bobot yang nol dibagi semua bobot, dikali seratus." },
+          "commonMistake": "Mengira pruning otomatis mengecilkan file tanpa memakai cara penyimpanan yang memanfaatkan angka nol.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa bobot yang kecil boleh dipangkas?",
+          "reviewItems": [ { "id": "t19c4r1", "front": "Apa itu pruning?", "back": "Menolkan atau membuang bobot yang kurang penting agar model lebih ringkas." } ]
+        },
+        {
+          "chunkId": "t19c5",
+          "title": "Anggaran memori: flash dan RAM",
+          "goal": "Setelah ini kamu bisa memeriksa apakah sebuah model muat di perangkat.",
+          "miniLab": "quant",
+          "terms": [
+            { "term": "flash", "plain": "tempat penyimpanan tetap untuk program dan model" },
+            { "term": "RAM", "plain": "memori kerja saat program berjalan" },
+            { "term": "tensor arena", "plain": "ruang RAM sementara untuk menghitung model" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Perangkat punya dua laci." },
+            { "who": "Rune", "text": "Laci tetap (flash) menyimpan modelnya. Laci kerja (RAM) dipakai saat model menghitung." }
+          ],
+          "guess": { "question": "Model 150 KB (di flash), tensor arena 80 KB (di RAM). Perangkat: flash 512 KB, RAM 128 KB. Muat?", "options": ["Muat", "Tidak muat di flash", "Tidak muat di RAM", "Tidak bisa dipastikan"], "correctIndex": 0, "reveal": "Kita periksa keduanya." },
+          "steps": [
+            { "text": "Asumsi pelajaran ini (disederhanakan): model disimpan di flash, dan tensor arena di RAM. Angka perangkat hanya contoh.", "highlight": [] },
+            { "text": "Periksa flash: 150 KB ≤ 512 KB. Muat.", "highlight": [] },
+            { "text": "Periksa RAM: 80 KB ≤ 128 KB. Muat.", "highlight": [] },
+            { "text": "Sisa RAM untuk program lain: 128 − 80 = 48 KB. Ini belum memperhitungkan kebutuhan lain.", "highlight": [] },
+            { "text": "Jika arena 200 KB, 200 > 128, jadi tidak muat di RAM meski modelnya kecil.", "highlight": [] },
+            { "text": "Jadi dua syarat harus terpenuhi sekaligus: model muat di flash dan arena muat di RAM.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t19c5p1", "type": "fillNumber", "question": "RAM 256 KB, tensor arena 200 KB. Berapa KB RAM yang tersisa?", "answer": 56, "tolerance": 0, "unit": "KB", "why": "256 − 200 = 56." },
+            { "id": "t19c5p2", "type": "choice", "question": "Model 300 KB, arena 200 KB. Flash 512 KB, RAM 256 KB. Muat?", "options": ["Muat di flash dan di RAM", "Tidak muat di flash", "Tidak muat di RAM", "Tidak muat di keduanya"], "correctIndex": 0, "why": "300 ≤ 512 dan 200 ≤ 256." },
+            { "id": "t19c5p3", "type": "choice", "question": "Model 600 KB dan flash 512 KB. Hasilnya?", "options": ["Tidak muat di flash", "Muat", "Muat jika RAM besar", "Tidak bisa dihitung"], "correctIndex": 0, "why": "600 KB melebihi 512 KB di flash." }
+          ],
+          "formula": { "lines": ["muat jika: ukuran model ≤ flash DAN tensor arena ≤ RAM"], "readAloud": "Muat jika ukuran model tidak melebihi flash dan arena tidak melebihi RAM." },
+          "commonMistake": "Hanya memeriksa ukuran model dan lupa menghitung RAM untuk tensor arena.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa model kecil tetap bisa tidak muat?",
+          "reviewItems": [ { "id": "t19c5r1", "front": "Dua syarat model muat di perangkat?", "back": "Ukuran model ≤ flash dan tensor arena ≤ RAM." } ]
+        }
+      ]
+    },
+    {
+      "topicId": 20,
+      "chunks": [
+        {
+          "chunkId": "t20c1",
+          "title": "Alur end-to-end dan baseline",
+          "goal": "Setelah ini kamu bisa menyusun alur proyek AI di perangkat dan membandingkan model dengan baseline.",
+          "terms": [
+            { "term": "end-to-end", "plain": "dari awal sampai akhir, misalnya dari sensor sampai model berjalan di perangkat" },
+            { "term": "poin persentase", "plain": "selisih dua persen, misalnya 86% dikurangi 80% = 6 poin" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Proyek akhirmu menyatukan semuanya: sensor, data, model, dan perangkat." },
+            { "who": "Kamu", "text": "Dari mana mulainya?" },
+            { "who": "Rune", "text": "Dari data dan baseline sederhana, bukan dari model terbesar." }
+          ],
+          "guess": { "question": "Baseline 80% dan model 86%. Naik berapa poin?", "options": ["6 poin", "86 poin", "7,5 poin", "80 poin"], "correctIndex": 0, "reveal": "Kita lihat dua cara mengukurnya." },
+          "visual": { "type": "bars", "items": [ { "id": "base", "label": "Akurasi baseline (%)", "value": 80 }, { "id": "model", "label": "Akurasi model (%)", "value": 86 } ] },
+          "steps": [
+            { "text": "Urutan alur: kumpulkan data sensor, buat baseline, latih model, kuantisasi, pasang ke perangkat, lalu ukur di perangkat.", "highlight": [] },
+            { "text": "Baseline akurasi 80%, model 86%. Selisihnya 86 − 80 = 6 poin.", "highlight": ["base", "model"] },
+            { "text": "Cara kedua: lihat galatnya. Galat baseline = 20%, galat model = 14%.", "highlight": [] },
+            { "text": "Penurunan galat relatif = (20 − 14) ÷ 20 = 0,3 = 30%.", "highlight": [] },
+            { "text": "Keduanya benar, tetapi artinya berbeda: 6 poin akurasi, atau 30% lebih sedikit galat.", "highlight": [] },
+            { "text": "Jadi sebut dengan jelas satuannya agar tidak membingungkan pembaca.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t20c1p1", "type": "fillNumber", "question": "Galat baseline 25% dan galat model 20%. Berapa poin selisihnya?", "answer": 5, "tolerance": 0, "unit": "poin", "why": "25 − 20 = 5." },
+            { "id": "t20c1p2", "type": "fillNumber", "question": "Dengan galat yang sama, berapa persen penurunan galat relatifnya?", "answer": 20, "tolerance": 0.01, "unit": "%", "why": "(25 − 20) ÷ 25 = 0,2 = 20%." },
+            { "id": "t20c1p3", "type": "order", "question": "Urutkan alur proyek.", "items": ["Kumpulkan data sensor", "Buat baseline sederhana", "Latih model dan kuantisasi", "Pasang ke perangkat dan ukur di sana"], "why": "Data, baseline, model, lalu pengukuran di perangkat sesungguhnya." }
+          ],
+          "formula": { "lines": ["selisih (poin) = akurasi model − akurasi baseline", "penurunan galat relatif = (galat baseline − galat model) ÷ galat baseline × 100"], "readAloud": "Selisih akurasi dalam poin. Penurunan galat relatif adalah selisih galat dibagi galat baseline." },
+          "commonMistake": "Menyebut 'naik 6%' padahal maksudnya naik 6 poin.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kita membuat baseline sebelum melatih model rumit?",
+          "reviewItems": [ { "id": "t20c1r1", "front": "Beda poin dan persen relatif?", "back": "Poin = selisih dua persen. Persen relatif = selisih dibagi nilai awal." } ]
+        },
+        {
+          "chunkId": "t20c2",
+          "title": "Anggaran latensi",
+          "goal": "Setelah ini kamu bisa menjumlahkan latensi tiap tahap dan memutuskan tahap mana yang dioptimalkan.",
+          "miniLab": "latency",
+          "terms": [
+            { "term": "latensi", "plain": "waktu dari sensor membaca sampai hasil dikirim, dalam milidetik (ms)" },
+            { "term": "inferensi", "plain": "waktu model menghitung prediksi" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Alarm harus berbunyi dalam 100 ms setelah getaran terdeteksi." },
+            { "who": "Rune", "text": "Waktu itu terbagi ke beberapa tahap." }
+          ],
+          "guess": { "question": "Akuisisi 25, pra-pemrosesan 10, inferensi 55, pengiriman 30 (ms). Berapa total?", "options": ["120 ms", "100 ms", "90 ms", "55 ms"], "correctIndex": 0, "reveal": "Kita jumlahkan dan bandingkan dengan batas." },
+          "visual": { "type": "bars", "items": [ { "id": "akuisisi", "label": "Akuisisi (ms)", "value": 25 }, { "id": "pra", "label": "Pra-pemrosesan (ms)", "value": 10 }, { "id": "inferensi", "label": "Inferensi (ms)", "value": 55 }, { "id": "kirim", "label": "Pengiriman (ms)", "value": 30 } ] },
+          "steps": [
+            { "text": "Jumlahkan semua tahap: 25 + 10 + 55 + 30 = 120 ms.", "highlight": ["akuisisi", "pra", "inferensi", "kirim"] },
+            { "text": "Batasnya 100 ms. Totalnya 120, jadi melebihi 20 ms.", "highlight": [] },
+            { "text": "Tahap terbesar adalah inferensi (55 ms). Optimalkan yang terbesar dulu.", "highlight": ["inferensi"] },
+            { "text": "Misalkan kuantisasi menurunkan inferensi menjadi 35 ms. Hal ini harus diukur, bukan diasumsikan.", "highlight": ["inferensi"] },
+            { "text": "Total baru: 25 + 10 + 35 + 30 = 100 ms. Pas di batas.", "highlight": [] },
+            { "text": "Jadi jumlahkan semua tahap, bandingkan dengan batas, lalu optimalkan tahap yang paling besar.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t20c2p1", "type": "fillNumber", "question": "15 + 5 + 40 + 20 (ms), batas 100 ms. Berapa ms sisa anggarannya?", "answer": 20, "tolerance": 0, "unit": "ms", "why": "Total 80. Sisa 100 − 80 = 20." },
+            { "id": "t20c2p2", "type": "fillNumber", "question": "40 + 10 + 50 + 45 (ms), batas 130 ms. Berapa ms yang melebihi batas?", "answer": 15, "tolerance": 0, "unit": "ms", "why": "Total 145. Melebihi 145 − 130 = 15." },
+            { "id": "t20c2p3", "type": "choice", "question": "Total melebihi batas. Tahap mana yang sebaiknya dioptimalkan lebih dulu?", "options": ["Tahap yang waktunya paling besar", "Tahap yang paling kecil", "Semua tahap sama", "Jangan optimalkan"], "correctIndex": 0, "why": "Tahap terbesar biasanya memberi penghematan terbesar. Tetap ukur hasilnya." }
+          ],
+          "formula": { "lines": ["latensi total = akuisisi + pra-pemrosesan + inferensi + pengiriman", "sisa anggaran = batas − latensi total"], "readAloud": "Latensi total adalah jumlah semua tahap. Sisa anggaran adalah batas dikurangi total." },
+          "commonMistake": "Hanya mengukur waktu inferensi dan melupakan tahap lain.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kita optimalkan tahap yang terbesar dulu?",
+          "reviewItems": [ { "id": "t20c2r1", "front": "Rumus latensi total?", "back": "akuisisi + pra-pemrosesan + inferensi + pengiriman" } ]
+        },
+        {
+          "chunkId": "t20c3",
+          "title": "Beda hasil di laptop dan di perangkat",
+          "goal": "Setelah ini kamu bisa menemukan penyebab hasil yang berbeda antara laptop dan perangkat.",
+          "terms": [
+            { "term": "pra-pemrosesan", "plain": "langkah menyiapkan data sebelum masuk ke model, misalnya normalisasi" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Di laptop, modelmu akurat. Di perangkat, hasilnya aneh." },
+            { "who": "Kamu", "text": "Modelnya rusak?" },
+            { "who": "Rune", "text": "Belum tentu. Mari kita periksa dulu hal-hal sederhana." }
+          ],
+          "guess": { "question": "Di laptop, suhu dinormalisasi dengan rata-rata 20 dan SD 5. Di perangkat, normalisasi terlupa. Hasilnya?", "options": ["Model menerima angka yang sangat berbeda dari yang dikenalnya", "Tidak ada bedanya", "Model lebih akurat", "Perangkat berhenti"], "correctIndex": 0, "reveal": "Kita hitung perbedaannya." },
+          "steps": [
+            { "text": "Pada pelatihan, suhu 25 dinormalisasi: (25 − 20) ÷ 5 = 1. Model terbiasa melihat angka seperti 1.", "highlight": [] },
+            { "text": "Di perangkat, normalisasi terlupa, jadi model menerima 25 mentah.", "highlight": [] },
+            { "text": "Angka 25 jauh dari 1, dan model tidak pernah dilatih dengan angka sebesar itu.", "highlight": [] },
+            { "text": "Cara memeriksa: kirim 10 sampel yang sama ke model laptop dan model perangkat, lalu bandingkan keluarannya.", "highlight": [] },
+            { "text": "Misalkan 9 dari 10 prediksi sama. Kesepakatan = 9 ÷ 10 = 90%.", "highlight": [] },
+            { "text": "Jika kesepakatan jauh di bawah harapan, periksa pra-pemrosesan, lalu efek kuantisasi.", "highlight": [] },
+            { "text": "Jadi bandingkan keluaran pada sampel yang sama dulu, sebelum menyimpulkan modelnya rusak.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t20c3p1", "type": "fillNumber", "question": "Rata-rata 20, SD 5. Berapa nilai normalisasi untuk suhu 35?", "answer": 3, "tolerance": 0, "unit": "", "why": "(35 − 20) ÷ 5 = 3." },
+            { "id": "t20c3p2", "type": "fillNumber", "question": "Dari 10 sampel yang sama, 8 prediksi laptop dan perangkat sama. Berapa persen kesepakatan?", "answer": 80, "tolerance": 0, "unit": "%", "why": "8 ÷ 10 = 0,8 = 80%." },
+            { "id": "t20c3p3", "type": "choice", "question": "Akurasi di perangkat jauh lebih rendah. Langkah paling masuk akal?", "options": ["Bandingkan keluaran laptop dan perangkat untuk sampel yang sama, lalu periksa pra-pemrosesan dan kuantisasi", "Langsung melatih ulang dari nol", "Mengganti sensor tanpa memeriksa", "Menurunkan target akurasi"], "correctIndex": 0, "why": "Membandingkan keluaran pada sampel yang sama mempersempit penyebabnya." }
+          ],
+          "formula": { "lines": ["kesepakatan = prediksi yang sama ÷ total sampel × 100"], "readAloud": "Kesepakatan adalah prediksi yang sama dibagi total sampel, dikali seratus." },
+          "commonMistake": "Hanya mengukur kinerja di laptop, lalu terkejut saat perangkat berperilaku berbeda.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa pra-pemrosesan di perangkat harus sama dengan saat pelatihan?",
+          "reviewItems": [ { "id": "t20c3r1", "front": "Langkah pertama jika hasil di perangkat berbeda?", "back": "Bandingkan keluaran laptop dan perangkat untuk sampel yang sama, lalu periksa pra-pemrosesan dan kuantisasi." } ]
+        },
+        {
+          "chunkId": "t20c4",
+          "title": "Kartu hasil dan keputusan pasang",
+          "goal": "Setelah ini kamu bisa membandingkan kandidat model dengan target dan memutuskan mana yang dipasang.",
+          "terms": [
+            { "term": "target", "plain": "syarat yang harus dipenuhi sebelum model dipasang" },
+            { "term": "kartu hasil", "plain": "ringkasan satu halaman: tujuan, data, hasil, dan batasan" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Dua kandidat model sudah selesai." },
+            { "who": "Rune", "text": "Satu lebih akurat, satu lebih ringan. Kamu perlu memilih dengan alasan yang jelas." }
+          ],
+          "guess": { "question": "Target: akurasi ≥ 85%, ukuran ≤ 150 KB, latensi ≤ 120 ms. Kandidat B (86%, 120 KB, 110 ms). Apakah B lolos?", "options": ["Lolos semua target", "Gagal di akurasi", "Gagal di ukuran", "Gagal di latensi"], "correctIndex": 0, "reveal": "Mari kita bandingkan dengan kandidat A." },
+          "visual": { "type": "matrixGrid", "matrices": [ { "id": "K", "rows": [[88, 200, 90], [86, 120, 110]], "rowLabels": ["Kandidat A", "Kandidat B"], "colLabels": ["Akurasi (%)", "Ukuran (KB)", "Latensi (ms)"] } ] },
+          "steps": [
+            { "text": "Target: akurasi ≥ 85%, ukuran ≤ 150 KB, latensi ≤ 120 ms.", "highlight": [] },
+            { "text": "Kandidat A: akurasi 88 lolos, ukuran 200 gagal, latensi 90 lolos. A hanya lolos 2 dari 3.", "highlight": ["K:r1c1", "K:r1c2", "K:r1c3"] },
+            { "text": "Kandidat B: akurasi 86 lolos, ukuran 120 lolos, latensi 110 lolos. B lolos 3 dari 3.", "highlight": ["K:r2c1", "K:r2c2", "K:r2c3"] },
+            { "text": "Pilih B, walaupun A lebih akurat, karena A tidak muat dan melanggar target ukuran.", "highlight": ["K:r2c1", "K:r2c2", "K:r2c3"] },
+            { "text": "Tulis kartu hasil: tujuan, data, hasil dibanding baseline, batasan, dan rencana cadangan demo.", "highlight": [] },
+            { "text": "Jadi keputusan dibuat dari target yang jelas, bukan dari satu angka saja.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t20c4p1", "type": "fillNumber", "question": "Kandidat D: akurasi 90%, ukuran 140 KB, latensi 130 ms. Dengan target yang sama, berapa target yang lolos?", "answer": 2, "tolerance": 0, "unit": "", "why": "Akurasi lolos, ukuran lolos, latensi gagal (130 > 120). Total 2." },
+            { "id": "t20c4p2", "type": "choice", "question": "Mana yang lolos semua target (akurasi ≥ 85%, ukuran ≤ 150 KB, latensi ≤ 120 ms)?", "options": ["E: 87%, 145 KB, 115 ms", "C: 84%, 100 KB, 80 ms", "D: 90%, 140 KB, 130 ms", "A: 88%, 200 KB, 90 ms"], "correctIndex": 0, "why": "Hanya E yang memenuhi ketiga target." },
+            { "id": "t20c4p3", "type": "order", "question": "Urutkan bagian kartu hasil.", "items": ["Tujuan proyek", "Data yang dipakai", "Hasil dibanding baseline", "Batasan dan rencana cadangan"], "why": "Dari tujuan ke data, hasil, lalu batasan." }
+          ],
+          "formula": { "lines": ["lolos jika SEMUA target terpenuhi"], "readAloud": "Kandidat lolos hanya jika semua target terpenuhi." },
+          "commonMistake": "Memilih kandidat hanya dari akurasi tertinggi tanpa memeriksa ukuran dan latensi.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa model paling akurat belum tentu yang dipasang?",
+          "reviewItems": [ { "id": "t20c4r1", "front": "Kapan kandidat model lolos dipasang?", "back": "Jika semua target (akurasi, ukuran, latensi) terpenuhi." } ]
+        }
+      ]
+    }
+  ]
+}

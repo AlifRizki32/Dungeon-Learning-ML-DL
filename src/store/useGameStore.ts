@@ -47,6 +47,7 @@ import {
   ReviewQueueEntry,
   ReviewRating,
   clampIntervalScale,
+  getLessonChunkById,
   getLessonChunksForTopic,
   scheduleReviewItem,
 } from '../game/lessonEngine';
@@ -116,6 +117,7 @@ export interface GameState {
   reduceMotion: boolean;
   lessonProgress: Record<string, LessonChunkProgress>;
   summaries: Record<string, string>;
+  taskDone: Record<string, boolean>;
   reviewQueue: Record<string, ReviewQueueEntry>;
   settings: {
     intervalScale: number;
@@ -210,6 +212,7 @@ export interface GameState {
   recordChunkPracticeAttempt: (chunkId: string, activityId: string, totalPracticeIds?: string[]) => void;
   completeLessonChunk: (chunkId: string, reviewItems: LessonReviewItem[]) => void;
   setChunkSummary: (chunkId: string, summary: string) => void;
+  toggleChunkRealTaskDone: (chunkId: string, done?: boolean) => void;
   gradeReviewItem: (itemId: string, rating: ReviewRating) => ReviewQueueEntry;
   setIntervalScale: (scale: number) => void;
   resetProgress: () => void;
@@ -287,6 +290,7 @@ const INITIAL_PERSISTED_STATE = {
   reduceMotion: false,
   lessonProgress: {} as Record<string, LessonChunkProgress>,
   summaries: {} as Record<string, string>,
+  taskDone: {} as Record<string, boolean>,
   reviewQueue: {} as Record<string, ReviewQueueEntry>,
   settings: {
     intervalScale: DEFAULT_INTERVAL_SCALE,
@@ -496,6 +500,19 @@ export function migrateStateToV3(rawState: Record<string, unknown>) {
     }
   }
 
+  const normalizedTaskDone: Record<string, boolean> = {};
+  if (
+    rawState.taskDone &&
+    typeof rawState.taskDone === 'object' &&
+    !Array.isArray(rawState.taskDone)
+  ) {
+    for (const [cId, val] of Object.entries(rawState.taskDone as Record<string, unknown>)) {
+      if (val === true) {
+        normalizedTaskDone[cId] = true;
+      }
+    }
+  }
+
   const normalizedReviewQueue: Record<string, ReviewQueueEntry> = {};
   if (
     rawState.reviewQueue &&
@@ -561,6 +578,7 @@ export function migrateStateToV3(rawState: Record<string, unknown>) {
     evidenceNotes: normalizedNotes,
     lessonProgress: normalizedLessonProgress,
     summaries: normalizedSummaries,
+    taskDone: normalizedTaskDone,
     reviewQueue: normalizedReviewQueue,
     settings: {
       intervalScale: normalizedIntervalScale,
@@ -1476,6 +1494,7 @@ export const useGameStore = create<GameState>()(
             reduceMotion: s.reduceMotion,
             lessonProgress: s.lessonProgress,
             summaries: s.summaries,
+            taskDone: s.taskDone,
             reviewQueue: s.reviewQueue,
             settings: s.settings,
           },
@@ -1555,14 +1574,7 @@ export const useGameStore = create<GameState>()(
         const attemptedSet = new Set(prev.attemptedActivities || []);
         attemptedSet.add(activityId);
 
-        let foundChunk = null;
-        for (let tId = 1; tId <= 28; tId++) {
-          const found = getLessonChunksForTopic(tId).find((c) => c.chunkId === chunkId);
-          if (found) {
-            foundChunk = found;
-            break;
-          }
-        }
+        const foundChunk = getLessonChunkById(chunkId);
 
         let allAttempted = prev.done;
         if (Array.isArray(totalPracticeIds) && totalPracticeIds.length > 0) {
@@ -1653,6 +1665,18 @@ export const useGameStore = create<GameState>()(
             [chunkId]: cleanSummary,
           },
         });
+      },
+
+      toggleChunkRealTaskDone: (chunkId: string, done?: boolean) => {
+        const state = get();
+        const nextVal = typeof done === 'boolean' ? done : !state.taskDone[chunkId];
+        const nextTaskDone = { ...state.taskDone };
+        if (nextVal) {
+          nextTaskDone[chunkId] = true;
+        } else {
+          delete nextTaskDone[chunkId];
+        }
+        set({ taskDone: nextTaskDone });
       },
 
       gradeReviewItem: (itemId: string, rating: ReviewRating) => {
@@ -1747,6 +1771,7 @@ export const useGameStore = create<GameState>()(
         reduceMotion: state.reduceMotion,
         lessonProgress: state.lessonProgress,
         summaries: state.summaries,
+        taskDone: state.taskDone,
         reviewQueue: state.reviewQueue,
         settings: state.settings,
       }),

@@ -1,5 +1,9 @@
 import floor1LessonsRaw from '../data/lessons/floor1.lessons.json';
 import floor2LessonsRaw from '../data/lessons/floor2.lessons.json';
+import floor3LessonsRaw from '../data/lessons/floor3.lessons.json';
+import floor4LessonsRaw from '../data/lessons/floor4.lessons.json';
+import floor5LessonsRaw from '../data/lessons/floor5.lessons.json';
+import floor6LessonsRaw from '../data/lessons/floor6.lessons.json';
 import { getLocalDateKey } from './campTracker';
 
 export interface LessonTerm {
@@ -141,14 +145,17 @@ export interface LessonChunk {
   chunkId: string;
   title: string;
   goal: string;
+  miniLab?: 'neuron' | 'softmax' | 'quant' | 'latency' | string;
   terms: LessonTerm[];
   scene: LessonSceneLine[];
   guess: LessonGuess;
   visual?: LessonVisual;
   steps: LessonStep[];
   practice: LessonPracticeActivity[];
+  formulaTitle?: string;
   formula: LessonFormula;
   commonMistake: string;
+  realTask?: string;
   summaryPrompt: string;
   reviewItems: LessonReviewItem[];
 }
@@ -158,12 +165,18 @@ export interface LessonTopicEntry {
   chunks: LessonChunk[];
 }
 
+export interface LessonQuestEntry {
+  questId: string;
+  chunks: LessonChunk[];
+}
+
 export interface FloorLessonsFile {
   reviewStatus: string;
   floor: number;
   lessonVersion: number;
   guide: { name: string; role: string };
-  topics: LessonTopicEntry[];
+  topics?: LessonTopicEntry[];
+  quests?: LessonQuestEntry[];
 }
 
 export interface LessonChunkProgress {
@@ -181,6 +194,7 @@ export interface EnrichedReviewItem extends LessonReviewItem {
   chunkId: string;
   chunkTitle: string;
   topicId: number;
+  questId?: string;
   box: number;
   due: string;
 }
@@ -189,16 +203,34 @@ export const FLOOR1_LESSONS: FloorLessonsFile =
   floor1LessonsRaw as unknown as FloorLessonsFile;
 export const FLOOR2_LESSONS: FloorLessonsFile =
   floor2LessonsRaw as unknown as FloorLessonsFile;
+export const FLOOR3_LESSONS: FloorLessonsFile =
+  floor3LessonsRaw as unknown as FloorLessonsFile;
+export const FLOOR4_LESSONS: FloorLessonsFile =
+  floor4LessonsRaw as unknown as FloorLessonsFile;
+export const FLOOR5_LESSONS: FloorLessonsFile =
+  floor5LessonsRaw as unknown as FloorLessonsFile;
+export const FLOOR6_LESSONS: FloorLessonsFile =
+  floor6LessonsRaw as unknown as FloorLessonsFile;
 
-const ALL_LESSON_FILES: FloorLessonsFile[] = [FLOOR1_LESSONS, FLOOR2_LESSONS];
+const ALL_LESSON_FILES: FloorLessonsFile[] = [
+  FLOOR1_LESSONS,
+  FLOOR2_LESSONS,
+  FLOOR3_LESSONS,
+  FLOOR4_LESSONS,
+  FLOOR5_LESSONS,
+  FLOOR6_LESSONS,
+];
 
 /**
  * Merged map of topicId (1..28) -> LessonChunk[]
+ * and questId ("m1".."m7") -> LessonChunk[]
  */
 const CHUNKS_BY_TOPIC_ID: Map<number, LessonChunk[]> = new Map();
+const CHUNKS_BY_QUEST_ID: Map<string, LessonChunk[]> = new Map();
+const CHUNKS_BY_ID: Map<string, LessonChunk> = new Map();
 const REVIEW_ITEMS_BY_ID: Map<
   string,
-  LessonReviewItem & { chunkId: string; chunkTitle: string; topicId: number }
+  LessonReviewItem & { chunkId: string; chunkTitle: string; topicId: number; questId?: string }
 > = new Map();
 
 for (const file of ALL_LESSON_FILES) {
@@ -208,12 +240,34 @@ for (const file of ALL_LESSON_FILES) {
     CHUNKS_BY_TOPIC_ID.set(t.topicId, merged);
 
     for (const chunk of t.chunks || []) {
+      CHUNKS_BY_ID.set(chunk.chunkId, chunk);
       for (const item of chunk.reviewItems || []) {
         REVIEW_ITEMS_BY_ID.set(item.id, {
           ...item,
           chunkId: chunk.chunkId,
           chunkTitle: chunk.title,
           topicId: t.topicId,
+        });
+      }
+    }
+  }
+
+  for (const q of file.quests || []) {
+    const qKey = String(q.questId).trim().toLowerCase();
+    const existing = CHUNKS_BY_QUEST_ID.get(qKey) || [];
+    const merged = [...existing, ...(q.chunks || [])];
+    CHUNKS_BY_QUEST_ID.set(qKey, merged);
+    const questNum = Number(qKey.replace(/^m/i, '')) || 0;
+
+    for (const chunk of q.chunks || []) {
+      CHUNKS_BY_ID.set(chunk.chunkId, chunk);
+      for (const item of chunk.reviewItems || []) {
+        REVIEW_ITEMS_BY_ID.set(item.id, {
+          ...item,
+          chunkId: chunk.chunkId,
+          chunkTitle: chunk.title,
+          topicId: 600 + questNum,
+          questId: q.questId,
         });
       }
     }
@@ -231,10 +285,31 @@ export function parseNumericTopicId(topicId: string | number): number | null {
 }
 
 /**
- * Returns the merged lesson chunks for a given topicId (e.g. 'topic-1' or 1).
- * Returns an empty array if the topic has no v3 lesson chunks yet (e.g. Floors 2-6).
+ * Returns the merged lesson chunks for a given questId (e.g. 'm1'..'m7').
+ */
+export function getLessonChunksForQuest(questId: string): LessonChunk[] {
+  if (!questId) return [];
+  const qKey = String(questId).trim().toLowerCase();
+  return CHUNKS_BY_QUEST_ID.get(qKey) || [];
+}
+
+export function hasLessonChunksForQuest(questId: string): boolean {
+  return getLessonChunksForQuest(questId).length > 0;
+}
+
+export function getLessonChunkById(chunkId: string): LessonChunk | null {
+  if (!chunkId) return null;
+  return CHUNKS_BY_ID.get(chunkId) || null;
+}
+
+/**
+ * Returns the merged lesson chunks for a given topicId (e.g. 'topic-1', 1, or questId 'm1'..'m7').
+ * Returns an empty array if the topic/quest has no v3 lesson chunks yet.
  */
 export function getLessonChunksForTopic(topicId: string | number): LessonChunk[] {
+  if (typeof topicId === 'string' && /^m\d+$/i.test(topicId.trim())) {
+    return getLessonChunksForQuest(topicId);
+  }
   const numId = parseNumericTopicId(topicId);
   if (numId === null) return [];
   return CHUNKS_BY_TOPIC_ID.get(numId) || [];
@@ -248,6 +323,7 @@ export function getAllReviewCatalogItems(): (LessonReviewItem & {
   chunkId: string;
   chunkTitle: string;
   topicId: number;
+  questId?: string;
 })[] {
   return Array.from(REVIEW_ITEMS_BY_ID.values());
 }
@@ -343,19 +419,38 @@ export function shuffleChoiceOptions(
 /**
  * Parses a localized numeric input string:
  * Accepts a comma or a dot as decimal separator, optional leading minus sign (- or −),
- * and surrounding whitespace.
+ * surrounding whitespace, and unambiguous thousands separators (e.g. "120.000", "120,000",
+ * "1.000.000", "1.200,5", "1,200.5").
  */
 export function parseLocalizedNumber(raw: string): number | null {
   if (typeof raw !== 'string') return null;
-  const cleaned = raw
-    .trim()
-    .replace(/\u2212/g, '-') // Unicode minus '−' -> ASCII '-'
-    .replace(/,/g, '.');
+  const trimmed = raw.trim().replace(/\u2212/g, '-'); // Unicode minus '−' -> ASCII '-'
+  if (!trimmed) return null;
 
-  if (!cleaned) return null;
-  if (!/^-?\d+(?:\.\d+)?$/.test(cleaned)) return null;
+  let normalized = trimmed;
 
-  const val = Number(cleaned);
+  // 1. Both '.' and ',' present: e.g. "120.000,5" or "120,000.5"
+  if (/^-?[1-9]\d{0,2}(?:\.\d{3})+,\d+$/.test(trimmed)) {
+    normalized = trimmed.replace(/\./g, '').replace(',', '.');
+  } else if (/^-?[1-9]\d{0,2}(?:,\d{3})+\.\d+$/.test(trimmed)) {
+    normalized = trimmed.replace(/,/g, '');
+  }
+  // 2. Multiple thousands groups with '.' or ',': e.g. "1.000.000" or "1,000,000"
+  else if (/^-?[1-9]\d{0,2}(?:\.\d{3}){2,}$/.test(trimmed)) {
+    normalized = trimmed.replace(/\./g, '');
+  } else if (/^-?[1-9]\d{0,2}(?:,\d{3}){2,}$/.test(trimmed)) {
+    normalized = trimmed.replace(/,/g, '');
+  }
+  // 3. Single thousands separator with exact ".000" or ",000" and non-zero leading integer: e.g. "120.000", "80.000", "120,000"
+  else if (/^-?[1-9]\d{0,2}[.,]000$/.test(trimmed)) {
+    normalized = trimmed.replace(/[.,]/g, '');
+  } else {
+    normalized = trimmed.replace(/,/g, '.');
+  }
+
+  if (!/^-?\d+(?:\.\d+)?$/.test(normalized)) return null;
+
+  const val = Number(normalized);
   return Number.isFinite(val) ? val : null;
 }
 
@@ -368,7 +463,23 @@ export function evaluateFillNumber(
   numericValue: number | null;
   isCorrect: boolean;
 } {
-  const parsed = parseLocalizedNumber(rawInput);
+  let parsed = parseLocalizedNumber(rawInput);
+
+  // If the expected answer is an integer >= 1000 and the user typed a single 3-digit thousands group like "12.500" or "12,500"
+  if (
+    typeof rawInput === 'string' &&
+    Number.isInteger(answer) &&
+    Math.abs(answer) >= 1000
+  ) {
+    const trimmed = rawInput.trim().replace(/\u2212/g, '-');
+    if (/^-?[1-9]\d{0,2}[.,]\d{3}$/.test(trimmed)) {
+      const asThousands = Number(trimmed.replace(/[.,]/g, ''));
+      if (Number.isFinite(asThousands)) {
+        parsed = asThousands;
+      }
+    }
+  }
+
   if (parsed === null) {
     return { valid: false, numericValue: null, isCorrect: false };
   }
@@ -397,6 +508,18 @@ export function formatBarValue(value: number): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 3,
   }).format(num);
+}
+
+/**
+ * Formats a matrix cell number as given with up to 3 decimals, keeping the minus sign for negatives.
+ */
+export function formatMatrixCell(value: number): string {
+  const num = Number(value);
+  if (!Number.isFinite(num) || Object.is(num, -0) || num === 0) {
+    return '0';
+  }
+  const rounded = Number(num.toFixed(3));
+  return String(rounded);
 }
 
 /**

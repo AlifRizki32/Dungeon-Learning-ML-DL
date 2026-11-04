@@ -9,11 +9,14 @@ import {
   canTickTowerStep,
   canUnlockCerminPuncak,
   FLOOR6_CONTENT,
+  Floor1TopicContent,
   formatCertificateSummaryText,
   getTowerQuestStepProgress,
   getTowerQuestStatus,
   TOWER_RELICS,
 } from '../game/spellbookEngine';
+import { getLessonChunksForQuest } from '../game/lessonEngine';
+import { LessonChunkPlayer } from '../components/LessonChunkPlayer';
 import {
   AvatarSprite,
   CerminPuncakSprite,
@@ -84,6 +87,8 @@ export const TowerPage: React.FC = () => {
   // Active selection in the vertical climb: 'm1'..'m7' or 'summit'
   const [activeLandingId, setActiveLandingId] = useState<string>('m1');
   const [climbDirection, setClimbDirection] = useState<1 | -1>(1);
+  // Active tab inside each tower quest panel: 'panduan' (shown first) or 'langkah'
+  const [activeQuestTab, setActiveQuestTab] = useState<'panduan' | 'langkah'>('panduan');
 
   // Celebratory "RELIK DITEMUKAN!" banner state when a quest is marked complete
   const [relicBanner, setRelicBanner] = useState<{
@@ -119,6 +124,7 @@ export const TowerPage: React.FC = () => {
     const nextIdx = landingOrder.indexOf(targetId);
     setClimbDirection(nextIdx >= prevIdx ? 1 : -1);
     setActiveLandingId(targetId);
+    setActiveQuestTab('panduan');
   };
 
   const activeQuest = FLOOR6_CONTENT.quests.find((q) => q.id === activeLandingId);
@@ -620,6 +626,39 @@ export const TowerPage: React.FC = () => {
                     );
                     const questStepMap = towerSteps[activeQuest.id] || {};
                     const noteValue = evidenceNotes[activeQuest.id] || '';
+                    const questChunks = getLessonChunksForQuest(activeQuest.id);
+                    const hasQuestChunks = questChunks.length > 0;
+                    const syntheticTopicContent: Floor1TopicContent = {
+                      topicId: 600 + landingNumber,
+                      monster: {
+                        name: activeQuest.title,
+                        sprite: 'mirror',
+                      },
+                      spell: {
+                        id: 's1',
+                        name: activeQuest.relic,
+                        formula: '',
+                        whenToUse: activeQuest.summary,
+                        trap: '',
+                      },
+                      scroll: {
+                        hook: activeQuest.summary,
+                        intuition: [],
+                        workedExample: {
+                          prompt: '',
+                          steps: [],
+                          takeaway: '',
+                        },
+                        spellCard: {
+                          formula: '',
+                          whenToUse: '',
+                          trap: '',
+                        },
+                        references: activeQuest.references,
+                      },
+                      calculation: [],
+                      quiz: [],
+                    };
 
                     return (
                       <>
@@ -663,8 +702,74 @@ export const TowerPage: React.FC = () => {
                           </p>
                         </div>
 
+                        {/* Quest Panel Tabs ("Panduan" shown first when quest has lesson chunks) */}
+                        {hasQuestChunks && (
+                          <div className="space-y-4">
+                            <div
+                              role="tablist"
+                              aria-label={`Tab Quest ${activeQuest.title}`}
+                              className="flex flex-wrap items-center gap-2 border-b-2 border-[#f5b935] pb-2.5"
+                            >
+                              <button
+                                type="button"
+                                role="tab"
+                                data-testid="tower-quest-tab-panduan"
+                                aria-selected={activeQuestTab === 'panduan'}
+                                onClick={() => {
+                                  playClick();
+                                  setActiveQuestTab('panduan');
+                                }}
+                                className={`pixel-btn px-4 py-2 font-pixel text-[10px] ${
+                                  activeQuestTab === 'panduan'
+                                    ? 'bg-[#f5b935] text-[#0d0a1a] border-[#f4f1ea] font-bold'
+                                    : 'bg-[#120d26] text-[#b3aad1] border-[#5c4e99] hover:text-[#f4f1ea]'
+                                }`}
+                              >
+                                📖 Panduan ({questChunks.length} Potongan)
+                              </button>
+
+                              <button
+                                type="button"
+                                role="tab"
+                                data-testid="tower-quest-tab-langkah"
+                                aria-selected={activeQuestTab === 'langkah'}
+                                onClick={() => {
+                                  playClick();
+                                  setActiveQuestTab('langkah');
+                                }}
+                                className={`pixel-btn px-4 py-2 font-pixel text-[10px] ${
+                                  activeQuestTab === 'langkah'
+                                    ? 'bg-[#f5b935] text-[#0d0a1a] border-[#f4f1ea] font-bold'
+                                    : 'bg-[#120d26] text-[#b3aad1] border-[#5c4e99] hover:text-[#f4f1ea]'
+                                }`}
+                              >
+                                ☑ Daftar Langkah &amp; Bukti ({progress.ticked}/{progress.total})
+                              </button>
+                            </div>
+
+                            {activeQuestTab === 'panduan' && (
+                              <div data-testid={`tower-panduan-panel-${activeQuest.id}`}>
+                                <LessonChunkPlayer
+                                  key={`tower-lesson-${activeQuest.id}`}
+                                  topicContent={syntheticTopicContent}
+                                  topicTitle={activeQuest.title}
+                                  chunks={questChunks}
+                                  reduceMotion={reduceMotion}
+                                  mode="tower-quest"
+                                  questId={activeQuest.id}
+                                  onSwitchToQuestChecklist={() => setActiveQuestTab('langkah')}
+                                  onClose={() => setActiveQuestTab('langkah')}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         {/* Quest Summary */}
-                        <div className="bg-[#120d26] border-2 border-[#5c4e99] p-3.5">
+                        <div
+                          id="tower-quest-checklist-section"
+                          className="bg-[#120d26] border-2 border-[#5c4e99] p-3.5"
+                        >
                           <div className="font-pixel text-[9px] text-[#f5b935] mb-1">
                             RINGKASAN QUEST:
                           </div>

@@ -1,0 +1,180 @@
+AUDIT RULES (apply to this whole task)
+- This is a READ-ONLY audit. Do NOT modify, create, rename or delete any tracked file. You may create throwaway scripts under /tmp only.
+- Run real commands and cite real evidence (command, exit code, short output excerpt, or file:line). Never mark a check PASS from reading code alone when the behavior could be executed; if you cannot execute it, mark it NOT RUN and say why.
+- Do not guess. If a requirement is ambiguous or a file is missing, mark it UNCLEAR or FAIL and explain.
+- Report format: a table with columns ID | Check | Result (PASS / FAIL / NOT RUN / UNCLEAR) | Evidence | Severity (blocker / major / minor). After the table add: (1) a count of each result, (2) the top 5 problems in priority order, (3) anything you noticed outside the checklist.
+- Do not propose fixes unless asked; one short sentence of suspected cause per FAIL is enough.
+- All user-facing text in the app is Indonesian; this audit report is in English.
+Tahap 0: Audit Master Prompt (kerangka game)
+[paste AUDIT RULES here]
+
+STAGE 0 AUDIT: Master Prompt build of "Dungeon Belajar ML & DL".
+
+Checks (use these IDs):
+S0-01 Stack: package.json uses Vite, React 18, Tailwind CSS 3.x (PostCSS setup), Framer Motion and zustand. List ALL dependencies and devDependencies and flag any not justified by these.
+S0-02 Build: run `npm ci` and `npm run build`. Report exit codes and any warnings.
+S0-03 No external assets: grep src/ and index.html for http:// and https:// and any <script>/<link>/<img> pointing off-site. Only Google Fonts is allowed.
+S0-04 Fonts: "Press Start 2P" (headings) and "VT323" (body) are loaded with monospace fallbacks.
+S0-05 Structure: src/data/roadmap.js, src/store/, src/components/ (DungeonMap, RoomNode, BattleModal, BossModal, XPBar, LevelUpModal, Inventory, sprites), src/pages/, src/hooks/useSound.js, src/styles/ exist; README explains install, `npm run dev`, and editing roadmap.js.
+S0-06 Roadmap data: exactly 28 topics numbered 1-28 across floors 1-5; Indonesian strings present; weeks {min,max} as follows: 1:1-2, 2:3-4, 3:3-4, 4:4-5, 5:3-4, 6:3-4, 7:2-3, 8:3-3, 9:2-3, 10:4-4, 11:2-3, 12:4-4, 13:3-4, 14:3-4, 15:2-3, 16:4-4, 17:2-3, 18:3-4, 19:4-6, 20:6-8, 21:3-4, 22:3-4, 23:4-6, 24:2-2, 25:2-2, 26:2-3, 27:1-2, 28:1-2. Topic 6 is flagged parallel; topics 21-28 are flagged parallel (Guild Quests).
+S0-07 XP formulas (test with a throwaway script calling the real functions): room XP = round(((min+max)/2)*50), for example topic 1 = 75, topic 2 = 175, topic 4 = 225, topic 8 = 150, topic 19 = 250, topic 20 = 350. Boss XP = 300. Tower quest XP = 150. XP needed to reach level L = 60*(L-1)^2 (L2 = 60, L3 = 240, L10 = 4860). Title bands: Lv1-2 "Novice Data", 3-4 "Data Apprentice", 5-6 "Neural Knight", 7-9 "Edge Ranger", 10+ "ML Archmage". No level cap.
+S0-08 Streak: +1 per calendar day (local time) with at least one completion; two completions on the same day count once; a skipped day resets to 1. Test with injected dates.
+S0-09 Persistence: single localStorage key "dungeon-ml-dl:v1" with a `version` field and a migration stub; every read/write is in try/catch; corrupted JSON in storage results in a clean fresh state with no crash; grep for any other localStorage/sessionStorage/IndexedDB use (there must be none).
+S0-10 Unlock rules: rooms on floors 1-4 are sequential; topic 6 is open from the start; floor 5 rooms (21-28) are all open from the start and can be done in any order; each boss unlocks only when all rooms of its floor are defeated (floor 5: all 8); floor 6 unlocks only after all 5 bosses.
+S0-11 Battle flow: the "Serang!" button is disabled until the self-assessment box is ticked; "Aku belum bisa" plays the hit animation and shows "Ulangi topik ini sebelum lanjut"; defeating a room grants XP exactly once (replaying or re-ticking never grants XP twice).
+S0-12 Screens: title, dungeon map, battle/boss panels, dashboard, inventory, Menara Master, settings; reset progress requires confirmation and truly clears the persisted state.
+S0-13 Motion and audio: prefers-reduced-motion and the in-app toggle replace large animations with fades; audio is OFF by default and nothing autoplays (AudioContext is created only after a user gesture).
+S0-14 Accessibility basics: keyboard navigation on the map and all modals, focus trap in modals, ARIA labels on icon-only buttons, visible focus outlines, feedback not conveyed by color alone. Report concrete violations; do not claim formal WCAG compliance.
+S0-15 Runtime errors: load the app and run a scripted pass through title -> floor 1 -> first room; report console errors/warnings. If no browser tooling is available, mark NOT RUN.
+S0-16 Secrets and network: grep for fetch, XMLHttpRequest, WebSocket, navigator.sendBeacon, analytics snippets and hard-coded keys. The app must make no network calls.
+Tahap 1: Audit mesin kuis, mantra, dan Lantai 1
+[paste AUDIT RULES here]
+
+STAGE 1 AUDIT: Spellbook/quiz engine and Floor 1 content.
+
+S1-01 Data integrity (throwaway script): src/data/floor1.content.json parses; it has 6 topics (ids 1-6), each with exactly 5 quiz questions; every question has 4 options, a correctIndex in 0-3, a unique id, an explanation, and a difficulty; each topic has a spell (s1..s6) with formulas; boss has 6 phases, each with 2 variants (4 options, valid correctIndex), phase 6 variants carry their own spellId where specified; "reviewStatus" is "needs-human-review".
+S1-02 Content untouched: report whether any quiz/boss text appears edited relative to the version supplied earlier (diff if available in git history; otherwise NOT RUN).
+S1-03 Battle structure: 5 topic questions + 1 "Gema Masa Lalu" echo (skipped when nothing is defeated); the echo never affects pass/fail; correct echo gives +5 XP once per room.
+S1-04 Pass rule: defeat requires at least 4 of 5 topic questions correct AND the self-assessment box ticked.
+S1-05 Hearts and fainting: 3 hearts; a wrong answer costs 1 heart and shows the explanation; 0 hearts = faint; retry reshuffles questions and options with correctness mapped by option identity (not by position).
+S1-06 Critical hit bonus: +10% of room XP applied once per room.
+S1-07 Dojo weights: weight = max(1, 1 + 2*wrongCount - correctStreak). Verify with a unit-style script: (wrong 2, streak 0) = 5; (wrong 0, streak 3) = 1; (wrong 1, streak 1) = 2. The Dojo pulls up to 8 questions from defeated topics only, costs no hearts, gives +2 XP per correct answer capped at 20 XP per calendar day.
+S1-08 Grimoire: 6 spell cards for floor 1; locked ones are silhouettes; unlocking shows the "MANTRA DIPELAJARI!" banner.
+S1-09 Boss: unlocks only after all 6 rooms; 6 segments, 3 hearts, 2 potions; spell selection shows names only; a potion reveals formulas for that phase only; wrong spell = fizzle + lose a heart + reveal the right spell; wrong answer = lose a heart + the phase repeats once with the other variant; faint = hearts refill and the boss regains one segment (never above full).
+S1-10 Boss completion: requires ticking the combined "Tanda sudah paham" checklist; rewards badge, relic, 300 XP exactly once; the next floor unlocks (or shows "Segera hadir").
+S1-11 Store: spellsUnlocked, questionStats {id:{seen,wrong,correctStreak}}, bestScoreByTopic, bossProgress exist; the persisted shape survives a reload; old saves migrate without data loss.
+S1-12 "Kelemahan" section on the dashboard lists the lowest best-scoring topics.
+S1-13 Randomization: options are shuffled at render time; confirm correct answers still grade correctly after shuffling (run the check 50 times).
+S1-14 Build/lint: `npm run build` passes; no console errors in a scripted battle and boss run (NOT RUN if no browser tooling).
+Tahap 2-5: Audit isi Lantai 2, 3, 4, dan 5 (satu templat)
+
+Ganti [N] dengan nomor lantai dan pakai angka dari tabel di bawah prompt.
+
+[paste AUDIT RULES here]
+
+FLOOR [N] CONTENT AUDIT. Reuse the engine from earlier stages; check only what this floor adds.
+
+F[N]-01 Data integrity: src/data/floor[N].content.json parses; topic ids, quiz counts, spell ids and boss phase count match the table below; every question has 4 options, a valid correctIndex and an explanation; boss variants valid; variant-level spellId overrides the phase-level spellId where present; "reviewStatus" is "needs-human-review".
+F[N]-02 Loader: the file is loaded by the same loader as earlier floors; nothing else in the app hard-codes its content.
+F[N]-03 Unlock rules for this floor match the table.
+F[N]-04 Room flow: scroll -> battle (5 questions + 1 echo) -> spell unlocked; pass rule and hearts unchanged from stage 1.
+F[N]-05 Echo rule: drawn from defeated topics with the stated split; fall back correctly when a pool is empty (test with injected state).
+F[N]-06 Grimoire and boss spell selection: cards grouped by floor tabs; maximum card count matches the table; names only unless a potion is used.
+F[N]-07 Boss: segment count equals boss.phases.length; hearts/potions as in the table; completion requires the combined checklist; rewards and relic as in the table; XP given once.
+F[N]-08 Mini-labs and special features listed in the table work (keyboard only; no XP; never block progress).
+F[N]-09 Store: new spell ids, question ids, relics and any new fields persist across reload; older saves migrate; no new localStorage keys.
+F[N]-10 Regression: floors 1..[N-1] still behave as before (run the earlier stage checks that are cheap to run).
+F[N]-11 Build and runtime: `npm run build` passes; no console errors in a scripted run through this floor's first room and boss.
+
+Table of floor specifics
+- Floor 2: topics 7-11 (5 topics, 25 questions); spells s7-s11; boss "Golem Pohon Purba" 6 phases (phase 6 "Gema Lantai 1": variants use s5 and s2); 3 hearts, 2 potions; sequential rooms; unlocks after floor 1 boss; echo 60% earlier floors / 40% current; max cards 11; relic "Daun Emas"; bossProgress keyed by floor.
+- Floor 3: topics 12-17 (6 topics, 30 questions); spells s12-s17; boss "Hydra Berkepala Banyak" 7 phases (phase 7 "Gema Lantai 1-2": variants s5 and s8); 3 hearts, 3 potions; unlocks after floor 2 boss; echo 60/40; max cards 17; mini-labs "neuron" (topic 12) and "softmax" (topic 16); relic "Inti Neuron".
+- Floor 4: topics 18-20 (3 topics, 15 questions); spells s18-s20; boss "Mecha-Core" 5 phases (phase 4 variants s14 and s9; phase 5 variants s2 and s15); 3 hearts, 2 potions; unlocks after floor 3 boss; echo 60/40; max cards 20; mini-labs "quant" (topic 19) and "latency" (topic 20); relic "Chip Edge"; completing this boss does NOT unlock floor 5 (floor 5 is open from the start): it shows the teaser "Guild Hall menunggu: 8 quest paralel" and counts toward the 5-boss requirement.
+- Floor 5: topics 21-28 (8 topics, 40 questions); spells s21-s28; boss "Raja Deadline" 8 phases, every phase uses ONLY floor 5 spells; 3 hearts, 3 potions; all 8 rooms unlocked from the start of the game and playable in any order; echo drawn from ALL defeated topics of any floor (skipped if none); max cards 28; each quest drops its own relic and the boss drops "Stopwatch Perak"; "Catatan bukti" (max 300 chars) is stored in evidenceNotes[topicId], rendered as PLAIN TEXT (grep for dangerouslySetInnerHTML/innerHTML and for auto-linking), optional, never blocks defeating a room; after the boss show "Boss dikalahkan: X/5" and which floors still lack a boss.
+Tahap 6: Audit Lantai 6 (Menara Master)
+[paste AUDIT RULES here]
+
+FLOOR 6 (MENARA MASTER) AUDIT.
+
+F6-01 Data integrity: src/data/floor6.content.json parses; 7 quests (m1-m7), each with xp 150, a relic, steps, references (null urls are rendered as plain text) and an evidenceHint; guardian "Cermin Puncak" with 5 reflection prompts (r1-r5); certificate has title, honestNote and closing; 5 specializations; "reviewStatus" is "needs-human-review". The file contains NO quiz questions.
+F6-02 Unlock: floor 6 is locked until ALL 5 bosses are defeated; while locked show "Boss dikalahkan: X/5" and a read-only preview of the 7 quests (titles and summaries only, no checkboxes).
+F6-03 Quests: any order; per-step checkboxes persist (towerSteps) and can be unticked until completion; "Tandai selesai" is enabled only when all steps are ticked; completion grants 150 XP once and drops the relic; completed quests stay completed.
+F6-04 Specialization (m6): dropdown with the 5 options plus the note; the step "Pilih satu spesialisasi di aplikasi ini" can be ticked only after a value is chosen; the value persists and appears on the dashboard and certificate.
+F6-05 Evidence notes: keys can be numbers (topics) or strings ("m1"); both work; plain text only; max 300 chars.
+F6-06 Guardian: unlocks only when all 7 quests are complete; 5 prompts one by one; each answer is a plain-text textarea (max 500 chars) saved as the player types; each must be non-empty to continue; the guardian never grades or rejects answers.
+F6-07 Certificate: shows name, level and title, rooms/quests defeated, bosses X/5, relics count, tower 7/7, specialization and issue date; uses the exact certificate.title and honestNote strings; never calls the player a "master"; "Salin ringkasan" copies plain text (with a fallback when navigator.clipboard is unavailable); "Cetak" prints only the certificate via a print stylesheet.
+F6-08 Persistence: towerSteps, towerCompleted, reflections, specialization, certificateIssuedAt persist and migrate; no new localStorage keys.
+F6-09 Safety: external links use rel="noopener noreferrer"; no HTML injection from any user text field.
+F6-10 Regression, build and runtime: floors 1-5 unchanged; `npm run build` passes; no console errors in a scripted pass (NOT RUN if no browser tooling).
+Tahap 7: Audit mesin pelajaran (Lantai 1)
+[paste AUDIT RULES here]
+
+LESSON ENGINE AUDIT (Lesson Chunks v3) with Floor 1 lessons.
+
+L0-01 Data: src/data/lessons/floor1.lessons.json parses; 22 chunks (topic 1: 3, topic 2: 4, topic 3: 5, topic 4: 3, topic 5: 4, topic 6: 3); every chunk has chunkId, title, goal, scene, guess, steps, practice, formula (with readAloud), commonMistake, summaryPrompt and reviewItems; "reviewStatus" is "needs-human-review".
+L0-02 `npm run check:lessons` exists, runs, and passes on Floor 1. Verify that it actually FAILS on deliberately broken copies in /tmp (step over 30 words, dotGrid groups not summing to total, a subset larger than its parent, correctIndex out of range, non-numeric fillNumber answer, order with fewer than 3 items, match with fewer than 3 pairs, missing readAloud).
+L0-03 Player flow: goal -> scene -> guess -> visual+steps -> practice -> formula/mistake -> summary -> finish; "Lewati ke rumus" jumps to the formula step but practice stays available; the guess question is ungraded (neutral reveal only).
+L0-04 Stepper: steps appear one at a time with "Lanjut"; revealed steps remain visible; highlight ids glow in the visual and unknown ids are ignored safely.
+L0-05 Activities (test each with a script or the UI): `choice` (shuffle keeps correctness), `fillNumber` (accepts comma or dot decimals, "-" and "−", surrounding spaces; respects tolerance; shows unit; accepts negatives like -18), `order` (data order is the correct order; shown shuffled; "Cek" marks wrong positions), `match` (right side shuffled; wrong pairs shown).
+L0-06 Retries: unlimited retries; "Lihat jawaban" appears after two wrong tries; no hearts, XP or unlock impact.
+L0-07 Visuals: dotGrid (parent/subset drawing, legend labels exactly as in the data, pattern or label in addition to color), bars (decimals, zero value still visible), linePlot (negative x draws axes; `line` {m,c}), matrixGrid (labels, highlight tokens like "A:r1", "B:c2", "C:r2c1"), codeBlock (indentation preserved, "#" lines dimmed, never executed).
+L0-08 Glossary: terms render as dotted-underline buttons; tap/click/focus opens a popover with the plain explanation; Escape closes; a "Kamus" drawer lists the chunk's terms; text is plain.
+L0-09 Review queue: items start at box 0 and are due immediately; intervals per box [1,3,7,14,30] days times intervalScale (0.5-2, default 1); "Ingat" moves up one box (max 4) and sets due accordingly; "Ragu" keeps the box with due = today + interval (min 1 day); "Lupa" goes to box 0 with due tomorrow; at most 10 items per session; badge with the due count; reviews count toward the streak but give no XP. Verify the scheduling function with injected dates.
+L0-10 Gating: "Aku siap bertarung" is enabled when all chunks of the topic are complete (every practice activity attempted at least once); it never depends on correct answers; topics without chunks still show the old v1 scroll.
+L0-11 Persistence: lessonProgress, summaries (max 400 chars, plain text), reviewQueue, settings.intervalScale persist; no new localStorage keys.
+L0-12 Accessibility: all activities usable by keyboard; labeled inputs; focus trap in popovers/drawers; feedback not color-only; reduced-motion respected.
+L0-13 Build and runtime: `npm run build` passes; no new dependencies; no console errors in a scripted run of one chunk of each topic.
+Tahap 8: Audit pelajaran Lantai 2 sampai 6 (satu templat)
+[paste AUDIT RULES here]
+
+LESSONS AUDIT FOR FLOOR [N] (Lesson Chunks v3). The engine is already audited; check only what this floor's lesson file adds.
+
+LF[N]-01 Data: src/data/lessons/floor[N].lessons.json parses and is registered in the loader (floor 6 is keyed by `questId` under `quests`; floors 1-5 by `topicId` under `topics`); chunk counts match the table below; required fields present; "reviewStatus" is "needs-human-review".
+LF[N]-02 `npm run check:lessons` passes for floors 1..[N]; report any warning.
+LF[N]-03 Cross-reference: every chunkId and reviewItem id is unique across ALL lesson files; every topic/quest id exists in the content files.
+LF[N]-04 Special fields: floor 3 `miniLab` appears only in t12c1 ("neuron") and t16c1 ("softmax"); floor 4 only in t19c5 ("quant") and t20c2 ("latency"); floor 5 chunks all have `realTask` cards ("Tugas nyata (opsional)" with a persisted "Sudah kucoba" tick, no XP); floor 6 chunks have `formulaTitle` headings and live in a "Panduan" tab of each quest panel without ticking checklist steps or completing quests.
+LF[N]-05 Renderer edge cases for this floor (table below) render and grade correctly.
+LF[N]-06 Independence: floor 5 and 6 lessons work without other floors completed.
+LF[N]-07 Regression: previous floors' lessons and the old v1 scroll fallback still work.
+LF[N]-08 Build and runtime: `npm run build` passes; no console errors in a scripted run of one chunk per topic/quest.
+
+Floor specifics
+- Floor 2: 22 chunks (topic 7: 4, 8: 5, 9: 6, 10: 4, 11: 3). Edge cases: matrixGrid with rowLabels/colLabels (t7c4, t9c1, t10c1 style), bars with values 0.105-100000 (t7c3), codeBlock with blank lines (t7c2).
+- Floor 3: 23 chunks (topic 12: 4, 13: 3, 14: 4, 15: 4, 16: 4, 17: 4). Edge cases: matrixGrid with negative/decimal cells, linePlot with negative x, answers like -12 and -18 in fillNumber, codeBlock indentation.
+- Floor 4: 13 chunks (topic 18: 4, 19: 5, 20: 4). Edge cases: large integers (120000, 14400), bars with 200000 vs 50000, matrixGrid with labels (t20c4), code comments starting with "#".
+- Floor 5: 29 chunks (topic 21: 4, 22: 3, 23: 6, 24: 3, 25: 3, 26: 3, 27: 3, 28: 4). Edge cases: codeBlock with inner double quotes, linePlot with non-integer points and line c = -6, fillNumber with units "%", "V", "Hz", "mA", "°C", dotGrid total 10 with 5 columns.
+- Floor 6: 19 chunks (m1: 3, m2: 2, m3: 4, m4: 3, m5: 3, m6: 2, m7: 2). Edge cases: Unicode math symbols (m̂, v̂, θ, α, β, ε, √, Σ, subscripts), fillNumber decimals 86.67 and 3.33, matrixGrid with long column labels (m6c1).
+Tahap 9: Audit aritmatika dan struktur seluruh konten
+
+Prompt ini mencari kesalahan hitung di semua file JSON dengan skrip sekali pakai. Ini paling berguna sebelum kamu memakai konten.
+
+[paste AUDIT RULES here]
+
+MATH AND CONTENT CONSISTENCY AUDIT across ALL content and lesson JSON files (src/data/floor*.content.json, src/data/lessons/*.lessons.json, src/data/floor6.content.json).
+
+Write a throwaway Node script under /tmp (do not add it to the repo) that does the following and prints a report grouped by file and id.
+
+M-01 Structural: every `correctIndex` is in range for its options; no duplicate options inside one question; `order` has >= 3 items; `match` has >= 3 pairs with unique left sides; ids are unique across all files.
+M-02 Arithmetic in explanations: scan every `why`, `explanation`, step `text` and `workedExample` for simple arithmetic written like "a × b = c", "a ÷ b = c", "a + b = c", "a − b = c" and chains of them. Parse Indonesian number formats (thousands with ".", decimals with ","). Recompute and compare with tolerance equal to the number of decimals shown. Treat "≈" as approximate (flag only if off by more than 1% relative). Report mismatches with file, id and the exact text. Do NOT try to interpret prose; only evaluate clearly arithmetic patterns, and list how many patterns you could and could not evaluate.
+M-03 fillNumber consistency: for each fillNumber whose `why` ends with "= X", compare X to `answer`; flag differences. Also flag any `answer` that is not representable by the unit (for example a percentage answer above 100 where the question is about a share).
+M-04 Quiz versus explanation: for each multiple-choice question, check whether the text of options[correctIndex] appears (or its numeric value appears) in the explanation; list questions where the explanation seems to support a different option. This is a heuristic: label results "needs human check", not FAIL.
+M-05 Cross-file consistency of recurring numbers: for the known recurring examples (Bayes 18 ÷ 117 and 15%, MSE 1.25, softmax [2,1,0], conv output sizes, 448 parameters, 40,000 bytes for 10,000 float32 parameters) confirm that every file that mentions them uses the same values.
+M-06 Reading aids: report chunks where a `steps[].text` exceeds 30 words, or a sentence in `scene` exceeds 20 words, with the average sentence length per floor.
+M-07 URLs: list every URL found in the references (with the file and id) in a table, grouped by domain, and flag any that is not https. Do not fetch them; the owner will check them manually.
+Finish with: counts of patterns evaluated, mismatches found, and items that need human review.
+Tahap 10: Audit integrasi lintas lantai
+[paste AUDIT RULES here]
+
+CROSS-FLOOR INTEGRATION AUDIT of the whole project.
+
+I-01 Fresh start: from an empty store, only floor 1 rooms (with topic 6 open) and all floor 5 quests are playable; floors 2-4 and the tower are locked with the correct messages.
+I-02 Progression chain: using injected state (throwaway script or devtools-free test), verify that defeating the floor 1..4 bosses unlocks floors 2..4 in order, that floor 5 never depends on them, and that the tower unlocks only when all 5 bosses are defeated (try 4 of 5 in every combination).
+I-03 Store migration: load saves from each earlier schema version you can reconstruct (v1 shape, bossProgress as a single object, no lessonProgress) and confirm they migrate to the current shape without data loss. List the final schema with every key.
+I-04 Single storage key: grep the whole codebase for localStorage, sessionStorage and indexedDB; there must be exactly one persisted key.
+I-05 Echo/Dojo/review interplay: Gema Masa Lalu, Dojo Latihan and Ulasan Harian use separate data (questionStats vs reviewQueue) and do not corrupt one another; defeated-topic filtering is correct across floors.
+I-06 Boss spell selection with all floors unlocked: up to 28 cards, tabs per floor, current floor tab open by default, names only unless a potion is used; floor 5 boss uses only floor 5 spells.
+I-07 Idempotent rewards: defeating, replaying, reloading or double-clicking never grants XP, relics or badges twice (boss 300, room formula, tower 150, echo +5, Dojo cap 20 per day).
+I-08 Text safety: grep for dangerouslySetInnerHTML, innerHTML, eval, new Function and document.write; user-entered text (evidence notes, summaries, reflections, name) is always rendered as plain text; external links have rel="noopener noreferrer".
+I-09 Network and privacy: no fetch/XHR/WebSocket/beacon/analytics; no hard-coded secrets; reset progress clears everything including lesson data and reviews.
+I-10 Performance sanity: report the production bundle size per chunk (from the build output), and the render cost of a 2,000-square dotGrid (measure or inspect; mark NOT RUN if not measurable).
+I-11 Accessibility sweep: keyboard-only pass through title, map, a battle, the lesson player, the grimoire, dashboard, tower and settings; list every trap, missing label or focus problem.
+I-12 Reduced motion: with the in-app toggle and with the OS preference, confirm every big animation is replaced by a fade and the CRT scanline effect is disabled.
+I-13 Dependency hygiene: run `npm ls --all` and `npm audit --omit=dev` and report; list unused dependencies if you can detect them.
+Tahap 11: Audit polesan akhir (pelacak jam belajar dan ekspor/impor)
+[paste AUDIT RULES here]
+
+FINAL POLISH AUDIT ("Camp Api Unggun", export/import, final QA).
+
+P-01 Study tracker: "Catat sesi" form (topic, duration, date) works; optional pixel Pomodoro timer logs a session on completion; weekly target default 9 hours (editable); this week's progress bar; hand-built SVG bar chart of the last 8 weeks (no chart library); daily streak.
+P-02 Projection: the projected completion month uses actual average hours per week, is clearly labeled a rough estimate, and handles the no-data and zero-average cases without NaN/Infinity.
+P-03 Weekly bonus: bonus XP is granted once per week when the target is met; the campfire visual scales with weekly progress.
+P-04 Export: produces a JSON file containing the whole save with a version field.
+P-05 Import: validates structure and version; rejects invalid or oversized files with a clear Indonesian message; asks for confirmation before overwriting; never merges partially on failure (the old save must remain intact if validation fails). Test with: valid file, truncated JSON, wrong version, unknown keys, huge file, and a file with script-like strings in text fields (they must render as plain text).
+P-06 Round trip: export, reset, import restores identical state (deep-equal compare).
+P-07 Final regression: run every earlier audit's cheap checks (build, check:lessons, XP formula script, unlock-chain script) and report their results in one table.
+P-08 Release hygiene: README describes install, dev, build, how to add or edit content files, and the `needs-human-review` status of the content; no leftover TODOs or debug logs; no unused assets.
+Prompt perbaikan (dipakai setelah audit)
+Fix ONLY the audit findings listed below. For each finding: (1) restate it, (2) make the smallest change that fixes it, (3) do not edit any quiz, boss, lesson or content text unless the finding explicitly says the content is wrong (in that case show the exact before/after and the arithmetic that justifies it), (4) re-run the exact check that failed and paste the evidence, (5) run `npm run build` and `npm run check:lessons` at the end. Do not refactor unrelated code, do not add dependencies, and do not touch files outside the findings' scope. If a finding is ambiguous, ask before changing anything.
+
+Findings to fix:
+[paste the FAIL rows from the audit table here]

@@ -245,7 +245,10 @@ export const ReviewPage: React.FC = () => {
                 Kartu <strong className="text-[#f5b935]">{currentIndex + 1}</strong> dari{' '}
                 <strong>{sessionDeck.length}</strong> (Sesi Ini) ·{' '}
                 <span className="text-[#3ac5eb]">
-                  Topik #{currentCard.topicId}: {currentCard.chunkTitle}
+                  {currentCard.questId
+                    ? `Quest Menara ${currentCard.questId.toUpperCase()}`
+                    : `Topik #${currentCard.topicId}`}
+                  : {currentCard.chunkTitle}
                 </span>
               </div>
               <div className="flex items-center gap-2">

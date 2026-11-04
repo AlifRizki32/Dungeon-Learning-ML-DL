@@ -24,7 +24,7 @@ const FLOATING_RUNES = [
   { text: 'df.isna().sum()', x: '62%', y: '36%', delay: 1.5 },
 ];
 
-const NeuronMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion }) => {
+export const NeuronMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion }) => {
   const [x1, setX1] = useState<number>(2);
   const [x2, setX2] = useState<number>(-1);
   const [w1, setW1] = useState<number>(1.5);
@@ -166,7 +166,7 @@ const NeuronMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion
   );
 };
 
-const SoftmaxMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion }) => {
+export const SoftmaxMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion }) => {
   const [s1, setS1] = useState<number>(2);
   const [s2, setS2] = useState<number>(1);
   const [s3, setS3] = useState<number>(0);
@@ -282,7 +282,7 @@ const SoftmaxMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotio
   );
 };
 
-const QuantMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion }) => {
+export const QuantMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion }) => {
   const [parameterCount, setParameterCount] = useState<number>(50000);
   const [dataType, setDataType] = useState<'float32' | 'int8'>('float32');
   const [flashKB, setFlashKB] = useState<number>(1000);
@@ -522,7 +522,7 @@ const QuantMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion 
   );
 };
 
-const LatencyMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion }) => {
+export const LatencyMiniLabWidget: React.FC<{ reduceMotion: boolean }> = ({ reduceMotion }) => {
   const [akuisisi, setAkuisisi] = useState<number>(20);
   const [prapemrosesan, setPrapemrosesan] = useState<number>(5);
   const [inferensi, setInferensi] = useState<number>(35);

@@ -1,0 +1,629 @@
+{
+  "reviewStatus": "needs-human-review",
+  "floor": 6,
+  "lessonVersion": 3,
+  "guide": { "name": "Rune", "role": "Pemandu dungeon" },
+  "quests": [
+    {
+      "questId": "m1",
+      "chunks": [
+        {
+          "chunkId": "m1c1",
+          "title": "Membaca buku teori secara aktif",
+          "goal": "Setelah ini kamu bisa menyusun jadwal membaca buku teori yang realistis dan membacanya secara aktif.",
+          "terms": [ { "term": "membaca aktif", "plain": "membaca satu bagian, menutup buku, lalu menulis intinya dengan kata sendiri" } ],
+          "scene": [
+            { "who": "Rune", "text": "Buku teori itu tebal. Jika hanya dibaca sekali lewat, sebagian besar akan hilang." },
+            { "who": "Kamu", "text": "Jadi aku butuh jadwal dan cara baca yang berbeda?" }
+          ],
+          "guess": { "question": "Buku 400 halaman dibaca dalam 20 minggu. Berapa halaman per minggu?", "options": ["20", "40", "10", "80"], "correctIndex": 0, "reveal": "Mari kita hitung, lalu tambahkan buffer." },
+          "steps": [
+            { "text": "Buku 400 halaman, target 20 minggu: 400 ÷ 20 = 20 halaman per minggu.", "highlight": [] },
+            { "text": "Jika kamu belajar 4 sesi per minggu: 20 ÷ 4 = 5 halaman per sesi.", "highlight": [] },
+            { "text": "Tambahkan buffer 20% agar jadwal tidak mudah rusak: 20 × 0,8 = 16 halaman per minggu.", "highlight": [] },
+            { "text": "Dengan 16 halaman per minggu, 400 ÷ 16 = 25 minggu. Jadwalnya lebih lama, tetapi lebih realistis.", "highlight": [] },
+            { "text": "Cara membaca aktif: baca satu bagian, tutup buku, tulis intinya dengan kata sendiri, lalu cek ke buku.", "highlight": [] },
+            { "text": "Bagian yang tidak bisa kamu tulis ulang adalah bagian yang perlu dibaca lagi.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m1c1p1", "type": "fillNumber", "question": "Buku 300 halaman dibaca dalam 15 minggu. Berapa halaman per minggu?", "answer": 20, "tolerance": 0, "unit": "halaman", "why": "300 ÷ 15 = 20." },
+            { "id": "m1c1p2", "type": "fillNumber", "question": "Buku 360 halaman dalam 12 minggu dengan 3 sesi per minggu. Berapa halaman per sesi?", "answer": 10, "tolerance": 0, "unit": "halaman", "why": "360 ÷ 12 = 30 per minggu. 30 ÷ 3 = 10 per sesi." },
+            { "id": "m1c1p3", "type": "choice", "question": "Bagian buku yang tidak bisa kamu tulis ulang dengan kata sendiri berarti...", "options": ["Perlu dibaca lagi", "Sudah dipahami", "Tidak penting", "Boleh dilewati"], "correctIndex": 0, "why": "Kesulitan menulis ulang menandakan pemahaman yang belum utuh." }
+          ],
+          "formulaTitle": "Aturan praktis",
+          "formula": { "lines": ["halaman per minggu = total halaman ÷ jumlah minggu", "jadwal dengan buffer: kalikan target mingguan dengan (1 − buffer)"], "readAloud": "Bagi total halaman dengan jumlah minggu, lalu sisihkan buffer agar jadwal tahan gangguan." },
+          "commonMistake": "Mengejar jumlah halaman tanpa menguji apakah kamu bisa menjelaskan isinya.",
+          "realTask": "Pilih satu buku teori, hitung halaman per minggu dengan buffer, dan tulis jadwalnya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa membaca aktif lebih berguna daripada membaca cepat?",
+          "reviewItems": [ { "id": "m1c1r1", "front": "Apa itu membaca aktif?", "back": "Membaca satu bagian, menutup buku, menulis intinya dengan kata sendiri, lalu mengecek." } ]
+        },
+        {
+          "chunkId": "m1c2",
+          "title": "Empat topik teori dan artinya",
+          "goal": "Setelah ini kamu bisa menjelaskan empat topik teori dengan satu kalimat dan menghitung entropi sederhana.",
+          "terms": [
+            { "term": "entropi", "plain": "ukuran ketidakpastian; makin sulit ditebak hasilnya, makin besar" },
+            { "term": "bit", "plain": "satuan informasi untuk ketidakpastian dua pilihan sama mungkin" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Empat nama besar muncul di buku teori: ML probabilistik, optimisasi, teori informasi, dan statistical learning theory." },
+            { "who": "Kamu", "text": "Namanya menakutkan. Apa isinya?" },
+            { "who": "Rune", "text": "Tiap topik menjawab satu pertanyaan sederhana." }
+          ],
+          "guess": { "question": "Koin adil: hasilnya paling sulit ditebak. Koin yang selalu gambar: tidak sulit sama sekali. Mana yang entropinya lebih besar?", "options": ["Koin adil", "Koin yang selalu gambar", "Sama", "Tidak bisa dihitung"], "correctIndex": 0, "reveal": "Kita hitung." },
+          "steps": [
+            { "text": "ML probabilistik memandang parameter dan prediksi sebagai hal yang punya ketidakpastian, dinyatakan dengan peluang. Teorema Bayes adalah salah satu alatnya.", "highlight": [] },
+            { "text": "Optimisasi mencari nilai parameter yang membuat loss sekecil mungkin. Gradient descent adalah salah satu caranya.", "highlight": [] },
+            { "text": "Teori informasi mengukur informasi atau ketidakpastian, misalnya dengan entropi: H = −Σ p·log₂(p).", "highlight": [] },
+            { "text": "Koin adil: H = −(0,5·log₂0,5 + 0,5·log₂0,5) = 0,5 + 0,5 = 1 bit.", "highlight": [] },
+            { "text": "Koin yang selalu gambar: peluangnya 1 dan 0. Entropinya 0 bit, karena tidak ada ketidakpastian.", "highlight": [] },
+            { "text": "Statistical learning theory mempelajari kapan model yang belajar dari contoh bisa bekerja pada data baru. Overfitting adalah salah satu masalahnya.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m1c2p1", "type": "match", "question": "Cocokkan topik dengan pertanyaan yang dijawabnya.", "pairs": [ { "left": "ML probabilistik", "right": "bagaimana menyatakan ketidakpastian dengan peluang" }, { "left": "Optimisasi", "right": "bagaimana mencari parameter dengan loss terkecil" }, { "left": "Teori informasi", "right": "bagaimana mengukur informasi atau ketidakpastian" }, { "left": "Statistical learning theory", "right": "kapan model bisa bekerja pada data baru" } ], "why": "Satu pertanyaan sederhana untuk tiap topik." },
+            { "id": "m1c2p2", "type": "fillNumber", "question": "Empat hasil yang sama mungkin. Entropinya log₂(4). Berapa bit?", "answer": 2, "tolerance": 0, "unit": "bit", "why": "Tiap p = 0,25. H = −4 × 0,25 × log₂(0,25) = −4 × 0,25 × (−2) = 2." },
+            { "id": "m1c2p3", "type": "fillNumber", "question": "Hasil dengan peluang 0,5 dan 0,5. Berapa entropinya?", "answer": 1, "tolerance": 0, "unit": "bit", "why": "Dua hasil sama mungkin menghasilkan 1 bit." }
+          ],
+          "formulaTitle": "Rumus kunci",
+          "formula": { "lines": ["entropi: H = −Σ p·log₂(p)", "dua hasil sama mungkin: H = 1 bit; satu hasil pasti: H = 0 bit"], "readAloud": "Entropi adalah minus jumlah peluang dikali log dua peluangnya." },
+          "commonMistake": "Mengira teori hanya hafalan rumus. Tiap topik menjawab pertanyaan yang bisa kamu jelaskan sendiri.",
+          "realTask": "Tulis satu kalimat dengan kata-katamu sendiri untuk tiap dari empat topik, lalu cari bab yang menjelaskannya di bukumu.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa koin adil punya entropi lebih besar?",
+          "reviewItems": [ { "id": "m1c2r1", "front": "Entropi koin adil?", "back": "1 bit." } ]
+        },
+        {
+          "chunkId": "m1c3",
+          "title": "Menguji dirimu tanpa catatan",
+          "goal": "Setelah ini kamu bisa mengukur seberapa lancar kamu menjelaskan konsep teori tanpa melihat catatan.",
+          "terms": [ { "term": "tes ingatan", "plain": "menjelaskan konsep dari ingatan, tanpa melihat buku atau catatan" } ],
+          "scene": [
+            { "who": "Rune", "text": "Membaca ulang terasa lancar, tetapi itu tidak membuktikan kamu paham." },
+            { "who": "Rune", "text": "Ujilah dirimu dengan menutup catatan." }
+          ],
+          "guess": { "question": "Dari 5 konsep, kamu lancar menjelaskan 3. Berapa persen?", "options": ["60%", "30%", "75%", "50%"], "correctIndex": 0, "reveal": "Mari kita bangun tes yang rapi." },
+          "steps": [
+            { "text": "Pilih 5 konsep dari buku yang sudah kamu baca.", "highlight": [] },
+            { "text": "Tutup catatan. Jelaskan tiap konsep selama sekitar 2 menit. Total waktu: 5 × 2 = 10 menit.", "highlight": [] },
+            { "text": "Tandai konsep yang membuatmu tersendat. Misalkan 2 dari 5.", "highlight": [] },
+            { "text": "Lancar = 5 − 2 = 3 konsep. Persen lancar = 3 ÷ 5 = 60%.", "highlight": [] },
+            { "text": "Pelajari ulang yang tersendat, lalu uji lagi minggu depan. Jika 4 dari 5 lancar, hasilnya 80%.", "highlight": [] },
+            { "text": "Jadi tes ingatan menunjukkan bagian yang masih lemah dengan jujur.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m1c3p1", "type": "fillNumber", "question": "Dari 8 konsep, 6 lancar dijelaskan. Berapa persen?", "answer": 75, "tolerance": 0, "unit": "%", "why": "6 ÷ 8 = 0,75 = 75%." },
+            { "id": "m1c3p2", "type": "fillNumber", "question": "6 konsep × 3 menit penjelasan. Berapa menit total?", "answer": 18, "tolerance": 0, "unit": "menit", "why": "6 × 3 = 18." },
+            { "id": "m1c3p3", "type": "order", "question": "Urutkan satu putaran tes ingatan.", "items": ["Pilih beberapa konsep", "Tutup catatan dan jelaskan", "Tandai yang membuatmu tersendat", "Pelajari ulang yang tersendat dan uji lagi"], "why": "Pilih, jelaskan, tandai, lalu perbaiki." }
+          ],
+          "formulaTitle": "Aturan praktis",
+          "formula": { "lines": ["persen lancar = konsep lancar ÷ total konsep × 100"], "readAloud": "Persen lancar adalah konsep yang lancar dibagi total, dikali seratus." },
+          "commonMistake": "Mengira membaca ulang catatan sama dengan memahami.",
+          "realTask": "Pilih 5 konsep teori, jelaskan tanpa catatan, dan hitung persen lancarmu.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang kamu pelajari dari bagian yang membuatmu tersendat?",
+          "reviewItems": [ { "id": "m1c3r1", "front": "Bagaimana menguji pemahamanmu?", "back": "Jelaskan konsep tanpa catatan, tandai yang tersendat, lalu pelajari ulang." } ]
+        }
+      ]
+    },
+    {
+      "questId": "m2",
+      "chunks": [
+        {
+          "chunkId": "m2c1",
+          "title": "Memilih satu kursus dan menjadwalkannya",
+          "goal": "Setelah ini kamu bisa memilih satu kursus utama dan menghitung berapa minggu yang kamu butuhkan.",
+          "terms": [ { "term": "kursus utama", "plain": "satu kursus yang kamu selesaikan lebih dulu, sebelum membuka yang lain" } ],
+          "scene": [
+            { "who": "Rune", "text": "Banyak kursus bagus tersedia, dan semuanya menggoda." },
+            { "who": "Rune", "text": "Petualang yang membuka sepuluh kursus biasanya tidak menyelesaikan satu pun." }
+          ],
+          "guess": { "question": "Kursus 40 jam dengan 5 jam belajar per minggu. Berapa minggu?", "options": ["8", "5", "10", "40"], "correctIndex": 0, "reveal": "Kita hitung, lalu tambahkan buffer." },
+          "steps": [
+            { "text": "Kursus 40 jam dengan 5 jam per minggu: 40 ÷ 5 = 8 minggu.", "highlight": [] },
+            { "text": "Tambahkan buffer 20%: jam efektif per minggu = 5 × 0,8 = 4.", "highlight": [] },
+            { "text": "Dengan 4 jam efektif per minggu: 40 ÷ 4 = 10 minggu.", "highlight": [] },
+            { "text": "Pilih satu kursus utama. Daftar yang lain di daftar 'nanti'.", "highlight": [] },
+            { "text": "Jadwalkan sesi tetap, misalnya dua sesi dua jam per minggu, dan tulis di kalender.", "highlight": [] },
+            { "text": "Jadi satu kursus dengan jadwal tetap lebih mungkin selesai daripada banyak kursus tanpa jadwal.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m2c1p1", "type": "fillNumber", "question": "Kursus 30 jam dengan 6 jam per minggu. Berapa minggu?", "answer": 5, "tolerance": 0, "unit": "minggu", "why": "30 ÷ 6 = 5." },
+            { "id": "m2c1p2", "type": "fillNumber", "question": "Kursus 48 jam, 6 jam per minggu, buffer 20%. Berapa minggu?", "answer": 10, "tolerance": 0, "unit": "minggu", "why": "Jam efektif 6 × 0,8 = 4,8. 48 ÷ 4,8 = 10." },
+            { "id": "m2c1p3", "type": "choice", "question": "Kamu tertarik pada lima kursus. Langkah yang paling realistis?", "options": ["Pilih satu kursus utama dan jadwalkan; yang lain masuk daftar 'nanti'", "Mulai kelimanya sekaligus", "Tidak mengikuti satu pun", "Berganti kursus tiap minggu"], "correctIndex": 0, "why": "Fokus pada satu kursus membantu menyelesaikannya." }
+          ],
+          "formulaTitle": "Aturan praktis",
+          "formula": { "lines": ["minggu = jam kursus ÷ (jam per minggu × (1 − buffer))"], "readAloud": "Jam kursus dibagi jam efektif per minggu." },
+          "commonMistake": "Mendaftar banyak kursus sekaligus tanpa menyelesaikan satu pun.",
+          "realTask": "Pilih satu kursus utama, hitung jumlah minggunya dengan buffer, dan jadwalkan sesinya di kalender.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kamu memilih kursus itu?",
+          "reviewItems": [ { "id": "m2c1r1", "front": "Cara menghitung lama kursus?", "back": "Jam kursus ÷ jam efektif per minggu (setelah buffer)." } ]
+        },
+        {
+          "chunkId": "m2c2",
+          "title": "Mengerjakan, bukan hanya menonton",
+          "goal": "Setelah ini kamu bisa mengukur seberapa banyak tugas kursus yang sudah kamu kerjakan dan menerapkannya ke proyek.",
+          "terms": [ { "term": "tugas kursus", "plain": "latihan atau proyek yang diberikan kursus untuk dikerjakan sendiri" } ],
+          "scene": [
+            { "who": "Rune", "text": "Menonton kuliah terasa seperti belajar, tetapi tangan belum bekerja." },
+            { "who": "Rune", "text": "Kebiasaan yang disarankan: tiap selesai satu materi, kerjakan tugasnya." }
+          ],
+          "guess": { "question": "Dari 15 tugas, kamu sudah mengerjakan 12. Berapa persen?", "options": ["80%", "12%", "75%", "90%"], "correctIndex": 0, "reveal": "Kita hitung dan rencanakan penerapannya." },
+          "steps": [
+            { "text": "Kursus punya 15 tugas. Kamu sudah mengerjakan 12.", "highlight": [] },
+            { "text": "Persen tugas selesai = 12 ÷ 15 = 0,8 = 80%.", "highlight": [] },
+            { "text": "Sisa 15 − 12 = 3 tugas. Jadwalkan seminggu untuk menyelesaikannya.", "highlight": [] },
+            { "text": "Pasangkan dengan kanal intuisi, misalnya StatQuest atau 3Blue1Brown, untuk konsep yang masih kabur.", "highlight": [] },
+            { "text": "Terapkan tiga hal dari kursus ke proyekmu sendiri dan catat hasilnya.", "highlight": [] },
+            { "text": "Jadi ukuran kemajuanmu adalah tugas yang kamu kerjakan, bukan jam video yang kamu tonton.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m2c2p1", "type": "fillNumber", "question": "20 tugas, 17 selesai. Berapa persen?", "answer": 85, "tolerance": 0, "unit": "%", "why": "17 ÷ 20 = 0,85 = 85%." },
+            { "id": "m2c2p2", "type": "fillNumber", "question": "Dari 24 tugas, 18 selesai. Berapa tugas yang tersisa?", "answer": 6, "tolerance": 0, "unit": "", "why": "24 − 18 = 6." },
+            { "id": "m2c2p3", "type": "choice", "question": "Ukuran kemajuan yang lebih berguna?", "options": ["Tugas yang kamu kerjakan dan terapkan", "Jam video yang ditonton", "Jumlah kursus yang dibuka", "Jumlah catatan yang disalin"], "correctIndex": 0, "why": "Tugas dan penerapan menunjukkan kemampuan sebenarnya." }
+          ],
+          "formulaTitle": "Aturan praktis",
+          "formula": { "lines": ["persen selesai = tugas selesai ÷ total tugas × 100"], "readAloud": "Tugas yang selesai dibagi total tugas, dikali seratus." },
+          "commonMistake": "Menghitung kemajuan dari jam menonton, bukan dari tugas yang dikerjakan.",
+          "realTask": "Hitung persen tugas kursus yang sudah selesai dan tulis tiga hal yang akan kamu terapkan ke proyekmu.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: satu hal dari kursus yang sudah kamu terapkan.",
+          "reviewItems": [ { "id": "m2c2r1", "front": "Ukuran kemajuan belajar yang baik?", "back": "Tugas yang dikerjakan dan diterapkan, bukan jam menonton." } ]
+        }
+      ]
+    },
+    {
+      "questId": "m3",
+      "chunks": [
+        {
+          "chunkId": "m3c1",
+          "title": "Cara membaca sebuah paper",
+          "goal": "Setelah ini kamu bisa membaca paper dengan urutan yang terarah dan menghitung waktu yang dibutuhkan.",
+          "terms": [
+            { "term": "abstrak", "plain": "ringkasan singkat sebuah paper" },
+            { "term": "replikasi", "plain": "membuat ulang hasil sebuah paper dengan kodemu sendiri" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Paper terasa padat, dan membacanya dari kata pertama sampai terakhir sering melelahkan." },
+            { "who": "Rune", "text": "Ada urutan yang disarankan agar kamu tidak tersesat." }
+          ],
+          "guess": { "question": "Bagian paper mana yang sebaiknya dibaca paling awal?", "options": ["Abstrak", "Daftar pustaka", "Lampiran", "Ucapan terima kasih"], "correctIndex": 0, "reveal": "Mari kita susun urutannya." },
+          "steps": [
+            { "text": "Mulai dari abstrak untuk tahu masalah dan hasil utamanya.", "highlight": [] },
+            { "text": "Lihat gambar dan tabel. Banyak ide inti terlihat dari sana.", "highlight": [] },
+            { "text": "Baca bagian metode dengan teliti. Inilah yang akan kamu implementasikan.", "highlight": [] },
+            { "text": "Baca bagian eksperimen untuk tahu pengaturan dan hasil yang dilaporkan.", "highlight": [] },
+            { "text": "Anggarkan waktu: abstrak dan gambar 30 menit, metode 90 menit, eksperimen 60 menit. Total 180 menit, yaitu 3 jam.", "highlight": [] },
+            { "text": "Jadi urutan terarah mencegah kamu tersesat sebelum paham ide intinya.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m3c1p1", "type": "order", "question": "Urutkan cara membaca paper yang disarankan.", "items": ["Baca abstrak", "Lihat gambar dan tabel", "Baca metode dengan teliti", "Baca eksperimen dan tulis ringkasan"], "why": "Dari gambaran umum ke detail." },
+            { "id": "m3c1p2", "type": "fillNumber", "question": "Abstrak dan gambar 20 menit, metode 80 menit, eksperimen 50 menit. Berapa menit total?", "answer": 150, "tolerance": 0, "unit": "menit", "why": "20 + 80 + 50 = 150." },
+            { "id": "m3c1p3", "type": "choice", "question": "Mengapa bagian metode dibaca teliti sebelum replikasi?", "options": ["Karena itulah yang akan kamu implementasikan", "Karena bagian itu paling pendek", "Karena tidak ada bagian lain", "Agar tidak perlu kode"], "correctIndex": 0, "why": "Replikasi menuntut detail langkah dari bagian metode." }
+          ],
+          "formulaTitle": "Urutan yang disarankan",
+          "formula": { "lines": ["abstrak → gambar dan tabel → metode → eksperimen → ringkasan"], "readAloud": "Dari ringkasan, ke gambar, ke metode, ke eksperimen, lalu tulis ringkasan." },
+          "commonMistake": "Membaca dari kata pertama tanpa tahu tujuan paper itu.",
+          "realTask": "Pilih satu paper dari daftar dan tulis ringkasan tiga kalimat dari abstrak dan gambarnya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa masalah yang ingin dipecahkan paper itu?",
+          "reviewItems": [ { "id": "m3c1r1", "front": "Urutan membaca paper yang disarankan?", "back": "Abstrak, gambar dan tabel, metode, eksperimen, lalu ringkasan." } ]
+        },
+        {
+          "chunkId": "m3c2",
+          "title": "Adam: satu langkah dengan tangan",
+          "goal": "Setelah ini kamu bisa menghitung langkah pertama Adam dengan tangan sebelum mengimplementasikannya.",
+          "terms": [
+            { "term": "momen pertama (m)", "plain": "rata-rata bergerak gradien" },
+            { "term": "momen kedua (v)", "plain": "rata-rata bergerak kuadrat gradien" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Adam sudah kamu kenal dari Lantai 3: ia menyesuaikan langkah tiap parameter." },
+            { "who": "Rune", "text": "Sekarang kita hitung satu langkahnya sebelum menulis kode." }
+          ],
+          "guess": { "question": "Dua parameter punya gradien 2 dan 200 pada langkah pertama Adam. Besar langkah keduanya kira-kira...", "options": ["Sama besar (sekitar α)", "Berbeda 100 kali", "Nol", "Tak terhingga"], "correctIndex": 0, "reveal": "Kita buktikan dengan hitungan." },
+          "steps": [
+            { "text": "Adam menyimpan m (rata-rata gradien) dan v (rata-rata kuadrat gradien). Mulai dari m = 0 dan v = 0.", "highlight": [] },
+            { "text": "Pembaruan: m = β1·m + (1 − β1)·g dan v = β2·v + (1 − β2)·g². Pengaturan umum: β1 = 0,9 dan β2 = 0,999.", "highlight": [] },
+            { "text": "Langkah 1 dengan g = 2: m = 0,1·2 = 0,2 dan v = 0,001·4 = 0,004.", "highlight": [] },
+            { "text": "Koreksi awal pada t = 1: m̂ = 0,2 ÷ 0,1 = 2 dan v̂ = 0,004 ÷ 0,001 = 4.", "highlight": [] },
+            { "text": "Parameter: θ baru = θ − α·m̂ ÷ (√v̂ + ε) = θ − 0,001 · 2 ÷ (2 + ε) ≈ θ − 0,001.", "highlight": [] },
+            { "text": "Untuk g = 200, hasilnya juga sekitar α. Langkah pertama kira-kira sebesar α untuk gradien berapa pun.", "highlight": [] },
+            { "text": "Cocokkan rumus ini dengan Algoritma 1 di paper aslinya sebelum menulis kode.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m3c2p1", "type": "fillNumber", "question": "Langkah 1 dengan g = 3 dan β1 = 0,9. Berapa m? (m mulai dari 0)", "answer": 0.3, "tolerance": 0.001, "unit": "", "why": "m = 0,9·0 + 0,1·3 = 0,3." },
+            { "id": "m3c2p2", "type": "fillNumber", "question": "Pada t = 1, m = 0,3. Berapa m̂ = m ÷ (1 − 0,9)?", "answer": 3, "tolerance": 0.001, "unit": "", "why": "0,3 ÷ 0,1 = 3." },
+            { "id": "m3c2p3", "type": "choice", "question": "Mengapa Adam memakai koreksi awal (bias correction)?", "options": ["m dan v mulai dari 0, sehingga estimasi awal condong ke nol", "Agar gradien selalu positif", "Agar learning rate nol", "Agar data lebih kecil"], "correctIndex": 0, "why": "Koreksi menaikkan estimasi awal yang terlalu kecil karena mulai dari nol." }
+          ],
+          "formulaTitle": "Rumus kunci",
+          "formula": { "lines": ["m = β1·m + (1 − β1)·g; v = β2·v + (1 − β2)·g²", "m̂ = m ÷ (1 − β1^t); v̂ = v ÷ (1 − β2^t)", "θ baru = θ − α·m̂ ÷ (√v̂ + ε)"], "readAloud": "Rata-rata gradien dan kuadrat gradien dikoreksi, lalu langkahnya adalah alfa kali rasio keduanya." },
+          "commonMistake": "Menyalin rumus dari ingatan tanpa mencocokkan dengan paper.",
+          "realTask": "Implementasikan Adam di NumPy untuk satu parameter dan cocokkan langkah pertamamu dengan hitungan di atas.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa langkah pertama Adam sekitar α?",
+          "reviewItems": [ { "id": "m3c2r1", "front": "Apa dua rata-rata yang disimpan Adam?", "back": "Rata-rata gradien (m) dan rata-rata kuadrat gradien (v)." } ]
+        },
+        {
+          "chunkId": "m3c3",
+          "title": "Dropout dan blok residual",
+          "goal": "Setelah ini kamu bisa merancang dua replikasi kecil: dropout pada MLP dan satu blok residual.",
+          "terms": [
+            { "term": "blok residual", "plain": "blok yang menghitung F(x) lalu menjumlahkannya dengan masukan x" },
+            { "term": "jurang latih-uji", "plain": "selisih skor latih dan skor uji" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Dua replikasi kecil yang cocok untuk dimulai: dropout dan blok residual." },
+            { "who": "Rune", "text": "Keduanya bisa dicoba pada tugas kecil tanpa GPU besar." }
+          ],
+          "guess": { "question": "Blok residual: keluaran = F(x) + x. Jika F(x) = 0, keluarannya...", "options": ["Sama dengan x", "Nol", "Dua kali x", "Tidak terdefinisi"], "correctIndex": 0, "reveal": "Kita hitung dan rancang perbandingannya." },
+          "steps": [
+            { "text": "Dropout: saat latihan, neuron dimatikan secara acak. Bandingkan jurang latih-uji dengan dan tanpa dropout.", "highlight": [] },
+            { "text": "Contoh angka: tanpa dropout latih 99 dan uji 85, jadi jurang 14. Dengan dropout latih 94 dan uji 88, jadi jurang 6.", "highlight": [] },
+            { "text": "Jurang menyusut 14 − 6 = 8 poin.", "highlight": [] },
+            { "text": "Blok residual: keluaran = F(x) + x. Dengan x = [2, 3] dan F(x) = [0,5, −1], keluaran = [2,5, 2].", "highlight": [] },
+            { "text": "Jika F(x) = 0, keluaran sama dengan x. Lapisan bisa belajar 'tidak mengubah apa pun'.", "highlight": [] },
+            { "text": "Bandingkan blok biasa dengan blok residual pada tugas kecil yang sama dan catat hasilnya.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m3c3p1", "type": "fillNumber", "question": "Tanpa dropout: latih 97 dan uji 82. Dengan dropout: latih 93 dan uji 87. Berapa poin jurang menyusut?", "answer": 9, "tolerance": 0, "unit": "poin", "why": "Jurang awal 15. Jurang baru 6. Menyusut 9." },
+            { "id": "m3c3p2", "type": "fillNumber", "question": "x = [4, 1] dan F(x) = [−1, 2]. Berapa elemen pertama dari F(x) + x?", "answer": 3, "tolerance": 0, "unit": "", "why": "4 + (−1) = 3." },
+            { "id": "m3c3p3", "type": "choice", "question": "Apa tujuan membandingkan jurang latih-uji dengan dan tanpa dropout?", "options": ["Melihat apakah dropout mengurangi overfitting pada tugasmu", "Menghapus data uji", "Menaikkan skor latih", "Menghindari evaluasi"], "correctIndex": 0, "why": "Jurang yang menyusut menunjukkan overfitting berkurang." }
+          ],
+          "formulaTitle": "Rumus kunci",
+          "formula": { "lines": ["keluaran residual = F(x) + x", "jurang = skor latih − skor uji"], "readAloud": "Keluaran blok residual adalah hasil lapisan ditambah masukannya. Jurang adalah skor latih dikurangi skor uji." },
+          "commonMistake": "Mengganti dua hal sekaligus sehingga tidak tahu mana yang memengaruhi hasil.",
+          "realTask": "Latih MLP kecil dengan dan tanpa dropout, lalu catat jurang latih-uji kedua versi.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang terjadi jika F(x) = 0 pada blok residual?",
+          "reviewItems": [ { "id": "m3c3r1", "front": "Keluaran blok residual?", "back": "F(x) + x" } ]
+        },
+        {
+          "chunkId": "m3c4",
+          "title": "Laporan replikasi yang jujur",
+          "goal": "Setelah ini kamu bisa melaporkan hasil replikasi dengan membandingkannya secara jujur dengan klaim paper.",
+          "terms": [ { "term": "klaim", "plain": "hasil yang dilaporkan oleh paper" } ],
+          "scene": [
+            { "who": "Rune", "text": "Hasil replikasimu hampir sama dengan paper, tetapi tidak persis." },
+            { "who": "Kamu", "text": "Haruskah kusembunyikan selisihnya?" },
+            { "who": "Rune", "text": "Jangan. Selisih itu bagian terbaik dari laporanmu." }
+          ],
+          "guess": { "question": "Klaim paper 92, hasilmu 89. Berapa poin selisihnya?", "options": ["3", "2", "5", "1"], "correctIndex": 0, "reveal": "Kita susun laporannya." },
+          "steps": [
+            { "text": "Contoh angka: klaim paper 92 dan hasilmu 89. Selisih = 92 − 89 = 3 poin.", "highlight": [] },
+            { "text": "Jalankan 3 seed: 88, 90, 89. Rata-rata = 267 ÷ 3 = 89 dan rentang = 90 − 88 = 2.", "highlight": [] },
+            { "text": "Laporkan: 89 dengan rentang 88 sampai 90, dibanding klaim 92.", "highlight": [] },
+            { "text": "Catat dugaan penyebab selisih: pengaturan berbeda, data berbeda, seed, atau versi library.", "highlight": [] },
+            { "text": "Jangan memilih seed terbaik saja. Laporan jujur menampilkan variasi dan selisih.", "highlight": [] },
+            { "text": "Jadi laporan replikasi yang baik memuat angkamu, angka paper, selisih, dan dugaan penyebab.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m3c4p1", "type": "fillNumber", "question": "Tiga seed memberi 85, 88, 87. Berapa rata-ratanya?", "answer": 86.67, "tolerance": 0.01, "unit": "", "why": "(85 + 88 + 87) ÷ 3 = 260 ÷ 3 ≈ 86,67." },
+            { "id": "m3c4p2", "type": "fillNumber", "question": "Klaim paper 90 dan rata-ratamu 86,67. Berapa poin selisihnya? (dua angka desimal)", "answer": 3.33, "tolerance": 0.01, "unit": "poin", "why": "90 − 86,67 = 3,33." },
+            { "id": "m3c4p3", "type": "choice", "question": "Hasilmu lebih rendah dari klaim paper. Langkah terbaik?", "options": ["Laporkan selisihnya dan tulis dugaan penyebabnya", "Menyembunyikan hasilnya", "Memilih seed terbaik saja", "Mengganti angka paper"], "correctIndex": 0, "why": "Kejujuran tentang selisih membuat laporan bisa dipercaya." }
+          ],
+          "formulaTitle": "Aturan praktis",
+          "formula": { "lines": ["selisih = klaim paper − hasilmu", "laporkan rata-rata dan rentang dari beberapa seed"], "readAloud": "Laporkan angkamu, angka paper, selisihnya, dan dugaan penyebabnya." },
+          "commonMistake": "Melaporkan hanya seed terbaik agar tampak mendekati paper.",
+          "realTask": "Tulis laporan satu halaman untuk satu replikasimu: hasil, klaim paper, selisih, dan dugaan penyebab.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa selisih dengan paper tidak perlu disembunyikan?",
+          "reviewItems": [ { "id": "m3c4r1", "front": "Isi laporan replikasi?", "back": "Hasilmu, klaim paper, selisih, dan dugaan penyebabnya." } ]
+        }
+      ]
+    },
+    {
+      "questId": "m4",
+      "chunks": [
+        {
+          "chunkId": "m4c1",
+          "title": "Tiga proyek dan jadwalnya",
+          "goal": "Setelah ini kamu bisa merencanakan tiga proyek end-to-end dan menghitung berapa minggu yang dibutuhkan.",
+          "terms": [ { "term": "proyek end-to-end", "plain": "proyek dari data sampai hasil yang bisa didemokan" } ],
+          "scene": [
+            { "who": "Rune", "text": "Portofoliomu terdiri dari minimal tiga proyek end-to-end, dan satu harus embedded atau IoT." },
+            { "who": "Kamu", "text": "Berapa lama itu?" }
+          ],
+          "guess": { "question": "Tiga proyek, masing-masing 30 jam. Berapa jam total?", "options": ["90", "60", "120", "30"], "correctIndex": 0, "reveal": "Kita hitung dengan buffer." },
+          "steps": [
+            { "text": "Tiga proyek × 30 jam = 90 jam.", "highlight": [] },
+            { "text": "Kamu punya 8 jam per minggu. Dengan buffer 25%: 8 × 0,75 = 6 jam efektif.", "highlight": [] },
+            { "text": "Lama pengerjaan = 90 ÷ 6 = 15 minggu.", "highlight": [] },
+            { "text": "Pastikan minimal satu dari tiga proyek berjalan di perangkat embedded atau IoT.", "highlight": [] },
+            { "text": "Beri tiap proyek satu tujuan berbeda, misalnya data sensor, model untuk perangkat, dan layanan yang bisa dipanggil.", "highlight": [] },
+            { "text": "Jadi hitung jam efektif lebih dulu agar jadwal portofolio tidak melampaui waktumu.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m4c1p1", "type": "fillNumber", "question": "8 jam per minggu dengan buffer 25%. Berapa jam efektif per minggu?", "answer": 6, "tolerance": 0, "unit": "jam", "why": "8 × 0,75 = 6." },
+            { "id": "m4c1p2", "type": "fillNumber", "question": "Total 90 jam dengan 6 jam efektif per minggu. Berapa minggu?", "answer": 15, "tolerance": 0, "unit": "minggu", "why": "90 ÷ 6 = 15." },
+            { "id": "m4c1p3", "type": "choice", "question": "Dari tiga proyek portofolio, minimal berapa yang embedded atau IoT?", "options": ["1", "0", "3", "2"], "correctIndex": 0, "why": "Aturan portofolio: minimal tiga proyek end-to-end, satu di antaranya embedded atau IoT." }
+          ],
+          "formulaTitle": "Aturan praktis",
+          "formula": { "lines": ["minggu = total jam ÷ (jam per minggu × (1 − buffer))"], "readAloud": "Total jam dibagi jam efektif per minggu." },
+          "commonMistake": "Merencanakan tiga proyek tanpa menghitung jam efektifmu.",
+          "realTask": "Tulis tiga ide proyek, perkirakan jamnya, dan hitung berapa minggu semuanya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa tujuan tiap proyekmu?",
+          "reviewItems": [ { "id": "m4c1r1", "front": "Syarat portofolio?", "back": "Minimal 3 proyek end-to-end, satu di antaranya embedded atau IoT." } ]
+        },
+        {
+          "chunkId": "m4c2",
+          "title": "README dan catatan keputusan",
+          "goal": "Setelah ini kamu bisa menyusun README yang jelas dan mencatat keputusan teknis.",
+          "terms": [ { "term": "README", "plain": "berkas pertama yang dibaca orang saat membuka repositorimu" } ],
+          "scene": [
+            { "who": "Rune", "text": "Seseorang membuka repositorimu. Dalam semenit ia harus tahu proyek ini apa dan bagaimana menjalankannya." }
+          ],
+          "guess": { "question": "Bagian mana yang sebaiknya paling awal di README?", "options": ["Judul dan tujuan proyek", "Daftar pustaka", "Riwayat bug", "Ucapan terima kasih"], "correctIndex": 0, "reveal": "Mari kita susun." },
+          "steps": [
+            { "text": "Mulai dengan judul dan tujuan proyek dalam dua kalimat.", "highlight": [] },
+            { "text": "Tulis cara menjalankan: perintah instalasi dan perintah utama.", "highlight": [] },
+            { "text": "Tulis data yang dipakai dan di mana ia disimpan (tanpa mengunggah rahasia).", "highlight": [] },
+            { "text": "Tampilkan hasil dibanding baseline.", "highlight": [] },
+            { "text": "Tulis batasan sistem secara terbuka.", "highlight": [] },
+            { "text": "Catat tiap keputusan penting: keputusan, alasan, dan alternatif yang ditolak. Jika 10 keputusan dan 7 tercatat, kelengkapannya 70%.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m4c2p1", "type": "order", "question": "Urutkan bagian README.", "items": ["Judul dan tujuan", "Cara menjalankan", "Data dan hasil dibanding baseline", "Batasan"], "why": "Dari tujuan ke cara pakai, bukti, lalu batasan." },
+            { "id": "m4c2p2", "type": "fillNumber", "question": "Dari 12 keputusan penting, 9 sudah dicatat. Berapa persen?", "answer": 75, "tolerance": 0, "unit": "%", "why": "9 ÷ 12 = 0,75 = 75%." },
+            { "id": "m4c2p3", "type": "choice", "question": "Catatan keputusan yang baik memuat...", "options": ["Keputusan, alasan, dan alternatif yang ditolak", "Hanya tanggal", "Hanya nama file", "Tidak ada"], "correctIndex": 0, "why": "Alasan dan alternatif membuat keputusan bisa ditinjau kembali." }
+          ],
+          "formulaTitle": "Aturan praktis",
+          "formula": { "lines": ["README: tujuan → cara menjalankan → data → hasil → batasan"], "readAloud": "Tujuan, cara menjalankan, data, hasil, lalu batasan." },
+          "commonMistake": "Menulis README setelah proyek selesai dan lupa alasan keputusan.",
+          "realTask": "Tulis README untuk satu proyekmu dengan lima bagian di atas.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa batasan perlu ada di README?",
+          "reviewItems": [ { "id": "m4c2r1", "front": "Isi catatan keputusan?", "back": "Keputusan, alasan, dan alternatif yang ditolak." } ]
+        },
+        {
+          "chunkId": "m4c3",
+          "title": "Catatan kegagalan dan perbaikan",
+          "goal": "Setelah ini kamu bisa menulis catatan kegagalan yang berisi kejadian, penyebab, perbaikan, dan pelajaran.",
+          "terms": [ { "term": "catatan kegagalan", "plain": "catatan tentang apa yang salah dan bagaimana kamu memperbaikinya" } ],
+          "scene": [
+            { "who": "Rune", "text": "Kegagalan bukan hal memalukan. Yang berharga adalah apa yang kamu pelajari darinya." }
+          ],
+          "guess": { "question": "Skor uji 98% terlihat terlalu bagus. Dugaan pertama?", "options": ["Mungkin ada kebocoran data", "Modelnya sempurna", "Datanya terlalu sedikit", "Metriknya salah"], "correctIndex": 0, "reveal": "Mari kita tulis sebagai catatan." },
+          "steps": [
+            { "text": "Apa yang terjadi: skor uji 98% terlihat terlalu bagus.", "highlight": [] },
+            { "text": "Penyebab: scaler dihitung dari seluruh data sebelum dibagi, sehingga data uji bocor.", "highlight": [] },
+            { "text": "Perbaikan: bagi data dulu, lalu fit scaler hanya pada data latih.", "highlight": [] },
+            { "text": "Hasil sesudah perbaikan: skor turun menjadi 86%. Selisih 98 − 86 = 12 poin.", "highlight": [] },
+            { "text": "Pelajaran: bagi data sebelum langkah belajar apa pun.", "highlight": [] },
+            { "text": "Catat keempat bagian itu. Catatan kegagalan membuat kesalahan yang sama tidak terulang.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m4c3p1", "type": "match", "question": "Cocokkan bagian catatan dengan isinya.", "pairs": [ { "left": "Apa yang terjadi", "right": "skor uji 98% tidak masuk akal" }, { "left": "Penyebab", "right": "scaler dihitung dari seluruh data" }, { "left": "Perbaikan", "right": "bagi data dulu, fit hanya pada data latih" }, { "left": "Pelajaran", "right": "bagi data sebelum langkah belajar apa pun" } ], "why": "Keempat bagian membentuk satu catatan utuh." },
+            { "id": "m4c3p2", "type": "fillNumber", "question": "Skor sebelum perbaikan 95% dan sesudah 83%. Berapa poin turunnya?", "answer": 12, "tolerance": 0, "unit": "poin", "why": "95 − 83 = 12." },
+            { "id": "m4c3p3", "type": "choice", "question": "Skor turun setelah menutup kebocoran data. Kesimpulan yang tepat?", "options": ["Skor baru lebih jujur", "Perbaikan salah", "Model rusak", "Data hilang"], "correctIndex": 0, "why": "Skor lama terlalu optimistis karena kebocoran." }
+          ],
+          "formulaTitle": "Format catatan",
+          "formula": { "lines": ["kejadian → penyebab → perbaikan → pelajaran"], "readAloud": "Tulis apa yang terjadi, penyebabnya, perbaikannya, dan pelajarannya." },
+          "commonMistake": "Hanya mencatat keberhasilan dan melupakan kegagalan.",
+          "realTask": "Tulis satu catatan kegagalan dari proyekmu dengan empat bagian di atas.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa pelajaran dari kegagalan terakhirmu?",
+          "reviewItems": [ { "id": "m4c3r1", "front": "Empat bagian catatan kegagalan?", "back": "Kejadian, penyebab, perbaikan, pelajaran." } ]
+        }
+      ]
+    },
+    {
+      "questId": "m5",
+      "chunks": [
+        {
+          "chunkId": "m5c1",
+          "title": "Kompetisi pertama: Titanic",
+          "goal": "Setelah ini kamu bisa mengikuti kompetisi pemula dengan alur yang rapi, mulai dari baseline sampai submission.",
+          "terms": [ { "term": "submission", "plain": "file prediksi yang kamu kirim untuk dinilai" } ],
+          "scene": [
+            { "who": "Rune", "text": "Kompetisi pemula seperti Titanic cocok untuk berlatih alur lengkap tanpa tekanan besar." },
+            { "who": "Rune", "text": "Aturan utamanya: kirim baseline dulu, lalu perbaiki sedikit demi sedikit." }
+          ],
+          "guess": { "question": "Baseline kamu 62% dan modelmu 78%. Berapa poin naiknya?", "options": ["16", "62", "78", "140"], "correctIndex": 0, "reveal": "Kita susun alurnya." },
+          "steps": [
+            { "text": "Baca halaman kompetisi dan aturannya sebelum menulis kode.", "highlight": [] },
+            { "text": "Unduh data dan periksa kolomnya dengan pandas.", "highlight": [] },
+            { "text": "Buat baseline sederhana, misalnya tebakan kelas mayoritas, lalu kirim sebagai submission pertama.", "highlight": [] },
+            { "text": "Perbaiki dengan satu perubahan pada satu waktu, dan catat skornya. Contoh angka: baseline 62%, model 78%.", "highlight": [] },
+            { "text": "Selisih: 78 − 62 = 16 poin. Catat apa yang kamu ubah untuk mendapat kenaikan itu.", "highlight": [] },
+            { "text": "Jadi baseline dulu dan perubahan satu per satu membuatmu tahu apa yang benar-benar membantu.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m5c1p1", "type": "fillNumber", "question": "Baseline 70% dan model 81%. Berapa poin naiknya?", "answer": 11, "tolerance": 0, "unit": "poin", "why": "81 − 70 = 11." },
+            { "id": "m5c1p2", "type": "order", "question": "Urutkan alur kompetisi pemula.", "items": ["Baca aturan dan unduh data", "Buat baseline dan kirim submission pertama", "Ubah satu hal lalu uji lagi", "Catat skor dan apa yang diubah"], "why": "Baseline dulu, lalu perbaikan terukur." },
+            { "id": "m5c1p3", "type": "choice", "question": "Mengapa mengubah satu hal pada satu waktu?", "options": ["Agar tahu perubahan mana yang memengaruhi skor", "Agar kode lebih panjang", "Agar tidak perlu catatan", "Agar tidak perlu submission"], "correctIndex": 0, "why": "Perubahan tunggal membuat sebab-akibat jelas." }
+          ],
+          "formulaTitle": "Aturan praktis",
+          "formula": { "lines": ["kenaikan (poin) = skor baru − skor lama", "satu perubahan per percobaan, catat tiap skor"], "readAloud": "Ubah satu hal, ukur, lalu catat." },
+          "commonMistake": "Mengubah banyak hal sekaligus sehingga tidak tahu penyebab kenaikan atau penurunan skor.",
+          "realTask": "Ikuti kompetisi pemula, kirim satu submission baseline, dan catat skornya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang kamu ubah dan apa efeknya?",
+          "reviewItems": [ { "id": "m5c1r1", "front": "Alur kompetisi pemula?", "back": "Baca aturan, buat baseline, kirim submission, ubah satu hal, dan catat skornya." } ]
+        },
+        {
+          "chunkId": "m5c2",
+          "title": "Bekerja dengan tenggat",
+          "goal": "Setelah ini kamu bisa membagi waktu kerja dengan tenggat dan menjaga hasil dasar tetap terkirim.",
+          "terms": [ { "term": "kotak waktu (time-box)", "plain": "batas waktu tetap untuk satu pekerjaan" } ],
+          "scene": [
+            { "who": "Rune", "text": "Tenggat membuat orang panik dan melupakan hal dasar." },
+            { "who": "Rune", "text": "Petualang yang baik membagi waktu lebih dulu." }
+          ],
+          "guess": { "question": "Tenggat 3 jam (180 menit). Bagian mana yang harus dikirim lebih dulu?", "options": ["Baseline yang sudah berjalan", "Model terbesar", "Dokumentasi lengkap", "Grafik cantik"], "correctIndex": 0, "reveal": "Mari kita bagi waktunya." },
+          "steps": [
+            { "text": "Total 180 menit. Bagi: baseline 30, iterasi 90, validasi 30, kirim 30.", "highlight": [] },
+            { "text": "Periksa: 30 + 90 + 30 + 30 = 180 menit.", "highlight": [] },
+            { "text": "Kirim baseline lebih dulu agar kamu punya hasil dasar yang aman.", "highlight": [] },
+            { "text": "Jika iterasi memakan 15 menit tiap putaran, 90 ÷ 15 = 6 putaran.", "highlight": [] },
+            { "text": "Sisakan 30 menit terakhir hanya untuk validasi dan pengiriman, jangan untuk ide baru.", "highlight": [] },
+            { "text": "Jadi kotak waktu membuatmu tetap punya hasil walau waktu hampir habis.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m5c2p1", "type": "fillNumber", "question": "Slot 240 menit: baseline 40, iterasi 120, validasi 40, kirim 20. Berapa menit sisa?", "answer": 20, "tolerance": 0, "unit": "menit", "why": "Total 220. Sisa 240 − 220 = 20." },
+            { "id": "m5c2p2", "type": "fillNumber", "question": "Iterasi 120 menit dengan 20 menit per putaran. Berapa putaran?", "answer": 6, "tolerance": 0, "unit": "putaran", "why": "120 ÷ 20 = 6." },
+            { "id": "m5c2p3", "type": "choice", "question": "Tersisa 30 menit sebelum tenggat. Apa yang dilakukan?", "options": ["Validasi dan kirim hasil terbaik yang aman", "Mulai model baru yang besar", "Mengubah seluruh pipeline", "Menunggu"], "correctIndex": 0, "why": "Waktu terakhir dipakai untuk mengamankan hasil." }
+          ],
+          "formulaTitle": "Aturan praktis",
+          "formula": { "lines": ["sisa waktu = total − jumlah bagian", "bagian terakhir: validasi dan kirim, bukan ide baru"], "readAloud": "Jumlahkan bagian dan pastikan masih ada sisa." },
+          "commonMistake": "Menghabiskan seluruh waktu untuk eksperimen dan lupa mengirim hasil.",
+          "realTask": "Latih satu sesi 3 jam dengan pembagian waktu di atas pada proyek kecilmu.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang kamu lakukan saat waktu hampir habis?",
+          "reviewItems": [ { "id": "m5c2r1", "front": "Apa yang dikirim lebih dulu saat tenggat?", "back": "Baseline yang sudah berjalan." } ]
+        },
+        {
+          "chunkId": "m5c3",
+          "title": "Kontribusi open source kecil",
+          "goal": "Setelah ini kamu bisa merencanakan satu kontribusi kecil, misalnya perbaikan dokumentasi.",
+          "terms": [
+            { "term": "pull request", "plain": "usulan perubahan yang kamu kirim ke pemilik proyek untuk ditinjau" },
+            { "term": "fork", "plain": "salinan repositori milikmu sendiri tempat kamu bebas mengubah" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Kontribusi pertama tidak harus besar. Satu kata salah ketik yang diperbaiki pun berarti." }
+          ],
+          "guess": { "question": "Kontribusi pertama yang paling realistis?", "options": ["Perbaikan dokumentasi atau bug kecil", "Menulis ulang seluruh proyek", "Mengubah arsitektur utama", "Menghapus tes"], "correctIndex": 0, "reveal": "Mari kita susun langkahnya." },
+          "steps": [
+            { "text": "Cari isu kecil, misalnya salah ketik atau contoh yang kurang jelas di dokumentasi.", "highlight": [] },
+            { "text": "Baca panduan kontribusi proyek itu.", "highlight": [] },
+            { "text": "Buat salinan (fork), lalu cabang baru untuk perubahanmu.", "highlight": [] },
+            { "text": "Perbaiki, commit dengan pesan jelas, lalu kirim pull request.", "highlight": [] },
+            { "text": "Contoh anggaran waktu: baca panduan 30 menit, perbaiki 45 menit, kirim 15 menit. Total 90 menit.", "highlight": [] },
+            { "text": "Tanggapi ulasan dengan sopan. Jadi kontribusi kecil yang rapi melatih alur Git dan komunikasi.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m5c3p1", "type": "order", "question": "Urutkan langkah kontribusi.", "items": ["Cari isu kecil dan baca panduan kontribusi", "Buat fork dan cabang baru", "Perbaiki dan commit dengan pesan jelas", "Kirim pull request dan tanggapi ulasan"], "why": "Siapkan, salin, perbaiki, lalu kirim." },
+            { "id": "m5c3p2", "type": "fillNumber", "question": "Baca panduan 20 menit, perbaiki 40, kirim 10. Berapa menit total?", "answer": 70, "tolerance": 0, "unit": "menit", "why": "20 + 40 + 10 = 70." },
+            { "id": "m5c3p3", "type": "choice", "question": "Mengapa membaca panduan kontribusi sebelum mengubah?", "options": ["Agar perubahanmu sesuai aturan proyek", "Agar bisa menghapus tes", "Agar tidak perlu pull request", "Agar tidak perlu Git"], "correctIndex": 0, "why": "Tiap proyek punya aturan sendiri." }
+          ],
+          "formulaTitle": "Alur praktis",
+          "formula": { "lines": ["isu kecil → panduan → fork dan cabang → perbaiki → pull request → tanggapi ulasan"], "readAloud": "Pilih hal kecil, ikuti aturan proyek, lalu kirim usulan perubahan." },
+          "commonMistake": "Mengirim perubahan besar tanpa membaca panduan atau berdiskusi lebih dulu.",
+          "realTask": "Temukan satu perbaikan kecil di dokumentasi sebuah proyek yang kamu pakai dan kirim sebagai pull request.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang kamu perbaiki dan mengapa?",
+          "reviewItems": [ { "id": "m5c3r1", "front": "Kontribusi pertama yang disarankan?", "back": "Perbaikan dokumentasi atau bug kecil." } ]
+        }
+      ]
+    },
+    {
+      "questId": "m6",
+      "chunks": [
+        {
+          "chunkId": "m6c1",
+          "title": "Membandingkan lima spesialisasi",
+          "goal": "Setelah ini kamu bisa membandingkan lima pilihan spesialisasi dengan tabel keputusan berbobot.",
+          "terms": [ { "term": "tabel keputusan berbobot", "plain": "tabel yang memberi nilai tiap pilihan pada beberapa kriteria, dengan bobot kepentingan" } ],
+          "scene": [
+            { "who": "Rune", "text": "Lima pintu: computer vision, NLP, time series dan data sensor, reinforcement learning, dan TinyML." },
+            { "who": "Rune", "text": "Menurut peta, untuk minat AI dan IoT, time series dan TinyML paling nyambung." }
+          ],
+          "guess": { "question": "Kriteria dengan bobot terbesar sebaiknya kriteria yang...", "options": ["Paling penting bagimu", "Paling mudah dihitung", "Paling banyak dipakai orang lain", "Dipilih acak"], "correctIndex": 0, "reveal": "Mari kita hitung contoh." },
+          "visual": { "type": "matrixGrid", "matrices": [ { "id": "S", "rows": [[5, 4, 4], [4, 3, 5], [3, 2, 2]], "rowLabels": ["Time series", "TinyML", "Computer vision"], "colLabels": ["Minat (bobot 3)", "Proyek yang ada (bobot 2)", "Peralatan (bobot 1)"] } ] },
+          "steps": [
+            { "text": "Tentukan kriteria dan bobot: minat (3), proyek yang sudah ada (2), peralatan tersedia (1).", "highlight": [] },
+            { "text": "Beri nilai 1 sampai 5 untuk tiap pilihan. Angka di tabel hanya contoh.", "highlight": ["S:r1", "S:r2", "S:r3"] },
+            { "text": "Time series: 5×3 + 4×2 + 4×1 = 15 + 8 + 4 = 27.", "highlight": ["S:r1"] },
+            { "text": "TinyML: 4×3 + 3×2 + 5×1 = 12 + 6 + 5 = 23.", "highlight": ["S:r2"] },
+            { "text": "Computer vision: 3×3 + 2×2 + 2×1 = 9 + 4 + 2 = 15.", "highlight": ["S:r3"] },
+            { "text": "Skor tertinggi adalah time series (27). Tabel hanya membantu, dan keputusan akhir tetap milikmu.", "highlight": ["S:r1"] }
+          ],
+          "practice": [
+            { "id": "m6c1p1", "type": "fillNumber", "question": "Nilai 4, 5, 2 dengan bobot 3, 2, 1. Berapa skor total?", "answer": 24, "tolerance": 0, "unit": "", "why": "4×3 + 5×2 + 2×1 = 12 + 10 + 2 = 24." },
+            { "id": "m6c1p2", "type": "fillNumber", "question": "Nilai 2, 3, 5 dengan bobot yang sama (3, 2, 1). Berapa skor total?", "answer": 17, "tolerance": 0, "unit": "", "why": "2×3 + 3×2 + 5×1 = 6 + 6 + 5 = 17." },
+            { "id": "m6c1p3", "type": "choice", "question": "Setelah menghitung skor, apa peran tabel?", "options": ["Membantu berpikir; keputusan akhir tetap milikmu", "Menentukan semuanya", "Menggantikan minatmu", "Menghapus pilihan lain"], "correctIndex": 0, "why": "Tabel menata pertimbangan, bukan menggantikan penilaianmu." }
+          ],
+          "formulaTitle": "Rumus kunci",
+          "formula": { "lines": ["skor = Σ (nilai × bobot)"], "readAloud": "Kalikan tiap nilai dengan bobotnya, lalu jumlahkan." },
+          "commonMistake": "Memilih spesialisasi hanya karena sedang ramai tanpa menimbang minat dan proyek yang sudah ada.",
+          "realTask": "Buat tabel keputusan berbobot untuk lima pilihan dengan kriteria dan nilaimu sendiri.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: pilihan mana yang paling cocok untukmu dan mengapa?",
+          "reviewItems": [ { "id": "m6c1r1", "front": "Rumus skor tabel keputusan berbobot?", "back": "Jumlah (nilai × bobot)." } ]
+        },
+        {
+          "chunkId": "m6c2",
+          "title": "Proyek spesialisasi tiga bulan",
+          "goal": "Setelah ini kamu bisa menetapkan satu proyek spesialisasi dengan batas lingkup dan jam yang realistis.",
+          "terms": [ { "term": "batas lingkup", "plain": "tulisan tentang apa yang dikerjakan dan apa yang tidak" } ],
+          "scene": [
+            { "who": "Rune", "text": "Spesialisasi tanpa proyek hanyalah nama." },
+            { "who": "Rune", "text": "Tetapkan satu proyek yang bisa kamu selesaikan." }
+          ],
+          "guess": { "question": "12 minggu × 6 jam per minggu. Berapa jam total?", "options": ["72", "18", "60", "120"], "correctIndex": 0, "reveal": "Kita hitung dengan buffer." },
+          "steps": [
+            { "text": "12 minggu × 6 jam = 72 jam.", "highlight": [] },
+            { "text": "Dengan buffer 20%: 72 × 0,8 = 57,6 jam efektif.", "highlight": [] },
+            { "text": "Jika tugas yang kamu rencanakan butuh 65 jam, kekurangannya 65 − 57,6 = 7,4 jam.", "highlight": [] },
+            { "text": "Potong lingkup ke MVP dan tulis apa yang TIDAK dikerjakan.", "highlight": [] },
+            { "text": "Tulis satu pertanyaan atau tujuan yang bisa diuji, misalnya 'apakah model ini muat di perangkat dengan akurasi minimal 85%'.", "highlight": [] },
+            { "text": "Jadi proyek spesialisasi yang jelas dan terukur lebih berguna daripada niat yang luas.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m6c2p1", "type": "fillNumber", "question": "10 minggu × 5 jam dengan buffer 20%. Berapa jam efektif?", "answer": 40, "tolerance": 0, "unit": "jam", "why": "50 × 0,8 = 40." },
+            { "id": "m6c2p2", "type": "fillNumber", "question": "Tugas 45 jam dan jam efektif 40. Berapa jam kekurangannya?", "answer": 5, "tolerance": 0, "unit": "jam", "why": "45 − 40 = 5." },
+            { "id": "m6c2p3", "type": "choice", "question": "Kekurangan jam ditemukan. Langkah yang tepat?", "options": ["Potong lingkup ke MVP", "Kurangi tidur", "Abaikan tes", "Tambah tugas baru"], "correctIndex": 0, "why": "Lingkup disesuaikan dengan waktu yang realistis." }
+          ],
+          "formulaTitle": "Aturan praktis",
+          "formula": { "lines": ["jam efektif = minggu × jam per minggu × (1 − buffer)"], "readAloud": "Jumlah minggu dikali jam per minggu, dikali satu kurang buffer." },
+          "commonMistake": "Menulis tujuan yang terlalu luas dan tidak bisa diuji.",
+          "realTask": "Tulis satu halaman proyek spesialisasimu: tujuan yang bisa diuji, MVP, dan apa yang TIDAK dikerjakan.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: tujuan proyek spesialisasimu dan cara mengujinya.",
+          "reviewItems": [ { "id": "m6c2r1", "front": "Ciri tujuan proyek yang baik?", "back": "Jelas, terukur, bisa diuji, dan punya batas lingkup tertulis." } ]
+        }
+      ]
+    },
+    {
+      "questId": "m7",
+      "chunks": [
+        {
+          "chunkId": "m7c1",
+          "title": "Menemukan bagian yang tersendat",
+          "goal": "Setelah ini kamu bisa mengajar satu konsep dan memakai titik tersendat untuk memperbaiki pemahamanmu.",
+          "terms": [ { "term": "titik tersendat", "plain": "bagian penjelasan yang membuatmu ragu atau salah ucap" } ],
+          "scene": [
+            { "who": "Rune", "text": "Bagian yang sulit dijelaskan adalah bagian yang belum benar-benar dipahami." },
+            { "who": "Rune", "text": "Mengajar adalah cara tercepat menemukannya." }
+          ],
+          "guess": { "question": "Penjelasanmu punya 10 bagian dan 4 membuatmu tersendat. Berapa persen lancar?", "options": ["60%", "40%", "90%", "4%"], "correctIndex": 0, "reveal": "Kita hitung dan perbaiki." },
+          "steps": [
+            { "text": "Pilih satu konsep dan pecah penjelasannya menjadi 10 bagian pendek.", "highlight": [] },
+            { "text": "Jelaskan ke satu orang atau rekam dirimu. Catat bagian yang tersendat. Misalkan 4 dari 10.", "highlight": [] },
+            { "text": "Persen lancar = (10 − 4) ÷ 10 = 60%.", "highlight": [] },
+            { "text": "Pelajari ulang keempat bagian itu, lalu jelaskan lagi.", "highlight": [] },
+            { "text": "Jika tersisa 1 yang tersendat, persen lancar = 9 ÷ 10 = 90%.", "highlight": [] },
+            { "text": "Jadi titik tersendat menunjukkan apa yang perlu dipelajari ulang.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m7c1p1", "type": "fillNumber", "question": "Dari 8 bagian, 2 tersendat. Berapa persen lancar?", "answer": 75, "tolerance": 0, "unit": "%", "why": "(8 − 2) ÷ 8 = 0,75 = 75%." },
+            { "id": "m7c1p2", "type": "fillNumber", "question": "Dari 20 bagian, 3 tersendat. Berapa persen lancar?", "answer": 85, "tolerance": 0, "unit": "%", "why": "17 ÷ 20 = 0,85 = 85%." },
+            { "id": "m7c1p3", "type": "choice", "question": "Setelah menemukan bagian yang tersendat, langkah berikutnya?", "options": ["Pelajari ulang bagian itu lalu jelaskan lagi", "Melewatinya", "Menghapus konsepnya", "Mengganti pendengar"], "correctIndex": 0, "why": "Titik tersendat adalah petunjuk untuk belajar ulang." }
+          ],
+          "formulaTitle": "Aturan praktis",
+          "formula": { "lines": ["persen lancar = (bagian − bagian tersendat) ÷ bagian × 100"], "readAloud": "Bagian yang lancar dibagi total bagian, dikali seratus." },
+          "commonMistake": "Melewati bagian yang tersendat karena malu atau terburu-buru.",
+          "realTask": "Jelaskan satu konsep ke seseorang, catat titik tersendatnya, lalu perbaiki.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: bagian mana yang paling membuatmu tersendat?",
+          "reviewItems": [ { "id": "m7c1r1", "front": "Apa gunanya titik tersendat?", "back": "Menunjukkan bagian yang belum dipahami dan perlu dipelajari ulang." } ]
+        },
+        {
+          "chunkId": "m7c2",
+          "title": "Menulis penjelasan yang mudah diikuti",
+          "goal": "Setelah ini kamu bisa menulis penjelasan pendek dengan urutan yang mudah diikuti pembaca.",
+          "terms": [ { "term": "contoh konkret", "plain": "contoh nyata dengan angka kecil yang bisa diikuti langkah demi langkah" } ],
+          "scene": [
+            { "who": "Rune", "text": "Pelajaran yang kamu ikuti sepanjang petualangan ini memakai urutan tertentu." },
+            { "who": "Rune", "text": "Kamu bisa memakai urutan yang sama untuk mengajar orang lain." }
+          ],
+          "guess": { "question": "Bagian mana yang sebaiknya paling awal dalam penjelasanmu?", "options": ["Pertanyaan atau situasi yang dikenal", "Rumus resmi", "Daftar pustaka", "Kesimpulan"], "correctIndex": 0, "reveal": "Mari kita susun." },
+          "steps": [
+            { "text": "Mulai dari pertanyaan atau situasi yang dikenal pembaca.", "highlight": [] },
+            { "text": "Beri contoh konkret dengan angka kecil, lalu hitung langkah demi langkah.", "highlight": [] },
+            { "text": "Tarik kesimpulan setelah angkanya terlihat, dan sebutkan alasannya.", "highlight": [] },
+            { "text": "Baru perkenalkan rumus atau istilah resminya.", "highlight": [] },
+            { "text": "Akhiri dengan satu jebakan umum dan satu latihan kecil.", "highlight": [] },
+            { "text": "Jika penjelasanmu 6 bagian dan tiap bagian 100 kata, total 600 kata. Pastikan itu cukup pendek untuk dibaca sekali duduk.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "m7c2p1", "type": "order", "question": "Urutkan penjelasan yang mudah diikuti.", "items": ["Situasi atau pertanyaan yang dikenal", "Contoh konkret langkah demi langkah", "Kesimpulan beralasan dan rumus resmi", "Jebakan umum dan latihan kecil"], "why": "Dari yang dikenal ke abstrak, lalu uji pemahaman." },
+            { "id": "m7c2p2", "type": "fillNumber", "question": "5 bagian × 120 kata. Berapa kata total?", "answer": 600, "tolerance": 0, "unit": "kata", "why": "5 × 120 = 600." },
+            { "id": "m7c2p3", "type": "choice", "question": "Mengapa kesimpulan diletakkan setelah contoh dengan angka?", "options": ["Agar pembaca melihat dasar kesimpulan dulu", "Agar tulisan lebih panjang", "Agar tidak perlu contoh", "Agar rumus hilang"], "correctIndex": 0, "why": "Kesimpulan lebih mudah dipercaya setelah pembaca melihat bukti." }
+          ],
+          "formulaTitle": "Urutan yang disarankan",
+          "formula": { "lines": ["situasi → contoh dengan angka → kesimpulan beralasan → rumus → jebakan dan latihan"], "readAloud": "Mulai dari yang dikenal, hitung contoh, simpulkan, lalu beri rumusnya." },
+          "commonMistake": "Langsung memberi rumus dan kesimpulan tanpa contoh yang bisa diikuti.",
+          "realTask": "Tulis penjelasan satu konsep (maksimal 600 kata) dengan urutan di atas dan bagikan ke satu orang.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa contoh konkret yang kamu pilih dan mengapa?",
+          "reviewItems": [ { "id": "m7c2r1", "front": "Urutan penjelasan yang mudah diikuti?", "back": "Situasi, contoh dengan angka, kesimpulan beralasan, rumus, jebakan dan latihan." } ]
+        }
+      ]
+    }
+  ]
+}

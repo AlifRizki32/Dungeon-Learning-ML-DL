@@ -25,6 +25,12 @@ import { useGameStore } from '../store/useGameStore';
 import { useSound } from '../hooks/useSound.js';
 import { AvatarSprite } from './PixelSprites';
 import { LessonVisualRenderer } from './LessonVisuals';
+import {
+  LatencyMiniLabWidget,
+  NeuronMiniLabWidget,
+  QuantMiniLabWidget,
+  SoftmaxMiniLabWidget,
+} from './ScrollView';
 
 export type LessonStage =
   | 'goal'
@@ -78,6 +84,26 @@ const RuneGuideAvatar: React.FC<{ size?: number }> = ({ size = 40 }) => (
   </svg>
 );
 
+const MATH_TOKEN_REGEX = /(\S*(?:[\u0300-\u036f]|[θTαβγεΣ√²³₂−÷×≈])\S*)/gu;
+
+function renderMathSafeText(str: string): React.ReactNode {
+  if (!str || !/(?:[\u0300-\u036f]|[θTαβγεΣ√²³₂−÷×≈])/u.test(str)) {
+    return str;
+  }
+  const parts = str.split(MATH_TOKEN_REGEX);
+  return parts.map((part, i) => {
+    if (!part) return null;
+    if (/(?:[\u0300-\u036f]|[θTαβγεΣ√²³₂−÷×≈])/u.test(part)) {
+      return (
+        <span key={i} className="whitespace-nowrap font-mono">
+          {part}
+        </span>
+      );
+    }
+    return <React.Fragment key={i}>{part}</React.Fragment>;
+  });
+}
+
 /**
  * Renders text with inline dotted-underline glossary buttons for any term in `terms`.
  * Clicking, tapping, or focusing opens a popover with the plain explanation; Escape closes it.
@@ -124,18 +150,29 @@ export const GlossaryText: React.FC<{
     <span ref={containerRef} className={className}>
       {tokens.map((tok, idx) => {
         if (!tok.termEntry) {
-          return <React.Fragment key={idx}>{tok.text}</React.Fragment>;
+          return <React.Fragment key={idx}>{renderMathSafeText(tok.text)}</React.Fragment>;
         }
         const isOpen = openIndex === idx;
         const popoverId = `glossary-popover-${idx}-${tok.termEntry.term.replace(/\W+/g, '-')}`;
         return (
           <span key={idx} className="relative inline-block">
-            <button
-              type="button"
+            <span
+              role="button"
+              tabIndex={0}
               data-testid="glossary-inline-term"
               aria-expanded={isOpen}
               aria-describedby={isOpen ? popoverId : undefined}
-              onClick={() => setOpenIndex(idx)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenIndex(idx);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setOpenIndex(idx);
+                }
+              }}
               onFocus={() => setOpenIndex(idx)}
               onBlur={(e) => {
                 if (!e.currentTarget.parentElement?.contains(e.relatedTarget as Node)) {
@@ -145,7 +182,7 @@ export const GlossaryText: React.FC<{
               className="inline font-bold text-[#f5b935] border-b-2 border-dotted border-[#f5b935] hover:bg-[#f5b935]/15 focus-visible:outline-2 focus-visible:outline-dashed focus-visible:outline-[#38d864] px-0.5 rounded-none cursor-help"
             >
               {tok.text}
-            </button>
+            </span>
             {isOpen && (
               <span
                 id={popoverId}
@@ -157,17 +194,25 @@ export const GlossaryText: React.FC<{
                   <strong className="font-pixel text-[9px] text-[#f5b935]">
                     📖 {tok.termEntry.term}
                   </strong>
-                  <button
-                    type="button"
+                  <span
+                    role="button"
+                    tabIndex={0}
                     aria-label="Tutup penjelasan istilah"
                     onClick={(e) => {
                       e.stopPropagation();
                       setOpenIndex(null);
                     }}
-                    className="font-pixel text-[8px] text-[#b3aad1] hover:text-[#f4f1ea] px-1"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setOpenIndex(null);
+                      }
+                    }}
+                    className="font-pixel text-[8px] text-[#b3aad1] hover:text-[#f4f1ea] px-1 cursor-pointer"
                   >
                     ✕ ESC
-                  </button>
+                  </span>
                 </span>
                 <span className="block font-vt text-base sm:text-lg text-[#f4f1ea] leading-snug">
                   {tok.termEntry.plain}
@@ -1178,8 +1223,10 @@ export interface LessonChunkPlayerProps {
   topicTitle: string;
   chunks: LessonChunk[];
   reduceMotion: boolean;
-  mode: 'battle-entry' | 'standalone';
+  mode: 'battle-entry' | 'standalone' | 'tower-quest';
+  questId?: string;
   onReadyToFight?: () => void;
+  onSwitchToQuestChecklist?: () => void;
   onClose: () => void;
 }
 
@@ -1189,15 +1236,19 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
   chunks,
   reduceMotion,
   mode,
+  questId,
   onReadyToFight,
+  onSwitchToQuestChecklist,
   onClose,
 }) => {
   const avatarId = useGameStore((s) => s.avatarId);
   const lessonProgress = useGameStore((s) => s.lessonProgress);
   const summaries = useGameStore((s) => s.summaries);
+  const taskDone = useGameStore((s) => s.taskDone);
   const recordChunkPracticeAttempt = useGameStore((s) => s.recordChunkPracticeAttempt);
   const completeLessonChunk = useGameStore((s) => s.completeLessonChunk);
   const setChunkSummary = useGameStore((s) => s.setChunkSummary);
+  const toggleChunkRealTaskDone = useGameStore((s) => s.toggleChunkRealTaskDone);
 
   const { playClick, playCast } = useSound();
 
@@ -1276,7 +1327,11 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
   return (
     <div
       data-testid="lesson-chunk-player"
-      className="relative flex flex-col max-h-[88vh] overflow-hidden bg-[#16112b]"
+      className={`relative flex flex-col bg-[#16112b] ${
+        mode === 'tower-quest'
+          ? 'border-2 border-[#f5b935]'
+          : 'max-h-[88vh] overflow-hidden'
+      }`}
     >
       {/* Top Header: Topic Title + Kamus Drawer Trigger + Close */}
       <div
@@ -1285,10 +1340,14 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
       >
         <div>
           <div className="font-pixel text-[9px] mb-1" style={{ color: spellTheme.color }}>
-            MICRO-LESSON INTERAKTIF · TOPIK #{topicContent.topicId} ({chunks.length} POTONGAN)
+            {mode === 'tower-quest'
+              ? `PANDUAN INTERAKTIF · QUEST MENARA ${(questId || '').toUpperCase()} (${chunks.length} POTONGAN)`
+              : `MICRO-LESSON INTERAKTIF · TOPIK #${topicContent.topicId} (${chunks.length} POTONGAN)`}
           </div>
           <h2 className="font-pixel text-xs sm:text-sm text-[#f4f1ea]">
-            {topicTitle} — {topicContent.spell.name}
+            {mode === 'tower-quest'
+              ? `${topicTitle}`
+              : `${topicTitle} — ${topicContent.spell.name}`}
           </h2>
         </div>
 
@@ -1305,17 +1364,33 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
             📖 Kamus ({currentChunk.terms.length})
           </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              playClick();
-              onClose();
-            }}
-            aria-label="Tutup Gulungan"
-            className="pixel-btn px-3 py-1.5 bg-[#1f193d] text-[#f4f1ea] font-pixel text-[10px]"
-          >
-            ✕ TUTUP
-          </button>
+          {mode === 'tower-quest' ? (
+            onSwitchToQuestChecklist && (
+              <button
+                type="button"
+                data-testid="switch-to-quest-checklist-btn"
+                onClick={() => {
+                  playClick();
+                  onSwitchToQuestChecklist();
+                }}
+                className="pixel-btn px-3 py-1.5 bg-[#1f193d] text-[#f4f1ea] font-pixel text-[10px]"
+              >
+                Langkah Quest →
+              </button>
+            )
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                playClick();
+                onClose();
+              }}
+              aria-label="Tutup Gulungan"
+              className="pixel-btn px-3 py-1.5 bg-[#1f193d] text-[#f4f1ea] font-pixel text-[10px]"
+            >
+              ✕ TUTUP
+            </button>
+          )}
         </div>
       </div>
 
@@ -1385,6 +1460,10 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
       >
         {STAGE_LABELS.map((s) => {
           const isCurrentStage = stage === s.id;
+          const displayLabel =
+            s.id === 'formula' && currentChunk.formulaTitle
+              ? `6. ${currentChunk.formulaTitle}`
+              : s.shortLabel;
           return (
             <button
               key={s.id}
@@ -1399,7 +1478,7 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
                   : 'bg-[#16112b] text-[#b3aad1] border-[#3a306e] hover:text-[#f4f1ea]'
               }`}
             >
-              {s.shortLabel}
+              {displayLabel}
             </button>
           );
         })}
@@ -1626,11 +1705,15 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
 
             <div
               className={`grid grid-cols-1 ${
-                currentChunk.visual ? 'lg:grid-cols-12' : ''
+                currentChunk.visual && mode !== 'tower-quest' ? 'lg:grid-cols-12' : ''
               } gap-4 items-start`}
             >
               {currentChunk.visual && (
-                <div className="lg:col-span-6 lg:sticky lg:top-2">
+                <div
+                  className={
+                    mode !== 'tower-quest' ? 'lg:col-span-6 lg:sticky lg:top-2' : 'w-full'
+                  }
+                >
                   <LessonVisualRenderer
                     visual={currentChunk.visual}
                     activeHighlights={activeStepHighlight}
@@ -1641,7 +1724,7 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
 
               <div
                 className={`${
-                  currentChunk.visual ? 'lg:col-span-6' : ''
+                  currentChunk.visual && mode !== 'tower-quest' ? 'lg:col-span-6' : ''
                 } space-y-2.5`}
               >
                 {currentChunk.steps.slice(0, stepsShownCount).map((stepObj, idx) => {
@@ -1709,6 +1792,27 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
                 </div>
               </div>
             </div>
+
+            {currentChunk.miniLab === 'neuron' && (
+              <div className="pt-2">
+                <NeuronMiniLabWidget reduceMotion={reduceMotion} />
+              </div>
+            )}
+            {currentChunk.miniLab === 'softmax' && (
+              <div className="pt-2">
+                <SoftmaxMiniLabWidget reduceMotion={reduceMotion} />
+              </div>
+            )}
+            {currentChunk.miniLab === 'quant' && (
+              <div className="pt-2">
+                <QuantMiniLabWidget reduceMotion={reduceMotion} />
+              </div>
+            )}
+            {currentChunk.miniLab === 'latency' && (
+              <div className="pt-2">
+                <LatencyMiniLabWidget reduceMotion={reduceMotion} />
+              </div>
+            )}
           </section>
         )}
 
@@ -1719,6 +1823,19 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
             aria-label="Latihan Praktik Tanpa Risiko"
             className="space-y-4"
           >
+            {currentChunk.miniLab === 'neuron' && (
+              <NeuronMiniLabWidget reduceMotion={reduceMotion} />
+            )}
+            {currentChunk.miniLab === 'softmax' && (
+              <SoftmaxMiniLabWidget reduceMotion={reduceMotion} />
+            )}
+            {currentChunk.miniLab === 'quant' && (
+              <QuantMiniLabWidget reduceMotion={reduceMotion} />
+            )}
+            {currentChunk.miniLab === 'latency' && (
+              <LatencyMiniLabWidget reduceMotion={reduceMotion} />
+            )}
+
             <div className="bg-[#120d26] border-2 border-[#38d864] p-3.5 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <div className="font-pixel text-[10px] text-[#38d864]">
@@ -1756,7 +1873,7 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
                 }}
                 className="pixel-btn px-5 py-2.5 bg-[#38d864] text-[#0d0a1a] font-pixel text-xs"
               >
-                Lanjut ke Rumus →
+                Lanjut ke {currentChunk.formulaTitle || 'Rumus'} →
               </button>
             </div>
           </section>
@@ -1775,9 +1892,18 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
               style={{ borderColor: spellTheme.color }}
             >
               <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-[#3a306e] pb-2">
-                <span className="font-pixel text-xs" style={{ color: spellTheme.color }}>
-                  ★ LANGKAH 6 · PELAT RUNE RUMUS: {currentChunk.title}
-                </span>
+                <div>
+                  <div className="font-pixel text-[9px] text-[#b3aad1] mb-0.5">
+                    ★ LANGKAH 6 · {currentChunk.title}
+                  </div>
+                  <h4
+                    data-testid="formula-step-heading"
+                    className="font-pixel text-xs sm:text-sm"
+                    style={{ color: spellTheme.color }}
+                  >
+                    {currentChunk.formulaTitle || 'Rumus'}
+                  </h4>
+                </div>
                 <span className="font-pixel text-[9px] text-[#b3aad1] bg-[#16112b] px-2 py-0.5 border border-[#5c4e99]">
                   {currentChunk.chunkId.toUpperCase()}
                 </span>
@@ -1897,6 +2023,38 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
               className="w-full bg-[#0d0a1a] border-2 border-[#5c4e99] focus:border-[#f5b935] p-3 font-vt text-xl text-[#f4f1ea] outline-none"
             />
 
+            {currentChunk.realTask && (
+              <div
+                data-testid="real-task-card"
+                className="bg-[#120d26] border-2 border-[#fb923c] p-4 space-y-2.5 text-left"
+              >
+                <div className="font-pixel text-[10px] text-[#fb923c]">
+                  Tugas nyata (opsional)
+                </div>
+                <p
+                  data-testid="real-task-text"
+                  className="font-vt text-xl sm:text-2xl text-[#f4f1ea] leading-snug"
+                >
+                  {currentChunk.realTask}
+                </p>
+                <label className="inline-flex items-center gap-2.5 cursor-pointer select-none pt-1">
+                  <input
+                    type="checkbox"
+                    data-testid={`real-task-checkbox-${currentChunk.chunkId}`}
+                    checked={Boolean(taskDone[currentChunk.chunkId])}
+                    onChange={(e) => {
+                      playClick();
+                      toggleChunkRealTaskDone(currentChunk.chunkId, e.target.checked);
+                    }}
+                    className="w-4 h-4 accent-[#38d864] cursor-pointer"
+                  />
+                  <span className="font-vt text-lg sm:text-xl text-[#38d864]">
+                    Sudah kucoba
+                  </span>
+                </label>
+              </div>
+            )}
+
             <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
               <button
                 type="button"
@@ -1944,6 +2102,38 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
               telah ditambahkan ke antrean <strong>Ulasan Harian</strong>.
             </p>
 
+            {currentChunk.realTask && (
+              <div
+                data-testid="real-task-card"
+                className="bg-[#120d26] border-2 border-[#fb923c] p-4 space-y-2.5 text-left"
+              >
+                <div className="font-pixel text-[10px] text-[#fb923c]">
+                  Tugas nyata (opsional)
+                </div>
+                <p
+                  data-testid="real-task-text"
+                  className="font-vt text-xl sm:text-2xl text-[#f4f1ea] leading-snug"
+                >
+                  {currentChunk.realTask}
+                </p>
+                <label className="inline-flex items-center gap-2.5 cursor-pointer select-none pt-1">
+                  <input
+                    type="checkbox"
+                    data-testid={`real-task-checkbox-${currentChunk.chunkId}`}
+                    checked={Boolean(taskDone[currentChunk.chunkId])}
+                    onChange={(e) => {
+                      playClick();
+                      toggleChunkRealTaskDone(currentChunk.chunkId, e.target.checked);
+                    }}
+                    className="w-4 h-4 accent-[#38d864] cursor-pointer"
+                  />
+                  <span className="font-vt text-lg sm:text-xl text-[#38d864]">
+                    Sudah kucoba
+                  </span>
+                </label>
+              </div>
+            )}
+
             {!chunkIsComplete && (
               <div className="bg-[#291324] border-2 border-[#f5b935] p-3 text-left font-vt text-lg text-[#f4f1ea]">
                 Catatan: Kamu masih memiliki latihan yang belum dicoba di potongan ini. Klik{' '}
@@ -1973,7 +2163,9 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
                 </button>
               ) : (
                 <div className="font-pixel text-xs text-[#f5b935]">
-                  ✓ Ini adalah potongan terakhir di Topik #{topicContent.topicId}!
+                  {mode === 'tower-quest'
+                    ? `✓ Ini adalah potongan terakhir di Quest ${(questId || '').toUpperCase()}!`
+                    : `✓ Ini adalah potongan terakhir di Topik #${topicContent.topicId}!`}
                 </div>
               )}
             </div>
@@ -2007,6 +2199,25 @@ export const LessonChunkPlayer: React.FC<LessonChunkPlayerProps> = ({
               </button>
             </div>
           </>
+        ) : mode === 'tower-quest' ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 w-full">
+            <span className="font-vt text-lg text-[#b3aad1]">
+              Panduan ini tidak mencentang langkah quest secara otomatis. Tandai langkah quest secara manual setelah kamu mengerjakannya.
+            </span>
+            {onSwitchToQuestChecklist && (
+              <button
+                type="button"
+                data-testid="footer-switch-to-quest-checklist-btn"
+                onClick={() => {
+                  playClick();
+                  onSwitchToQuestChecklist();
+                }}
+                className="pixel-btn px-4 py-2 bg-[#f5b935] text-[#0d0a1a] font-pixel text-xs shrink-0"
+              >
+                Ke Daftar Langkah Quest →
+              </button>
+            )}
+          </div>
         ) : (
           <div className="flex items-center justify-between w-full">
             <span className="font-vt text-lg text-[#38d864]">

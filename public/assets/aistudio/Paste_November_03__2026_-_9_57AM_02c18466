@@ -1,0 +1,805 @@
+{
+  "reviewStatus": "needs-human-review",
+  "floor": 3,
+  "lessonVersion": 3,
+  "guide": { "name": "Rune", "role": "Pemandu dungeon" },
+  "topics": [
+    {
+      "topicId": 12,
+      "chunks": [
+        {
+          "chunkId": "t12c1",
+          "title": "Neuron: menimbang bukti",
+          "goal": "Setelah ini kamu bisa menghitung keluaran satu neuron: z = w·x + b.",
+          "miniLab": "neuron",
+          "terms": [
+            { "term": "bobot (w)", "plain": "seberapa penting sebuah masukan bagi neuron" },
+            { "term": "bias (b)", "plain": "angka tambahan yang menggeser hasil" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Neuron adalah juri kecil. Ia menimbang beberapa bukti, lalu memberi satu angka." },
+            { "who": "Rune", "text": "Monster ini punya tinggi 3 dan jumlah mata 2. Tinggi dianggap berbahaya (bobot 1). Mata dianggap menenangkan (bobot −0,5). Juri punya bias 2." },
+            { "who": "Kamu", "text": "Berapa nilai pertimbangannya?" }
+          ],
+          "guess": { "question": "Neuron dengan x = [3, 2], w = [1, −0,5], b = 2 menghasilkan z yang mendekati...", "options": ["4", "6", "3", "0"], "correctIndex": 0, "reveal": "Mari kita hitung pelan-pelan." },
+          "visual": { "type": "matrixGrid", "matrices": [ { "id": "x", "rows": [[3, 2]] }, { "id": "w", "rows": [[1, -0.5]] } ] },
+          "steps": [
+            { "text": "Neuron menerima dua masukan: x1 = 3 dan x2 = 2.", "highlight": ["x:r1"] },
+            { "text": "Tiap masukan punya bobot: w1 = 1 dan w2 = −0,5.", "highlight": ["w:r1"] },
+            { "text": "Kalikan tiap pasangan: 3 × 1 = 3 dan 2 × (−0,5) = −1.", "highlight": ["x:r1", "w:r1"] },
+            { "text": "Jumlahkan: 3 + (−1) = 2.", "highlight": [] },
+            { "text": "Tambahkan bias: 2 + 2 = 4. Angka 4 inilah z.", "highlight": [] },
+            { "text": "Jadi z = w·x + b = 4, karena bukti dikalikan bobot, dijumlahkan, lalu digeser oleh bias.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t12c1p1", "type": "fillNumber", "question": "x = [2, 4], w = [3, −1], b = 1. Berapa z?", "answer": 3, "tolerance": 0, "unit": "", "why": "2×3 + 4×(−1) + 1 = 6 − 4 + 1 = 3." },
+            { "id": "t12c1p2", "type": "fillNumber", "question": "x = [1, 1, 1], w = [2, −2, 5], b = −1. Berapa z?", "answer": 4, "tolerance": 0, "unit": "", "why": "2 − 2 + 5 − 1 = 4." },
+            { "id": "t12c1p3", "type": "choice", "question": "Apa fungsi bias b?", "options": ["Menggeser hasil penjumlahan agar neuron lebih fleksibel", "Menghapus masukan", "Mengalikan semua bobot", "Mengurutkan masukan"], "correctIndex": 0, "why": "Bias ditambahkan ke jumlah berbobot sehingga hasilnya bisa digeser naik atau turun." }
+          ],
+          "formula": { "lines": ["z = w·x + b", "z = w1·x1 + w2·x2 + ... + b"], "readAloud": "z sama dengan jumlah tiap bobot dikali masukannya, ditambah bias." },
+          "commonMistake": "Lupa menambahkan bias setelah menjumlahkan hasil kali.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang dilakukan neuron terhadap masukannya?",
+          "reviewItems": [ { "id": "t12c1r1", "front": "Rumus satu neuron?", "back": "z = w·x + b" } ]
+        },
+        {
+          "chunkId": "t12c2",
+          "title": "Fungsi aktivasi: saklar neuron",
+          "goal": "Setelah ini kamu bisa menghitung ReLU dan menjelaskan mengapa jaringan butuh aktivasi non-linear.",
+          "terms": [
+            { "term": "fungsi aktivasi", "plain": "aturan yang mengubah z menjadi keluaran neuron" },
+            { "term": "ReLU", "plain": "mengubah angka negatif menjadi 0 dan membiarkan angka positif" },
+            { "term": "non-linear", "plain": "tidak membentuk garis lurus" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Setelah menghitung z, neuron melewatkannya ke fungsi aktivasi." },
+            { "who": "Rune", "text": "Fungsi ini menentukan seberapa kuat neuron 'menyala'." }
+          ],
+          "guess": { "question": "Berapa ReLU(−3)?", "options": ["0", "−3", "3", "1"], "correctIndex": 0, "reveal": "Kita lihat aturannya." },
+          "visual": { "type": "linePlot", "points": [[-3, 0], [-1, 0], [0, 0], [1, 1], [3, 3]] },
+          "steps": [
+            { "text": "ReLU(z) = max(0, z). Jika z negatif, hasilnya 0. Jika z positif, hasilnya z itu sendiri.", "highlight": [] },
+            { "text": "ReLU(4) = 4 dan ReLU(−3) = 0.", "highlight": [] },
+            { "text": "Mengapa aktivasi perlu? Bayangkan dua lapisan tanpa aktivasi: lapisan 1 mengalikan 2, lapisan 2 mengalikan 3.", "highlight": [] },
+            { "text": "Untuk x = −1: −1 × 2 = −2, lalu −2 × 3 = −6. Untuk x = 2: 2 × 2 × 3 = 12. Hasilnya garis lurus y = 6x.", "highlight": [] },
+            { "text": "Sisipkan ReLU di antara kedua lapisan. Untuk x = −1: −2 lalu ReLU menjadi 0, lalu 0 × 3 = 0. Untuk x = 2: 4 tetap 4, lalu 12.", "highlight": [] },
+            { "text": "Sekarang x = −1 memberi 0, bukan −6. Hasilnya bukan lagi garis y = 6x, karena ReLU memotong bagian negatif.", "highlight": [] },
+            { "text": "Jadi aktivasi non-linear memungkinkan jaringan membentuk pola yang bukan garis lurus. Tanpanya, tumpukan lapisan sama kuatnya dengan satu lapisan.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t12c2p1", "type": "fillNumber", "question": "Berapa ReLU(−4)?", "answer": 0, "tolerance": 0, "unit": "", "why": "Karena −4 negatif, hasilnya 0." },
+            { "id": "t12c2p2", "type": "fillNumber", "question": "Lapisan 1: y = 3x. Lalu ReLU. Lapisan 2: out = 4 × hasil ReLU. Berapa out untuk x = 2?", "answer": 24, "tolerance": 0, "unit": "", "why": "y = 6. ReLU(6) = 6. out = 4 × 6 = 24." },
+            { "id": "t12c2p3", "type": "choice", "question": "Mengapa jaringan neural butuh aktivasi non-linear?", "options": ["Agar bobot tidak perlu dilatih", "Agar loss selalu nol", "Tanpanya, tumpukan lapisan linear hanya setara satu lapisan linear", "Agar data tidak perlu dinormalisasi"], "correctIndex": 2, "why": "Komposisi fungsi linear tetap linear, jadi kedalaman tidak menambah kemampuan." }
+          ],
+          "formula": { "lines": ["ReLU(z) = max(0, z)", "sigmoid σ(z) = 1 ÷ (1 + e^(−z)), hasilnya antara 0 dan 1"], "readAloud": "ReLU mengambil yang lebih besar antara nol dan z." },
+          "commonMistake": "Mengira lapisan-lapisan linear yang ditumpuk menjadi lebih ekspresif tanpa aktivasi non-linear.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang berubah ketika ReLU disisipkan di antara dua lapisan?",
+          "reviewItems": [
+            { "id": "t12c2r1", "front": "Rumus ReLU?", "back": "max(0, z)" },
+            { "id": "t12c2r2", "front": "Mengapa butuh aktivasi non-linear?", "back": "Tanpanya, lapisan-lapisan linear hanya setara satu lapisan linear." }
+          ]
+        },
+        {
+          "chunkId": "t12c3",
+          "title": "Backpropagation: kesalahan mengalir mundur",
+          "goal": "Setelah ini kamu bisa menghitung gradien satu bobot dengan aturan rantai.",
+          "terms": [
+            { "term": "backpropagation", "plain": "cara menghitung seberapa besar tiap bobot menyumbang kesalahan, dari keluaran mundur ke masukan" },
+            { "term": "gradien", "plain": "kemiringan loss terhadap sebuah bobot" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Sebuah pabrik punya beberapa stasiun. Produk akhirnya cacat." },
+            { "who": "Rune", "text": "Kita telusuri mundur: seberapa besar tiap stasiun menyumbang cacat itu?" }
+          ],
+          "guess": { "question": "Neuron: x = 2, w = 1, target 6. Tebakan ŷ = 2, jadi terlalu kecil. Menurutmu w sebaiknya...", "options": ["Naik", "Turun", "Tetap", "Tidak tahu"], "correctIndex": 0, "reveal": "Kita buktikan dengan hitungan." },
+          "visual": { "type": "bars", "items": [ { "id": "sebelum", "label": "Loss sebelum", "value": 16 }, { "id": "sesudah", "label": "Loss sesudah", "value": 5.76 } ] },
+          "steps": [
+            { "text": "Model: ŷ = w·x dengan x = 2 dan w = 1. Targetnya t = 6.", "highlight": [] },
+            { "text": "Maju (forward): ŷ = 1 × 2 = 2. Loss L = (ŷ − t)² = (2 − 6)² = 16.", "highlight": ["sebelum"] },
+            { "text": "Mundur, langkah 1: seberapa loss berubah jika ŷ berubah? dL/dŷ = 2(ŷ − t) = 2 × (−4) = −8.", "highlight": [] },
+            { "text": "Langkah 2: seberapa ŷ berubah jika w berubah? dŷ/dw = x = 2.", "highlight": [] },
+            { "text": "Aturan rantai: kalikan keduanya. dL/dw = −8 × 2 = −16.", "highlight": [] },
+            { "text": "Gradien negatif berarti menaikkan w menurunkan loss. Dengan η = 0,05: w baru = 1 − 0,05 × (−16) = 1,8.", "highlight": [] },
+            { "text": "Cek: ŷ baru = 1,8 × 2 = 3,6. Loss baru = (3,6 − 6)² = 5,76, turun dari 16.", "highlight": ["sesudah"] },
+            { "text": "Jadi backpropagation menghitung gradien dengan mengalikan turunan tiap tahap dari keluaran mundur ke masukan.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t12c3p1", "type": "fillNumber", "question": "x = 3, w = 1, target 6, jadi ŷ = 3. Berapa dL/dw?", "answer": -18, "tolerance": 0, "unit": "", "why": "dL/dŷ = 2(3 − 6) = −6. dŷ/dw = 3. dL/dw = −6 × 3 = −18." },
+            { "id": "t12c3p2", "type": "fillNumber", "question": "Dengan gradien itu dan η = 0,1, berapa w baru?", "answer": 2.8, "tolerance": 0.001, "unit": "", "why": "w baru = 1 − 0,1 × (−18) = 2,8." },
+            { "id": "t12c3p3", "type": "order", "question": "Urutkan langkah satu putaran belajar.", "items": ["Hitung tebakan ŷ dan loss (maju)", "Hitung dL/dŷ", "Kalikan dengan dŷ/dw (aturan rantai)", "Perbarui w dengan gradien"], "why": "Maju dulu, lalu gradien dihitung mundur, baru bobot diperbarui." }
+          ],
+          "formula": { "lines": ["dL/dw = dL/dŷ · dŷ/dw", "w baru = w − η · dL/dw"], "readAloud": "Gradien bobot sama dengan perubahan loss terhadap tebakan, dikali perubahan tebakan terhadap bobot." },
+          "commonMistake": "Berhenti di satu turunan padahal semua turunan sepanjang rantai harus dikalikan.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa dua turunan itu dikalikan?",
+          "reviewItems": [ { "id": "t12c3r1", "front": "Apa yang dilakukan backpropagation?", "back": "Menghitung gradien loss terhadap bobot dengan aturan rantai, dari keluaran ke masukan." } ]
+        },
+        {
+          "chunkId": "t12c4",
+          "title": "SGD dan Adam",
+          "goal": "Setelah ini kamu bisa menghitung satu langkah SGD dan menjelaskan apa yang membuat Adam berbeda.",
+          "terms": [
+            { "term": "SGD", "plain": "memperbarui bobot searah negatif gradien dengan langkah sebanding gradiennya" },
+            { "term": "Adam", "plain": "optimizer yang menyesuaikan ukuran langkah tiap parameter" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Dua pendaki menuruni bukit berkabut." },
+            { "who": "Rune", "text": "Pendaki SGD melangkah sebesar kemiringan dikali η." },
+            { "who": "Rune", "text": "Pendaki Adam mengingat riwayat kemiringan sebelum melangkah." }
+          ],
+          "guess": { "question": "Dua parameter punya gradien 100 dan 0,01. Dengan SGD (η = 0,001), langkah keduanya...", "options": ["Sama besar", "Sangat berbeda", "Selalu nol", "Selalu 1"], "correctIndex": 1, "reveal": "Kita hitung perbedaannya." },
+          "steps": [
+            { "text": "SGD: w baru = w − η × g. Langkahnya sebanding dengan gradien g.", "highlight": [] },
+            { "text": "Dengan η = 0,001 dan g = 100: langkah = 0,001 × 100 = 0,1.", "highlight": [] },
+            { "text": "Dengan η = 0,001 dan g = 0,01: langkah = 0,001 × 0,01 = 0,00001.", "highlight": [] },
+            { "text": "Selisihnya 10.000 kali. Parameter dengan gradien kecil nyaris tidak bergerak.", "highlight": [] },
+            { "text": "Adam menyimpan rata-rata gradien dan rata-rata kuadrat gradien untuk tiap parameter, lalu menyesuaikan langkah tiap parameter.", "highlight": [] },
+            { "text": "Pada langkah pertama (disederhanakan), langkah Adam sekitar η untuk kedua parameter itu, yaitu sekitar 0,001, apa pun besar gradiennya.", "highlight": [] },
+            { "text": "Jadi Adam memberi tiap parameter langkah yang sepadan, sedangkan SGD mengikuti besar gradien apa adanya.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t12c4p1", "type": "fillNumber", "question": "w = 2, g = −4, η = 0,05. Berapa w baru dengan SGD?", "answer": 2.2, "tolerance": 0.001, "unit": "", "why": "w baru = 2 − 0,05 × (−4) = 2,2." },
+            { "id": "t12c4p2", "type": "fillNumber", "question": "η = 0,002 dan g = 50. Berapa besar langkah SGD?", "answer": 0.1, "tolerance": 0.001, "unit": "", "why": "0,002 × 50 = 0,1." },
+            { "id": "t12c4p3", "type": "choice", "question": "Apa ciri utama Adam dibanding SGD biasa?", "options": ["Adam tidak memakai gradien", "Adam menyesuaikan ukuran langkah tiap parameter memakai rata-rata gradien dan kuadrat gradien", "Adam selalu memakai learning rate nol", "Adam hanya untuk CNN"], "correctIndex": 1, "why": "Itulah yang membuat langkah tiap parameter sepadan." }
+          ],
+          "formula": { "lines": ["SGD: w baru = w − η·g", "Adam: langkah tiap parameter disesuaikan memakai rata-rata gradien dan rata-rata kuadrat gradien"], "readAloud": "SGD: bobot baru sama dengan bobot lama dikurangi eta kali gradien." },
+          "commonMistake": "Mengira Adam tidak memakai gradien. Adam tetap memakainya, tetapi menyesuaikan langkahnya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa parameter dengan gradien kecil nyaris tidak bergerak pada SGD?",
+          "reviewItems": [
+            { "id": "t12c4r1", "front": "Rumus pembaruan SGD?", "back": "w baru = w − η·g" },
+            { "id": "t12c4r2", "front": "Apa ciri Adam?", "back": "Menyesuaikan langkah tiap parameter memakai rata-rata gradien dan kuadrat gradien." }
+          ]
+        }
+      ]
+    },
+    {
+      "topicId": 13,
+      "chunks": [
+        {
+          "chunkId": "t13c1",
+          "title": "Tensor dan autograd",
+          "goal": "Setelah ini kamu bisa memakai autograd untuk mendapatkan gradien otomatis.",
+          "terms": [
+            { "term": "tensor", "plain": "array angka yang bisa dihitung di CPU atau GPU" },
+            { "term": "autograd", "plain": "fitur PyTorch yang mencatat hitungan dan menghitung gradien otomatis" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Bayangkan buku catatan ajaib yang mencatat setiap hitungan melibatkan bobotmu." },
+            { "who": "Rune", "text": "Setelah itu ia bisa menelusuri mundur dan memberi gradien tanpa kamu menurunkan rumusnya." }
+          ],
+          "guess": { "question": "w = 1, x = 4, target 6. Gradien loss terhadap w kira-kira bernilai...", "options": ["Negatif", "Positif", "Nol", "Tidak ada"], "correctIndex": 0, "reveal": "Mari kita jalankan kodenya dalam pikiran." },
+          "visual": { "type": "codeBlock", "lines": ["import torch", "x = torch.tensor(4.0)", "w = torch.tensor(1.0, requires_grad=True)", "y = w * x               # 4.0", "loss = (y - 6) ** 2     # 4.0", "loss.backward()", "print(w.grad)           # tensor(-16.)"] },
+          "steps": [
+            { "text": "x = torch.tensor(4.0) membuat tensor berisi 4.", "highlight": ["l2"] },
+            { "text": "w dibuat dengan requires_grad=True. Artinya autograd mencatat semua hitungan yang melibatkan w.", "highlight": ["l3"] },
+            { "text": "y = w * x menghitung 1 × 4 = 4.", "highlight": ["l4"] },
+            { "text": "loss = (y − 6)² = (4 − 6)² = 4.", "highlight": ["l5"] },
+            { "text": "loss.backward() menghitung gradien loss terhadap w lewat aturan rantai dan menyimpannya di w.grad.", "highlight": ["l6"] },
+            { "text": "Hasilnya: dL/dw = 2(y − 6) × x = 2 × (−2) × 4 = −16.", "highlight": ["l7"] },
+            { "text": "Jadi autograd melakukan backpropagation otomatis, dan kamu tidak perlu menurunkan rumusnya sendiri.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t13c1p1", "type": "fillNumber", "question": "x = 2, w = 1, target 5, loss = (w·x − 5)². Berapa w.grad?", "answer": -12, "tolerance": 0, "unit": "", "why": "y = 2. dL/dw = 2(2 − 5) × 2 = −12." },
+            { "id": "t13c1p2", "type": "choice", "question": "Tensor tanpa requires_grad=True. Apakah w.grad dihitung untuknya?", "options": ["Tidak, tensor itu tidak dilacak autograd", "Ya, selalu", "Hanya di GPU", "Hanya jika loss nol"], "correctIndex": 0, "why": "Autograd hanya mencatat tensor yang diminta untuk dilacak." },
+            { "id": "t13c1p3", "type": "choice", "question": "loss.backward() melakukan apa?", "options": ["Menghitung gradien loss dan menyimpannya di .grad", "Mengubah nilai loss menjadi nol", "Memperbarui bobot", "Menghapus tensor"], "correctIndex": 0, "why": "Pembaruan bobot dilakukan optimizer, bukan backward()." }
+          ],
+          "formula": { "lines": ["w = torch.tensor(..., requires_grad=True)", "loss.backward() → w.grad"], "readAloud": "Minta autograd melacak w, lalu backward mengisi w.grad dengan gradiennya." },
+          "commonMistake": "Mengira backward() sudah memperbarui bobot. Itu tugas optimizer.step().",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang dicatat autograd dan untuk apa?",
+          "reviewItems": [ { "id": "t13c1r1", "front": "Apa arti requires_grad=True?", "back": "Autograd melacak operasi pada tensor itu agar gradiennya bisa dihitung." } ]
+        },
+        {
+          "chunkId": "t13c2",
+          "title": "Loop pelatihan lima langkah",
+          "goal": "Setelah ini kamu bisa menyusun loop pelatihan PyTorch dan menjelaskan alasan zero_grad.",
+          "terms": [
+            { "term": "optimizer", "plain": "bagian yang memperbarui bobot memakai gradien" },
+            { "term": "epoch", "plain": "satu putaran penuh melewati seluruh data latih" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Melatih model itu seperti latihan pedang yang diulang: tebak, ukur salah, hapus catatan lama, telusuri kesalahan, perbaiki." }
+          ],
+          "guess": { "question": "Jika optimizer.zero_grad() dilewati, apa yang terjadi?", "options": ["Gradien lama ikut tertambah ke gradien baru", "Tidak ada efek", "Model lebih cepat belajar", "Loss selalu nol"], "correctIndex": 0, "reveal": "Kita lihat lewat angka." },
+          "visual": { "type": "codeBlock", "lines": ["for x_batch, y_batch in data:", "    pred = model(x_batch)          # 1. maju", "    loss = loss_fn(pred, y_batch)  # 2. hitung loss", "    optimizer.zero_grad()          # 3. hapus gradien lama", "    loss.backward()                # 4. hitung gradien baru", "    optimizer.step()               # 5. perbarui bobot"] },
+          "steps": [
+            { "text": "Langkah 1: model membuat tebakan dari data (maju).", "highlight": ["l2"] },
+            { "text": "Langkah 2: hitung loss dari tebakan dan jawaban asli.", "highlight": ["l3"] },
+            { "text": "Langkah 3: hapus gradien dari putaran sebelumnya dengan zero_grad().", "highlight": ["l4"] },
+            { "text": "Langkah 4: backward() menghitung gradien baru.", "highlight": ["l5"] },
+            { "text": "Langkah 5: step() memperbarui bobot. Contoh: w = 1, w.grad = −16, lr = 0,01 → w baru = 1 − 0,01 × (−16) = 1,16.", "highlight": ["l6"] },
+            { "text": "Mengapa langkah 3 penting? backward() menambah ke w.grad, bukan menggantinya.", "highlight": ["l4", "l5"] },
+            { "text": "Jika zero_grad dilewati dan gradien baru −16, sedangkan sisa lama juga −16, w.grad menjadi −32. Langkah update jadi dua kali lipat dan salah.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t13c2p1", "type": "fillNumber", "question": "w = 0,5, w.grad = −8, lr = 0,1. Berapa w setelah optimizer.step()?", "answer": 1.3, "tolerance": 0.001, "unit": "", "why": "w baru = 0,5 − 0,1 × (−8) = 1,3." },
+            { "id": "t13c2p2", "type": "fillNumber", "question": "Gradien iterasi 1 adalah 3. Iterasi 2 juga menghasilkan 3, tetapi zero_grad dilewati. Berapa w.grad pada iterasi 2?", "answer": 6, "tolerance": 0, "unit": "", "why": "Gradien menumpuk: 3 + 3 = 6." },
+            { "id": "t13c2p3", "type": "order", "question": "Urutkan loop pelatihan yang benar.", "items": ["Tebakan model (forward)", "Hitung loss", "optimizer.zero_grad()", "loss.backward()", "optimizer.step()"], "why": "Hapus gradien lama sebelum backward, lalu perbarui bobot sesudahnya." }
+          ],
+          "formula": { "lines": ["forward → loss → zero_grad() → backward() → step()"], "readAloud": "Tebak, hitung loss, hapus gradien lama, hitung gradien baru, lalu perbarui bobot." },
+          "commonMistake": "Lupa memanggil zero_grad(), sehingga gradien putaran lama ikut tertambah.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa gradien harus dihapus tiap putaran?",
+          "reviewItems": [ { "id": "t13c2r1", "front": "Urutan loop pelatihan PyTorch?", "back": "forward, loss, zero_grad, backward, step." } ]
+        },
+        {
+          "chunkId": "t13c3",
+          "title": "Mode latih dan mode evaluasi",
+          "goal": "Setelah ini kamu bisa mengevaluasi model dengan benar di PyTorch.",
+          "terms": [
+            { "term": "dropout", "plain": "mematikan sebagian neuron secara acak saat latihan" },
+            { "term": "torch.no_grad()", "plain": "perintah agar PyTorch tidak melacak gradien" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Model punya dua mode: mode latihan dan mode ujian." },
+            { "who": "Rune", "text": "Di mode latihan, dropout menyalakan 'gangguan acak'. Di mode ujian, gangguan itu harus dimatikan." }
+          ],
+          "guess": { "question": "Saat mengevaluasi model yang berisi dropout, kamu perlu...", "options": ["model.eval() dan torch.no_grad()", "model.train()", "Menaikkan learning rate", "Menghapus dropout dari data"], "correctIndex": 0, "reveal": "Kita lihat alasannya." },
+          "visual": { "type": "codeBlock", "lines": ["model.eval()                 # mode evaluasi", "with torch.no_grad():        # tanpa melacak gradien", "    pred = model(x_uji)", "model.train()                # kembali ke mode latih"] },
+          "steps": [
+            { "text": "model.train(): dropout aktif. Batch norm memakai statistik batch saat ini.", "highlight": [] },
+            { "text": "model.eval(): dropout dimatikan, semua neuron dipakai. Batch norm memakai statistik tersimpan.", "highlight": ["l1"] },
+            { "text": "Contoh: dropout p = 0,5 pada 10 neuron. Mode latih: rata-rata 5 dimatikan. Mode eval: 0 dimatikan.", "highlight": [] },
+            { "text": "torch.no_grad() membuat PyTorch tidak mencatat gradien. Ini menghemat memori saat evaluasi.", "highlight": ["l2"] },
+            { "text": "Jadi untuk evaluasi: panggil model.eval(), jalankan di dalam torch.no_grad(), lalu kembali ke model.train() jika melatih lagi.", "highlight": ["l1", "l2", "l4"] }
+          ],
+          "practice": [
+            { "id": "t13c3p1", "type": "fillNumber", "question": "Dropout p = 0,3 pada 200 neuron. Rata-rata berapa neuron dimatikan saat latihan?", "answer": 60, "tolerance": 0, "unit": "", "why": "0,3 × 200 = 60." },
+            { "id": "t13c3p2", "type": "fillNumber", "question": "Pada mode eval, berapa neuron dropout yang dimatikan?", "answer": 0, "tolerance": 0, "unit": "", "why": "Dropout tidak aktif saat evaluasi." },
+            { "id": "t13c3p3", "type": "choice", "question": "Cara yang tepat mengevaluasi model berisi dropout?", "options": ["model.train() lalu hitung gradien", "model.eval() dan jalankan di dalam torch.no_grad()", "Kosongkan dataset", "Naikkan learning rate"], "correctIndex": 1, "why": "eval() mematikan dropout dan no_grad() menghemat memori." }
+          ],
+          "formula": { "lines": ["model.eval() + with torch.no_grad(): untuk evaluasi", "model.train() untuk melatih"], "readAloud": "Evaluasi memakai eval dan no_grad. Latihan memakai train." },
+          "commonMistake": "Lupa model.eval() sehingga dropout tetap aktif saat menguji.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa dropout dimatikan saat evaluasi?",
+          "reviewItems": [ { "id": "t13c3r1", "front": "Cara mengevaluasi model PyTorch yang benar?", "back": "model.eval() dan jalankan di dalam torch.no_grad()." } ]
+        }
+      ]
+    },
+    {
+      "topicId": 14,
+      "chunks": [
+        {
+          "chunkId": "t14c1",
+          "title": "Konvolusi: kaca pembesar kecil",
+          "goal": "Setelah ini kamu bisa menghitung hasil konvolusi sebuah kernel pada gambar kecil.",
+          "terms": [
+            { "term": "kernel", "plain": "kotak kecil berisi bobot yang digeser di atas gambar" },
+            { "term": "konvolusi", "plain": "menggeser kernel di atas gambar dan menghitung dot product di tiap posisi" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Gambar punya banyak piksel. Melihatnya sekaligus terlalu rumit." },
+            { "who": "Rune", "text": "Kita pakai kaca pembesar kecil yang digeser, melihat satu jendela pada satu waktu." }
+          ],
+          "guess": { "question": "Jendela [[1,2],[0,1]] dan kernel [[1,0],[0,1]]. Hasil kali per kotak lalu dijumlah adalah...", "options": ["2", "4", "1", "3"], "correctIndex": 0, "reveal": "Kita hitung kotak demi kotak." },
+          "visual": { "type": "matrixGrid", "matrices": [ { "id": "I", "rows": [[1, 2, 0], [0, 1, 3], [2, 0, 1]] }, { "id": "K", "rows": [[1, 0], [0, 1]] }, { "id": "O", "rows": [[2, 5], [0, 2]] } ] },
+          "steps": [
+            { "text": "Gambar I berukuran 3×3 dan kernel K berukuran 2×2.", "highlight": [] },
+            { "text": "Letakkan kernel di pojok kiri atas gambar. Jendelanya [[1,2],[0,1]].", "highlight": ["I:r1c1", "I:r1c2", "I:r2c1", "I:r2c2"] },
+            { "text": "Kalikan tiap pasangan yang sejajar, lalu jumlahkan: 1×1 + 2×0 + 0×0 + 1×1 = 2.", "highlight": ["O:r1c1"] },
+            { "text": "Geser kernel satu kotak ke kanan. Jendelanya [[2,0],[1,3]]: 2×1 + 0×0 + 1×0 + 3×1 = 5.", "highlight": ["O:r1c2"] },
+            { "text": "Geser ke baris berikutnya. Jendela [[0,1],[2,0]] memberi 0. Jendela [[1,3],[0,1]] memberi 2.", "highlight": ["O:r2c1", "O:r2c2"] },
+            { "text": "Hasilnya [[2, 5], [0, 2]].", "highlight": ["O:r1c1", "O:r1c2", "O:r2c1", "O:r2c2"] },
+            { "text": "Jadi konvolusi adalah dot product kernel dengan tiap jendela gambar, dan kernel yang sama dipakai di seluruh gambar.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t14c1p1", "type": "fillNumber", "question": "Jendela [[1,2],[3,4]] dan kernel [[1,0],[0,1]]. Berapa hasilnya?", "answer": 5, "tolerance": 0, "unit": "", "why": "1×1 + 2×0 + 3×0 + 4×1 = 5." },
+            { "id": "t14c1p2", "type": "fillNumber", "question": "Jendela [[1,2],[3,4]] dan kernel [[1,1],[1,1]]. Berapa hasilnya?", "answer": 10, "tolerance": 0, "unit": "", "why": "1 + 2 + 3 + 4 = 10." },
+            { "id": "t14c1p3", "type": "choice", "question": "Mengapa kernel yang sama dipakai di seluruh gambar?", "options": ["Agar pola yang sama bisa dikenali di mana pun, dengan parameter jauh lebih sedikit", "Agar gambar menjadi hitam putih", "Agar loss nol", "Agar gambar lebih besar"], "correctIndex": 0, "why": "Berbagi bobot menghemat parameter dan membuat pendeteksi pola bekerja di semua posisi." }
+          ],
+          "formula": { "lines": ["hasil di satu posisi = dot product kernel dengan jendela gambar"], "readAloud": "Kalikan kernel dengan jendela, kotak demi kotak, lalu jumlahkan." },
+          "commonMistake": "Lupa menjumlahkan hasil kali sehingga yang dihitung hanya perkalian kotak per kotak.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang dilakukan kernel pada gambar?",
+          "reviewItems": [ { "id": "t14c1r1", "front": "Apa itu konvolusi?", "back": "Menggeser kernel di atas gambar dan menghitung dot product di tiap posisi." } ]
+        },
+        {
+          "chunkId": "t14c2",
+          "title": "Ukuran keluaran dan pooling",
+          "goal": "Setelah ini kamu bisa menghitung ukuran keluaran konvolusi dan hasil max pooling.",
+          "terms": [
+            { "term": "padding (p)", "plain": "bingkai angka nol yang ditambahkan di tepi gambar" },
+            { "term": "stride (s)", "plain": "jarak geseran kernel tiap langkah" },
+            { "term": "pooling", "plain": "mengecilkan peta fitur dengan mengambil satu nilai tiap jendela" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Setelah kaca pembesar digeser, kadang gambarnya mengecil." },
+            { "who": "Kamu", "text": "Bagaimana tahu seberapa kecil?" },
+            { "who": "Rune", "text": "Ada rumusnya. Mari kita coba." }
+          ],
+          "guess": { "question": "Gambar 7×7, kernel 3×3, padding 0, stride 1. Ukuran keluaran per sisi?", "options": ["5", "7", "3", "4"], "correctIndex": 0, "reveal": "Kita pakai rumusnya." },
+          "visual": { "type": "matrixGrid", "matrices": [ { "id": "M", "rows": [[1, 3, 2, 0], [4, 2, 1, 1], [0, 1, 6, 2], [3, 2, 0, 5]] }, { "id": "P", "rows": [[4, 2], [3, 6]] } ] },
+          "steps": [
+            { "text": "Ukuran keluaran = ⌊(n − k + 2p) ÷ s⌋ + 1.", "highlight": [] },
+            { "text": "n = 7, k = 3, p = 0, s = 1: (7 − 3 + 0) ÷ 1 + 1 = 5.", "highlight": [] },
+            { "text": "Dengan padding p = 1: (7 − 3 + 2) ÷ 1 + 1 = 7. Ukurannya tetap 7.", "highlight": [] },
+            { "text": "Dengan stride s = 2 dan p = 0: ⌊(7 − 3) ÷ 2⌋ + 1 = 3. Langkah lebih besar membuat keluaran lebih kecil.", "highlight": [] },
+            { "text": "Pooling juga mengecilkan. Max pooling 2×2 stride 2 mengambil nilai terbesar di tiap jendela.", "highlight": [] },
+            { "text": "Matriks M berukuran 4×4. Jendela kiri atas [[1,3],[4,2]] memberi 4. Jendela kanan atas [[2,0],[1,1]] memberi 2.", "highlight": ["P:r1c1", "P:r1c2"] },
+            { "text": "Jendela kiri bawah [[0,1],[3,2]] memberi 3. Jendela kanan bawah [[6,2],[0,5]] memberi 6. Hasil P = [[4,2],[3,6]].", "highlight": ["P:r2c1", "P:r2c2"] },
+            { "text": "Jadi padding menjaga ukuran, sedangkan stride dan pooling mengecilkannya.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t14c2p1", "type": "fillNumber", "question": "n = 10, k = 3, p = 0, s = 1. Berapa ukuran keluaran?", "answer": 8, "tolerance": 0, "unit": "", "why": "(10 − 3) ÷ 1 + 1 = 8." },
+            { "id": "t14c2p2", "type": "fillNumber", "question": "n = 10, k = 4, p = 0, s = 2. Berapa ukuran keluaran?", "answer": 4, "tolerance": 0, "unit": "", "why": "⌊(10 − 4) ÷ 2⌋ + 1 = 3 + 1 = 4." },
+            { "id": "t14c2p3", "type": "fillNumber", "question": "Max pooling pada jendela [[5,1],[2,3]]. Berapa hasilnya?", "answer": 5, "tolerance": 0, "unit": "", "why": "Nilai terbesar di jendela itu adalah 5." }
+          ],
+          "formula": { "lines": ["ukuran keluaran = ⌊(n − k + 2p) ÷ s⌋ + 1", "max pooling: ambil nilai terbesar di tiap jendela"], "readAloud": "Ukuran keluaran: n kurang k tambah dua p, dibagi s, dibulatkan ke bawah, lalu tambah satu." },
+          "commonMistake": "Lupa menambah 1 di akhir atau lupa menghitung padding dua sisi (2p).",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa beda cara padding dan stride memengaruhi ukuran keluaran?",
+          "reviewItems": [ { "id": "t14c2r1", "front": "Rumus ukuran keluaran konvolusi?", "back": "⌊(n − k + 2p) ÷ s⌋ + 1" } ]
+        },
+        {
+          "chunkId": "t14c3",
+          "title": "Menghitung parameter konvolusi",
+          "goal": "Setelah ini kamu bisa menghitung jumlah parameter sebuah lapisan konvolusi.",
+          "terms": [
+            { "term": "kanal", "plain": "lapisan warna pada gambar, misalnya merah, hijau, biru" },
+            { "term": "filter", "plain": "satu kernel lengkap untuk semua kanal masukan" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Setiap filter menyimpan bobot. Berapa jumlahnya?" },
+            { "who": "Kamu", "text": "Apakah tergantung ukuran gambar?" },
+            { "who": "Rune", "text": "Kita hitung dan lihat sendiri." }
+          ],
+          "guess": { "question": "Gambar membesar dari 32×32 menjadi 64×64. Jumlah parameter lapisan konvolusi...", "options": ["Tetap sama", "Menjadi dua kali", "Menjadi empat kali", "Menjadi nol"], "correctIndex": 0, "reveal": "Lihat alasannya." },
+          "steps": [
+            { "text": "Satu filter 3×3 pada gambar 1 kanal: 3 × 3 = 9 bobot, ditambah 1 bias, jadi 10 parameter.", "highlight": [] },
+            { "text": "Dengan 4 filter: 4 × 10 = 40 parameter.", "highlight": [] },
+            { "text": "Jika gambar punya 3 kanal (RGB), tiap filter berukuran 3×3×3 = 27 bobot, ditambah 1 bias, jadi 28.", "highlight": [] },
+            { "text": "Dengan 8 filter: 8 × 28 = 224 parameter.", "highlight": [] },
+            { "text": "Ukuran gambar tidak muncul di hitungan ini sama sekali.", "highlight": [] },
+            { "text": "Jadi jumlah parameter hanya bergantung pada ukuran kernel, jumlah kanal masukan, dan jumlah filter.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t14c3p1", "type": "fillNumber", "question": "Masukan 2 kanal, 5 filter berukuran 3×3 (dengan bias). Berapa parameternya?", "answer": 95, "tolerance": 0, "unit": "", "why": "(3×3×2 + 1) × 5 = 19 × 5 = 95." },
+            { "id": "t14c3p2", "type": "fillNumber", "question": "Masukan 1 kanal, 6 filter berukuran 5×5 (dengan bias). Berapa parameternya?", "answer": 156, "tolerance": 0, "unit": "", "why": "(5×5×1 + 1) × 6 = 26 × 6 = 156." },
+            { "id": "t14c3p3", "type": "choice", "question": "Gambar membesar dari 32×32 ke 64×64. Jumlah parameter lapisan konvolusi yang sama...", "options": ["Tetap sama", "Menjadi empat kali", "Menjadi dua kali", "Menjadi setengah"], "correctIndex": 0, "why": "Parameter hanya bergantung pada kernel, kanal, dan jumlah filter." }
+          ],
+          "formula": { "lines": ["parameter = (k·k·C_masuk + 1) · C_keluar"], "readAloud": "Ukuran kernel dikali kanal masukan, ditambah satu bias, lalu dikali jumlah filter." },
+          "commonMistake": "Lupa menambah bias, atau mengira jumlah parameter ikut membesar saat gambar membesar.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa ukuran gambar tidak memengaruhi jumlah parameter?",
+          "reviewItems": [ { "id": "t14c3r1", "front": "Rumus parameter lapisan konvolusi?", "back": "(k·k·C_masuk + 1) · C_keluar" } ]
+        },
+        {
+          "chunkId": "t14c4",
+          "title": "Transfer learning: murid pindahan",
+          "goal": "Setelah ini kamu bisa menjelaskan langkah transfer learning dan kapan memakainya.",
+          "terms": [
+            { "term": "model pralatih", "plain": "model yang sudah dilatih lebih dulu pada data yang sangat besar" },
+            { "term": "fine-tune", "plain": "melatih sebagian model pralatih lagi dengan data milikmu" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Seorang murid pindahan sudah pandai membaca tepi, bentuk, dan warna." },
+            { "who": "Rune", "text": "Ia tinggal belajar mengenali kelas barumu, misalnya jenis monster di dungeon ini." },
+            { "who": "Kamu", "text": "Jadi aku tidak perlu melatih dari nol?" }
+          ],
+          "guess": { "question": "Datamu hanya ratusan gambar. Cara paling masuk akal?", "options": ["Memakai model pralatih lalu mengganti dan melatih lapisan akhir", "Melatih model sangat besar dari nol", "Tidak melatih apa pun", "Menghapus data"], "correctIndex": 0, "reveal": "Kita lihat langkah-langkahnya." },
+          "steps": [
+            { "text": "Ambil model pralatih. Lapisan awalnya sudah mengenali pola umum seperti tepi dan bentuk.", "highlight": [] },
+            { "text": "Ganti lapisan klasifikasi akhir dengan lapisan baru untuk kelas-kelasmu.", "highlight": [] },
+            { "text": "Latih terutama lapisan baru itu (bekukan lapisan awal), lalu bila perlu fine-tune sebagian lapisan lain.", "highlight": [] },
+            { "text": "Contoh angka: model punya 10.000.000 parameter, lapisan baru hanya 1.000 parameter.", "highlight": [] },
+            { "text": "Bagian yang dilatih: 1.000 ÷ 10.000.000 = 0,0001 = 0,01%.", "highlight": [] },
+            { "text": "Jadi kamu hanya melatih sebagian kecil, sehingga data yang sedikit sudah cukup.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t14c4p1", "type": "fillNumber", "question": "Model punya 2.000.000 parameter. Kamu melatih 20.000 parameter. Berapa persen yang dilatih?", "answer": 1, "tolerance": 0.001, "unit": "%", "why": "20.000 ÷ 2.000.000 = 0,01 = 1%." },
+            { "id": "t14c4p2", "type": "choice", "question": "Kapan transfer learning paling berguna?", "options": ["Saat datamu sedikit tetapi tugasnya mirip dengan data besar pada model pralatih", "Saat tidak ada data sama sekali", "Saat modelnya harus ditulis ulang dari nol", "Hanya untuk teks"], "correctIndex": 0, "why": "Pengetahuan umum dari model pralatih bisa dipakai ulang." },
+            { "id": "t14c4p3", "type": "order", "question": "Urutkan langkah transfer learning.", "items": ["Ambil model pralatih", "Ganti lapisan klasifikasi akhir", "Latih lapisan baru (fine-tune)", "Evaluasi dengan data uji"], "why": "Ambil, ganti kepala, latih, lalu evaluasi." }
+          ],
+          "formula": { "lines": ["transfer learning: model pralatih → ganti lapisan akhir → fine-tune → evaluasi"], "readAloud": "Pakai model pralatih, ganti lapisan akhir, latih sebagian, lalu uji." },
+          "commonMistake": "Melatih model besar dari nol padahal datanya sedikit.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa data sedikit cukup untuk transfer learning?",
+          "reviewItems": [ { "id": "t14c4r1", "front": "Langkah transfer learning?", "back": "Pakai model pralatih, ganti lapisan akhir, fine-tune, lalu evaluasi." } ]
+        }
+      ]
+    },
+    {
+      "topicId": 15,
+      "chunks": [
+        {
+          "chunkId": "t15c1",
+          "title": "Deret sensor jadi pasangan (jendela)",
+          "goal": "Setelah ini kamu bisa mengubah deret sensor menjadi pasangan masukan-target dan membagi data menurut waktu.",
+          "terms": [
+            { "term": "time series", "plain": "data yang dicatat berurutan menurut waktu" },
+            { "term": "jendela", "plain": "beberapa nilai terakhir yang dipakai untuk menebak nilai berikutnya" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Sebuah sensor mencatat satu angka tiap menit." },
+            { "who": "Rune", "text": "Kita ingin menebak angka berikutnya dari beberapa angka terakhir." }
+          ],
+          "guess": { "question": "Deret 3, 5, 4, 6, 8, 7 dengan jendela 3. Berapa pasangan (masukan → target) yang bisa dibuat?", "options": ["3", "6", "4", "2"], "correctIndex": 0, "reveal": "Mari kita buat satu per satu." },
+          "visual": { "type": "bars", "items": [ { "id": "t1", "label": "Menit 1", "value": 3 }, { "id": "t2", "label": "Menit 2", "value": 5 }, { "id": "t3", "label": "Menit 3", "value": 4 }, { "id": "t4", "label": "Menit 4", "value": 6 }, { "id": "t5", "label": "Menit 5", "value": 8 }, { "id": "t6", "label": "Menit 6", "value": 7 } ] },
+          "steps": [
+            { "text": "Deret sensor: 3, 5, 4, 6, 8, 7.", "highlight": ["t1", "t2", "t3", "t4", "t5", "t6"] },
+            { "text": "Jendela berukuran 3: tiga nilai terakhir dipakai untuk menebak nilai berikutnya.", "highlight": [] },
+            { "text": "Pasangan 1: [3, 5, 4] → 6. Pasangan 2: [5, 4, 6] → 8. Pasangan 3: [4, 6, 8] → 7.", "highlight": ["t1", "t2", "t3", "t4"] },
+            { "text": "Jumlah pasangan = panjang deret − ukuran jendela = 6 − 3 = 3.", "highlight": [] },
+            { "text": "Membagi data: ambil bagian awal untuk latih dan bagian akhir untuk uji. Jangan mengacak.", "highlight": [] },
+            { "text": "Alasannya: di dunia nyata kita menebak masa depan dari masa lalu. Mengacak membuat model 'melihat' masa depan saat belajar.", "highlight": [] },
+            { "text": "Contoh: 100 titik dengan 80% awal untuk latih. Titik 1 sampai 80 untuk latih, titik 81 sampai 100 untuk uji.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t15c1p1", "type": "fillNumber", "question": "Deret 8 titik dengan jendela 3. Berapa pasangan yang dihasilkan?", "answer": 5, "tolerance": 0, "unit": "", "why": "8 − 3 = 5." },
+            { "id": "t15c1p2", "type": "fillNumber", "question": "Deret 12 titik dengan jendela 4. Berapa pasangan yang dihasilkan?", "answer": 8, "tolerance": 0, "unit": "", "why": "12 − 4 = 8." },
+            { "id": "t15c1p3", "type": "choice", "question": "Mengapa data time series tidak diacak sebelum dibagi?", "options": ["Agar tidak ada informasi masa depan bocor ke pelatihan; data uji harus lebih baru", "Agar data lebih kecil", "Agar kelas seimbang", "Agar LSTM tidak dipakai"], "correctIndex": 0, "why": "Pengacakan membiarkan model belajar dari masa depan sehingga skor ujinya terlalu optimistis." }
+          ],
+          "formula": { "lines": ["jumlah pasangan = panjang deret − ukuran jendela", "bagi menurut waktu: latih lebih awal, uji lebih akhir"], "readAloud": "Banyak pasangan sama dengan panjang deret kurang ukuran jendela." },
+          "commonMistake": "Mengacak data time series sebelum membaginya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa urutan waktu harus dijaga?",
+          "reviewItems": [ { "id": "t15c1r1", "front": "Bagaimana membagi data time series?", "back": "Menurut waktu: latih lebih awal, uji lebih akhir. Jangan diacak." } ]
+        },
+        {
+          "chunkId": "t15c2",
+          "title": "RNN: ingatan yang dibawa",
+          "goal": "Setelah ini kamu bisa menghitung hidden state versi sederhana dan melihat mengapa ingatan RNN menyusut.",
+          "terms": [
+            { "term": "hidden state (h)", "plain": "ringkasan masa lalu yang dibawa dari langkah ke langkah" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "RNN membaca urutan satu langkah demi satu langkah." },
+            { "who": "Rune", "text": "Ia membawa catatan kecil bernama hidden state ke langkah berikutnya." }
+          ],
+          "guess": { "question": "Aturan sederhana: h baru = 0,5 × h lama + x baru, mulai dari h = 0. Untuk masukan [2, 4, 2], h terakhir mendekati...", "options": ["4,5", "8", "2", "6"], "correctIndex": 0, "reveal": "Kita hitung langkah demi langkah." },
+          "visual": { "type": "bars", "items": [ { "id": "h1", "label": "h1", "value": 2 }, { "id": "h2", "label": "h2", "value": 5 }, { "id": "h3", "label": "h3", "value": 4.5 } ] },
+          "steps": [
+            { "text": "Aturan contoh (disederhanakan, tanpa fungsi aktivasi): h baru = 0,5 × h lama + x baru. Mulai h = 0.", "highlight": [] },
+            { "text": "Masukan [2, 4, 2]. Langkah 1: h1 = 0,5×0 + 2 = 2.", "highlight": ["h1"] },
+            { "text": "Langkah 2: h2 = 0,5×2 + 4 = 5.", "highlight": ["h2"] },
+            { "text": "Langkah 3: h3 = 0,5×5 + 2 = 4,5.", "highlight": ["h3"] },
+            { "text": "Tiap h bergantung pada seluruh masa lalu, karena h lama ikut dihitung.", "highlight": [] },
+            { "text": "Tetapi pengaruh masa lalu menyusut. Masukan pertama (2) menyumbang 2 ke h1, lalu 1 ke h2, lalu 0,5 ke h3.", "highlight": [] },
+            { "text": "Jadi pada urutan panjang, informasi awal hampir hilang karena tiap langkah mengecilkannya.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t15c2p1", "type": "fillNumber", "question": "Aturan yang sama, masukan [1, 3], h awal 0. Berapa h2?", "answer": 3.5, "tolerance": 0.001, "unit": "", "why": "h1 = 1. h2 = 0,5×1 + 3 = 3,5." },
+            { "id": "t15c2p2", "type": "fillNumber", "question": "Masukan [4, 0, 0], h awal 0. Berapa h3?", "answer": 1, "tolerance": 0.001, "unit": "", "why": "h1 = 4. h2 = 2. h3 = 1." },
+            { "id": "t15c2p3", "type": "choice", "question": "Apa fungsi hidden state pada RNN?", "options": ["Menyimpan bobot model", "Membawa ringkasan informasi dari langkah-langkah sebelumnya", "Menyimpan label", "Menghitung loss"], "correctIndex": 1, "why": "h dihitung dari masukan saat ini dan h lama, sehingga membawa konteks urutan." }
+          ],
+          "formula": { "lines": ["RNN: h_t = f(W_x·x_t + W_h·h_(t−1) + b)", "contoh sederhana: h_t = 0,5·h_(t−1) + x_t"], "readAloud": "Hidden state baru dihitung dari masukan sekarang dan hidden state lama." },
+          "commonMistake": "Mengira RNN mengingat semua masa lalu dengan sama kuat. Pada urutan panjang, ingatan lama menyusut.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa masukan pertama makin kecil pengaruhnya?",
+          "reviewItems": [ { "id": "t15c2r1", "front": "Apa fungsi hidden state?", "back": "Membawa ringkasan informasi dari langkah-langkah sebelumnya." } ]
+        },
+        {
+          "chunkId": "t15c3",
+          "title": "LSTM: gerbang ingatan",
+          "goal": "Setelah ini kamu bisa menghitung pembaruan sel memori LSTM versi sederhana.",
+          "terms": [
+            { "term": "sel memori (c)", "plain": "tempat LSTM menyimpan ingatan jangka panjang" },
+            { "term": "gerbang", "plain": "angka antara 0 dan 1 yang mengatur seberapa banyak yang lewat" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "RNN biasa cepat melupakan." },
+            { "who": "Rune", "text": "LSTM punya gerbang: boleh menyimpan, boleh membuang, boleh mengeluarkan." }
+          ],
+          "guess": { "question": "Gerbang lupa mendekati 1. Apa artinya?", "options": ["Ingatan lama sebagian besar dipertahankan", "Semua ingatan dibuang", "Tidak ada ingatan baru", "Model berhenti"], "correctIndex": 0, "reveal": "Kita lihat lewat angka." },
+          "steps": [
+            { "text": "LSTM menambah sel memori c dan tiga gerbang: lupa (f), masuk (i), dan keluar (o).", "highlight": [] },
+            { "text": "Tiap gerbang bernilai antara 0 dan 1. Angka 0 berarti tutup, angka 1 berarti buka penuh.", "highlight": [] },
+            { "text": "Pembaruan memori (disederhanakan): c baru = f × c lama + i × kandidat.", "highlight": [] },
+            { "text": "c lama = 10, f = 0,9, i = 0,5, kandidat = 4: c baru = 9 + 2 = 11.", "highlight": [] },
+            { "text": "Jika f = 0,1: c baru = 0,1×10 + 0,5×4 = 1 + 2 = 3. Gerbang lupa hampir tertutup, jadi ingatan lama banyak dibuang.", "highlight": [] },
+            { "text": "Jadi LSTM bisa memilih apa yang diingat atau dilupakan, sehingga informasi penting bertahan lebih lama.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t15c3p1", "type": "fillNumber", "question": "c lama = 20, f = 0,5, i = 1, kandidat = 3. Berapa c baru?", "answer": 13, "tolerance": 0.001, "unit": "", "why": "0,5×20 + 1×3 = 10 + 3 = 13." },
+            { "id": "t15c3p2", "type": "fillNumber", "question": "c lama = 20, f = 0, i = 0,5, kandidat = 6. Berapa c baru?", "answer": 3, "tolerance": 0.001, "unit": "", "why": "0×20 + 0,5×6 = 3." },
+            { "id": "t15c3p3", "type": "choice", "question": "Apa keunggulan LSTM dibanding RNN biasa?", "options": ["Gerbang dan sel memori membantu menjaga informasi pada urutan panjang", "LSTM hanya untuk gambar", "LSTM tidak butuh data", "LSTM menaikkan learning rate otomatis"], "correctIndex": 0, "why": "Gerbang mengatur apa yang disimpan, dibuang, dan dikeluarkan." }
+          ],
+          "formula": { "lines": ["c baru = f × c lama + i × kandidat", "gerbang: f, i, o bernilai 0 sampai 1"], "readAloud": "Memori baru sama dengan gerbang lupa kali memori lama, ditambah gerbang masuk kali kandidat." },
+          "commonMistake": "Mengira gerbang bernilai persis 0 atau 1. Gerbang bernilai di antara keduanya.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang dilakukan gerbang lupa?",
+          "reviewItems": [ { "id": "t15c3r1", "front": "Apa keunggulan LSTM?", "back": "Gerbang dan sel memori menjaga informasi penting pada urutan panjang." } ]
+        },
+        {
+          "chunkId": "t15c4",
+          "title": "Baseline persistence dan MAE",
+          "goal": "Setelah ini kamu bisa membandingkan model dengan baseline sederhana memakai MAE.",
+          "terms": [
+            { "term": "baseline persistence", "plain": "menebak nilai berikutnya sama dengan nilai terakhir" },
+            { "term": "MAE", "plain": "rata-rata selisih mutlak antara tebakan dan nilai asli" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Sebelum memakai model rumit, tanyakan: apakah tebakan sederhana sudah cukup?" },
+            { "who": "Rune", "text": "Tebakan paling sederhana: besok sama dengan hari ini." }
+          ],
+          "guess": { "question": "Jika model tidak bisa mengalahkan baseline persistence, apa artinya?", "options": ["Model belum memberi nilai tambah", "Model pasti sempurna", "Datanya salah", "Baseline pasti salah"], "correctIndex": 0, "reveal": "Kita hitung contohnya." },
+          "visual": { "type": "bars", "items": [ { "id": "base", "label": "MAE baseline", "value": 2.33 }, { "id": "model", "label": "MAE model", "value": 0.67 } ] },
+          "steps": [
+            { "text": "Nilai asli: 8, 10, 9, 13. Baseline menebak tiap nilai sama dengan nilai sebelumnya.", "highlight": [] },
+            { "text": "Tebakan baseline untuk 10 adalah 8, untuk 9 adalah 10, untuk 13 adalah 9.", "highlight": [] },
+            { "text": "Galat mutlak: |10 − 8| = 2, |9 − 10| = 1, |13 − 9| = 4.", "highlight": [] },
+            { "text": "MAE baseline = (2 + 1 + 4) ÷ 3 ≈ 2,33.", "highlight": ["base"] },
+            { "text": "Model menebak 9, 9, 12. Galat mutlak: 1, 0, 1. MAE model = 2 ÷ 3 ≈ 0,67.", "highlight": ["model"] },
+            { "text": "Peningkatan = (2,33 − 0,67) ÷ 2,33 ≈ 0,71, jadi sekitar 71% lebih baik.", "highlight": ["base", "model"] },
+            { "text": "Jadi model bernilai bila MAE-nya lebih kecil dari baseline. Jika tidak, model belum memberi nilai tambah.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t15c4p1", "type": "fillNumber", "question": "Nilai asli 5, 8, 6. Tebakan persistence untuk 8 adalah 5 dan untuk 6 adalah 8. Berapa MAE?", "answer": 2.5, "tolerance": 0.001, "unit": "", "why": "Galat: 3 dan 2. MAE = (3 + 2) ÷ 2 = 2,5." },
+            { "id": "t15c4p2", "type": "fillNumber", "question": "MAE baseline 2,0 dan MAE model 1,0. Berapa persen peningkatannya?", "answer": 50, "tolerance": 0.01, "unit": "%", "why": "(2,0 − 1,0) ÷ 2,0 = 0,5 = 50%." },
+            { "id": "t15c4p3", "type": "choice", "question": "MAE model 3,0 dan MAE baseline 2,0. Kesimpulan?", "options": ["Model lebih buruk daripada baseline", "Model lebih baik", "Keduanya sama", "Tidak bisa dibandingkan"], "correctIndex": 0, "why": "Galat model lebih besar, jadi baseline sederhana mengalahkannya." }
+          ],
+          "formula": { "lines": ["baseline persistence: ŷ_t = y_(t−1)", "MAE = rata-rata |y − ŷ|"], "readAloud": "Tebakan baseline sama dengan nilai sebelumnya. MAE adalah rata-rata selisih mutlak." },
+          "commonMistake": "Melaporkan MAE model tanpa membandingkannya dengan baseline.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa baseline persistence berguna sebagai pembanding?",
+          "reviewItems": [
+            { "id": "t15c4r1", "front": "Apa itu baseline persistence?", "back": "Menebak nilai berikutnya sama dengan nilai terakhir." },
+            { "id": "t15c4r2", "front": "Rumus MAE?", "back": "Rata-rata |y − ŷ|" }
+          ]
+        }
+      ]
+    },
+    {
+      "topicId": 16,
+      "chunks": [
+        {
+          "chunkId": "t16c1",
+          "title": "Softmax: skor jadi bobot",
+          "goal": "Setelah ini kamu bisa mengubah beberapa skor menjadi bobot yang jumlahnya 1.",
+          "miniLab": "softmax",
+          "terms": [
+            { "term": "softmax", "plain": "cara mengubah daftar skor menjadi bobot positif yang jumlahnya 1" },
+            { "term": "bobot atensi", "plain": "seberapa besar perhatian diberikan ke tiap kata" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Tiga kata bersaing mendapat perhatianmu. Masing-masing punya skor." },
+            { "who": "Rune", "text": "Kita ubah skor itu menjadi pembagian perhatian yang totalnya 100%." }
+          ],
+          "guess": { "question": "Skor [2, 1, 0]. Kata dengan skor 2 akan mendapat bobot...", "options": ["Paling besar", "Paling kecil", "Sama dengan yang lain", "Negatif"], "correctIndex": 0, "reveal": "Kita hitung bobotnya." },
+          "visual": { "type": "bars", "items": [ { "id": "w1", "label": "Bobot skor 2", "value": 0.67 }, { "id": "w2", "label": "Bobot skor 1", "value": 0.24 }, { "id": "w3", "label": "Bobot skor 0", "value": 0.09 } ] },
+          "steps": [
+            { "text": "Skor [2, 1, 0]. Langkah 1: hitung e pangkat tiap skor.", "highlight": [] },
+            { "text": "e² ≈ 7,39. e¹ ≈ 2,72. e⁰ = 1.", "highlight": [] },
+            { "text": "Langkah 2: jumlahkan: 7,39 + 2,72 + 1 ≈ 11,11.", "highlight": [] },
+            { "text": "Langkah 3: bagi tiap nilai dengan jumlahnya: 7,39 ÷ 11,11 ≈ 0,67; 2,72 ÷ 11,11 ≈ 0,24; 1 ÷ 11,11 ≈ 0,09.", "highlight": ["w1", "w2", "w3"] },
+            { "text": "Jumlah bobot: 0,67 + 0,24 + 0,09 = 1,00.", "highlight": [] },
+            { "text": "Jadi skor terbesar mendapat bobot terbesar, dan semua bobot selalu berjumlah 1.", "highlight": ["w1"] }
+          ],
+          "practice": [
+            { "id": "t16c1p1", "type": "fillNumber", "question": "Skor [3, 3]. Berapa bobot masing-masing?", "answer": 0.5, "tolerance": 0.001, "unit": "", "why": "Skor sama, jadi bobot sama: 1 ÷ 2 = 0,5." },
+            { "id": "t16c1p2", "type": "fillNumber", "question": "Skor [0, 0, 0, 0]. Berapa bobot masing-masing?", "answer": 0.25, "tolerance": 0.001, "unit": "", "why": "e⁰ = 1 untuk semuanya. Bobotnya 1 ÷ 4 = 0,25." },
+            { "id": "t16c1p3", "type": "choice", "question": "Jumlah semua bobot hasil softmax selalu...", "options": ["1", "0", "Sama dengan skor terbesar", "Bergantung pada jumlah kata"], "correctIndex": 0, "why": "Tiap nilai dibagi jumlah totalnya, jadi hasilnya selalu berjumlah 1." }
+          ],
+          "formula": { "lines": ["softmax: p_i = e^(s_i) ÷ Σ e^(s_j)"], "readAloud": "Bobot kata i sama dengan e pangkat skornya, dibagi jumlah e pangkat semua skor." },
+          "commonMistake": "Lupa membagi dengan jumlah total sehingga bobot tidak berjumlah 1.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa yang dilakukan softmax terhadap skor?",
+          "reviewItems": [ { "id": "t16c1r1", "front": "Rumus softmax?", "back": "p_i = e^(s_i) ÷ Σ e^(s_j)" } ]
+        },
+        {
+          "chunkId": "t16c2",
+          "title": "Self-attention: Q, K, dan V",
+          "goal": "Setelah ini kamu bisa menghitung keluaran attention dari satu query dan dua key-value.",
+          "terms": [
+            { "term": "query (Q)", "plain": "apa yang sedang dicari sebuah kata" },
+            { "term": "key (K)", "plain": "apa yang ditawarkan sebuah kata" },
+            { "term": "value (V)", "plain": "isi yang dibagikan sebuah kata" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Di perpustakaan, kamu membawa pertanyaan (query)." },
+            { "who": "Rune", "text": "Tiap buku punya label (key) dan isi (value). Buku yang labelnya cocok dengan pertanyaanmu dibaca lebih lama." }
+          ],
+          "guess": { "question": "Buku dengan key yang lebih cocok dengan query akan mendapat bobot...", "options": ["Lebih besar", "Lebih kecil", "Sama", "Nol"], "correctIndex": 0, "reveal": "Kita hitung." },
+          "steps": [
+            { "text": "Contoh: query q = [1, 1]. Dua kata lain punya key k1 = [1, 0] dan k2 = [1, −1], dengan value 10 dan 20.", "highlight": [] },
+            { "text": "Skor = dot product query dengan tiap key. q·k1 = 1×1 + 1×0 = 1. q·k2 = 1×1 + 1×(−1) = 0.", "highlight": [] },
+            { "text": "Softmax dari [1, 0]: e¹ ≈ 2,72 dan e⁰ = 1. Bobot = 2,72 ÷ 3,72 ≈ 0,73 dan 1 ÷ 3,72 ≈ 0,27.", "highlight": [] },
+            { "text": "Keluaran = jumlah berbobot value: 0,73 × 10 + 0,27 × 20 = 7,3 + 5,4 = 12,7.", "highlight": [] },
+            { "text": "Karena key k1 lebih cocok dengan query, bobotnya lebih besar, dan keluaran lebih dekat ke value 10.", "highlight": [] },
+            { "text": "Self-attention berarti Q, K, dan V berasal dari urutan yang sama, jadi tiap kata melihat semua kata lain (dan dirinya sendiri).", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t16c2p1", "type": "fillNumber", "question": "Bobot [0,6; 0,4] pada value 5 dan 10. Berapa keluaran attention?", "answer": 7, "tolerance": 0.001, "unit": "", "why": "0,6×5 + 0,4×10 = 3 + 4 = 7." },
+            { "id": "t16c2p2", "type": "fillNumber", "question": "q = [2, 1] dan k = [3, −2]. Berapa skor q·k?", "answer": 4, "tolerance": 0, "unit": "", "why": "2×3 + 1×(−2) = 6 − 2 = 4." },
+            { "id": "t16c2p3", "type": "choice", "question": "Apa arti self-attention?", "options": ["Tiap posisi menghitung bobot relevansi terhadap semua posisi lain dalam urutan yang sama, lalu mengambil jumlah berbobot value", "Satu kata hanya melihat kata sebelumnya", "Model menyalin masukan ke keluaran", "Dua urutan berbeda tanpa interaksi"], "correctIndex": 0, "why": "Q, K, dan V berasal dari urutan yang sama." }
+          ],
+          "formula": { "lines": ["skor = Q · K", "bobot = softmax(skor)", "keluaran = jumlah (bobot × V)"], "readAloud": "Skor dari query dan key, diubah jadi bobot lewat softmax, lalu dipakai untuk menjumlahkan value." },
+          "commonMistake": "Mengira bobot attention ditentukan sebelumnya. Bobot dihitung dari kecocokan query dan key.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: apa peran query, key, dan value?",
+          "reviewItems": [ { "id": "t16c2r1", "front": "Langkah menghitung keluaran attention?", "back": "Skor Q·K, softmax menjadi bobot, lalu jumlah berbobot V." } ]
+        },
+        {
+          "chunkId": "t16c3",
+          "title": "Pembagian √d_k dan positional encoding",
+          "goal": "Setelah ini kamu bisa menjelaskan mengapa skor dibagi √d_k dan mengapa posisi perlu ditambahkan.",
+          "terms": [
+            { "term": "d_k", "plain": "panjang vektor key" },
+            { "term": "positional encoding", "plain": "informasi posisi yang ditambahkan ke tiap kata" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Dua masalah kecil di dalam attention." },
+            { "who": "Rune", "text": "Pertama: skor mentah kadang terlalu besar. Kedua: attention tidak tahu urutan kata." }
+          ],
+          "guess": { "question": "Skor mentah [8, 0] masuk softmax. Bobot kata pertama kira-kira...", "options": ["Hampir 100%", "Sekitar 50%", "Sekitar 25%", "0%"], "correctIndex": 0, "reveal": "Kita hitung, lalu lihat solusinya." },
+          "steps": [
+            { "text": "Dot product bisa sangat besar jika vektornya panjang (d_k besar).", "highlight": [] },
+            { "text": "Skor [8, 0]: e⁸ ≈ 2.981 dan e⁰ = 1. Bobot ≈ [0,9997; 0,0003]. Hampir semuanya pada satu kata, jadi softmax jenuh.", "highlight": [] },
+            { "text": "Solusinya: bagi skor dengan √d_k. Jika d_k = 4, maka √4 = 2 dan skor [8, 0] menjadi [4, 0].", "highlight": [] },
+            { "text": "Softmax [4, 0]: e⁴ ≈ 54,6. Bobot ≈ [0,98; 0,02]. Lebih lembut dan gradien tetap sehat.", "highlight": [] },
+            { "text": "Masalah kedua: 'kucing makan ikan' dan 'ikan makan kucing' berisi kata yang sama. Tanpa info urutan, attention sulit membedakannya.", "highlight": [] },
+            { "text": "Positional encoding menambahkan informasi posisi ke tiap kata sehingga model tahu urutannya.", "highlight": [] },
+            { "text": "Jadi pembagian √d_k menjaga softmax tetap sehat, dan positional encoding memberi tahu posisi kata.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t16c3p1", "type": "fillNumber", "question": "d_k = 16 dan skor mentah 12. Berapa skor setelah dibagi √d_k?", "answer": 3, "tolerance": 0, "unit": "", "why": "√16 = 4, jadi 12 ÷ 4 = 3." },
+            { "id": "t16c3p2", "type": "fillNumber", "question": "d_k = 64 dan skor mentah 24. Berapa skor setelah dibagi √d_k?", "answer": 3, "tolerance": 0, "unit": "", "why": "√64 = 8, jadi 24 ÷ 8 = 3." },
+            { "id": "t16c3p3", "type": "choice", "question": "Mengapa Transformer butuh positional encoding?", "options": ["Karena memproses semua posisi sekaligus, ia butuh informasi urutan tambahan", "Agar model lebih kecil", "Agar softmax berjumlah 2", "Agar loss turun otomatis"], "correctIndex": 0, "why": "Tanpanya, attention tidak membedakan urutan kata." }
+          ],
+          "formula": { "lines": ["Attention(Q, K, V) = softmax(Q·Kᵀ ÷ √d_k) · V"], "readAloud": "Skor Q kali K transpos dibagi akar d_k, lewat softmax, lalu dikali V." },
+          "commonMistake": "Melupakan pembagian √d_k sehingga softmax jenuh pada vektor panjang.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa skor besar membuat softmax bermasalah?",
+          "reviewItems": [
+            { "id": "t16c3r1", "front": "Mengapa dibagi √d_k?", "back": "Agar dot product tidak terlalu besar sehingga softmax tidak jenuh." },
+            { "id": "t16c3r2", "front": "Mengapa butuh positional encoding?", "back": "Transformer memproses semua posisi sekaligus, sehingga butuh informasi urutan." }
+          ]
+        },
+        {
+          "chunkId": "t16c4",
+          "title": "Encoder-decoder dan biaya attention",
+          "goal": "Setelah ini kamu bisa menjelaskan peran encoder dan decoder dan menghitung ukuran matriks attention.",
+          "terms": [
+            { "term": "encoder", "plain": "bagian yang membaca masukan dan mengubahnya menjadi representasi" },
+            { "term": "decoder", "plain": "bagian yang menghasilkan keluaran token demi token" },
+            { "term": "token", "plain": "potongan teks yang diproses model, misalnya kata atau bagian kata" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Penerjemah bekerja dalam dua tahap." },
+            { "who": "Rune", "text": "Pertama ia membaca kalimat asal sampai paham. Lalu ia menulis kalimat tujuan satu kata demi satu kata." }
+          ],
+          "guess": { "question": "Kalimat 10 token. Berapa jumlah bobot attention antar-token dalam satu matriks?", "options": ["100", "10", "20", "1"], "correctIndex": 0, "reveal": "Mari kita lihat tabelnya." },
+          "visual": { "type": "matrixGrid", "matrices": [ { "id": "A", "rows": [[0.7, 0.2, 0.1], [0.1, 0.8, 0.1], [0.3, 0.3, 0.4]], "rowLabels": ["kata 1", "kata 2", "kata 3"], "colLabels": ["ke kata 1", "ke kata 2", "ke kata 3"] } ] },
+          "steps": [
+            { "text": "Satu lapisan self-attention menghasilkan tabel bobot: tiap kata (baris) punya bobot ke semua kata (kolom).", "highlight": ["A:r1"] },
+            { "text": "Tiap baris berjumlah 1, karena hasil softmax. Baris 1: 0,7 + 0,2 + 0,1 = 1.", "highlight": ["A:r1"] },
+            { "text": "Jumlah bobot = n × n. Untuk 3 kata: 9. Untuk 10 kata: 100. Untuk 20 kata: 400.", "highlight": [] },
+            { "text": "Dari 10 ke 20 kata, jumlah bobot naik 4 kali (bukan 2 kali). Biayanya naik kuadrat.", "highlight": [] },
+            { "text": "Encoder membaca kalimat masukan dan mengubahnya menjadi representasi.", "highlight": [] },
+            { "text": "Decoder menulis keluaran satu token demi satu token. Ia melihat token yang sudah ditulis dan memakai cross-attention untuk melihat hasil encoder.", "highlight": [] },
+            { "text": "Contoh: masukan 6 token, keluaran 5 token. Decoder berjalan 5 langkah, satu per token keluaran.", "highlight": [] },
+            { "text": "Model bahasa memprediksi token berikutnya dari token-token sebelumnya.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t16c4p1", "type": "fillNumber", "question": "Kalimat 8 token. Berapa jumlah bobot attention dalam satu matriks?", "answer": 64, "tolerance": 0, "unit": "", "why": "8 × 8 = 64." },
+            { "id": "t16c4p2", "type": "fillNumber", "question": "Kalimat bertambah dari 10 menjadi 20 token. Berapa kali lipat jumlah bobotnya?", "answer": 4, "tolerance": 0, "unit": "kali", "why": "100 menjadi 400, yaitu 4 kali." },
+            { "id": "t16c4p3", "type": "choice", "question": "Apa peran decoder?", "options": ["Menghasilkan keluaran token demi token, memakai hasil encoder lewat cross-attention", "Membaca masukan saja", "Menghapus token", "Menghitung loss"], "correctIndex": 0, "why": "Encoder membaca masukan, decoder menulis keluaran." }
+          ],
+          "formula": { "lines": ["jumlah bobot attention = n × n", "encoder membaca masukan; decoder menghasilkan keluaran dengan cross-attention ke encoder"], "readAloud": "Jumlah bobot sama dengan n kali n. Encoder membaca, decoder menulis." },
+          "commonMistake": "Mengira biaya attention naik linear. Ia naik kuadrat terhadap panjang urutan.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa kalimat yang dua kali lebih panjang membuat bobot attention empat kali lebih banyak?",
+          "reviewItems": [
+            { "id": "t16c4r1", "front": "Peran encoder dan decoder?", "back": "Encoder membaca masukan. Decoder menghasilkan keluaran token demi token dengan cross-attention." },
+            { "id": "t16c4r2", "front": "Jumlah bobot attention untuk n token?", "back": "n × n" }
+          ]
+        }
+      ]
+    },
+    {
+      "topicId": 17,
+      "chunks": [
+        {
+          "chunkId": "t17c1",
+          "title": "Dropout: latihan dengan gangguan",
+          "goal": "Setelah ini kamu bisa menjelaskan dan menghitung efek dropout.",
+          "terms": [
+            { "term": "regularisasi", "plain": "cara mencegah model menghafal data latih" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Tim yang selalu bergantung pada satu pahlawan akan kalah jika pahlawan itu absen." },
+            { "who": "Rune", "text": "Dropout membuat pahlawan 'absen' secara acak saat latihan, supaya seluruh tim belajar bekerja sama." }
+          ],
+          "guess": { "question": "Dropout p = 0,5 pada 10 neuron. Rata-rata berapa neuron dimatikan di tiap langkah latihan?", "options": ["5", "0", "10", "2"], "correctIndex": 0, "reveal": "Kita lihat penjelasannya." },
+          "steps": [
+            { "text": "Overfitting terjadi saat model terlalu bergantung pada pola kecil di data latih.", "highlight": [] },
+            { "text": "Dropout: saat latihan, tiap neuron dimatikan secara acak dengan peluang p.", "highlight": [] },
+            { "text": "Dengan p = 0,5 pada 10 neuron, rata-rata 5 neuron dimatikan di tiap langkah.", "highlight": [] },
+            { "text": "Neuron yang dimatikan menghasilkan 0. Jaringan tidak bisa mengandalkan satu neuron saja, jadi harus belajar pola yang lebih kuat.", "highlight": [] },
+            { "text": "Saat evaluasi, dropout dimatikan dan semua neuron dipakai (model.eval()).", "highlight": [] },
+            { "text": "Jadi dropout hanya bekerja saat latihan, dan fungsinya mengurangi overfitting.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t17c1p1", "type": "fillNumber", "question": "p = 0,2 pada 100 neuron. Rata-rata berapa neuron dimatikan?", "answer": 20, "tolerance": 0, "unit": "", "why": "0,2 × 100 = 20." },
+            { "id": "t17c1p2", "type": "fillNumber", "question": "p = 0,25 pada 40 neuron. Rata-rata berapa neuron yang tetap aktif?", "answer": 30, "tolerance": 0, "unit": "", "why": "Yang dimatikan 0,25 × 40 = 10. Yang aktif 40 − 10 = 30." },
+            { "id": "t17c1p3", "type": "choice", "question": "Bagaimana dropout berperilaku saat evaluasi?", "options": ["Tetap aktif dengan peluang yang sama", "Dimatikan: semua neuron dipakai (model.eval())", "Aktif 100%", "Mengubah label"], "correctIndex": 1, "why": "Dropout hanya dipakai saat pelatihan sebagai regularisasi." }
+          ],
+          "formula": { "lines": ["dropout: matikan tiap neuron dengan peluang p saat latihan", "evaluasi: dropout dimatikan"], "readAloud": "Saat latihan, tiap neuron dimatikan dengan peluang p. Saat evaluasi, tidak ada yang dimatikan." },
+          "commonMistake": "Lupa mematikan dropout saat evaluasi (tidak memanggil model.eval()).",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa mematikan neuron secara acak bisa membantu model?",
+          "reviewItems": [ { "id": "t17c1r1", "front": "Apa yang dilakukan dropout?", "back": "Mematikan neuron secara acak saat latihan untuk mengurangi overfitting; dimatikan saat evaluasi." } ]
+        },
+        {
+          "chunkId": "t17c2",
+          "title": "Batch normalization",
+          "goal": "Setelah ini kamu bisa menghitung normalisasi satu mini-batch beserta skala dan gesernya.",
+          "terms": [
+            { "term": "mini-batch", "plain": "sekelompok kecil contoh yang diproses bersamaan" },
+            { "term": "γ dan β", "plain": "angka skala dan geser yang dipelajari model" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Antar lapisan, nilai bisa kadang sangat kecil, kadang sangat besar." },
+            { "who": "Rune", "text": "Itu membuat pelatihan tidak stabil. Batch norm merapikan skalanya." }
+          ],
+          "guess": { "question": "Batch [2, 6] dinormalisasi: nilai 2 menjadi...", "options": ["−1", "0", "1", "2"], "correctIndex": 0, "reveal": "Kita hitung." },
+          "steps": [
+            { "text": "Batch norm menormalkan nilai dalam satu mini-batch.", "highlight": [] },
+            { "text": "Contoh batch [2, 6]: rata-rata 4. Simpangan baku 2.", "highlight": [] },
+            { "text": "Normalisasi: (2 − 4) ÷ 2 = −1 dan (6 − 4) ÷ 2 = 1. Hasilnya [−1, 1].", "highlight": [] },
+            { "text": "Lalu model boleh menskalakan dan menggeser: y = γ·x̂ + β.", "highlight": [] },
+            { "text": "Jika γ = 2 dan β = 1: −1 menjadi 2×(−1) + 1 = −1, dan 1 menjadi 2×1 + 1 = 3.", "highlight": [] },
+            { "text": "Jadi batch norm menstabilkan skala nilai, tetapi tetap memberi model ruang memilih skala dan geseran yang cocok.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t17c2p1", "type": "fillNumber", "question": "Batch [10, 14] punya rata-rata 12 dan simpangan baku 2. Berapa nilai 14 setelah normalisasi?", "answer": 1, "tolerance": 0, "unit": "", "why": "(14 − 12) ÷ 2 = 1." },
+            { "id": "t17c2p2", "type": "fillNumber", "question": "x̂ = 1, γ = 3, β = −1. Berapa y = γ·x̂ + β?", "answer": 2, "tolerance": 0, "unit": "", "why": "3×1 + (−1) = 2." },
+            { "id": "t17c2p3", "type": "choice", "question": "Apa yang dilakukan batch normalization?", "options": ["Menormalkan aktivasi per mini-batch lalu menskalakan dan menggeser dengan parameter yang dipelajari", "Menghapus fitur", "Menggandakan data", "Mengubah label"], "correctIndex": 0, "why": "Normalisasi menstabilkan pelatihan, sedangkan γ dan β menjaga fleksibilitas." }
+          ],
+          "formula": { "lines": ["x̂ = (x − rata-rata batch) ÷ simpangan baku batch", "y = γ·x̂ + β"], "readAloud": "Kurangi rata-rata batch, bagi simpangan baku batch, lalu kalikan gamma dan tambahkan beta." },
+          "commonMistake": "Mengira batch norm menghapus kebebasan model memilih skala. γ dan β memberi kebebasan itu.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa nilai yang stabil membantu pelatihan?",
+          "reviewItems": [ { "id": "t17c2r1", "front": "Apa yang dilakukan batch norm?", "back": "Menormalkan aktivasi per mini-batch, lalu menskalakan dan menggeser dengan γ dan β." } ]
+        },
+        {
+          "chunkId": "t17c3",
+          "title": "Menyetel: jadwal learning rate dan validasi",
+          "goal": "Setelah ini kamu bisa menghitung jadwal learning rate dan memilih hyperparameter dengan data validasi.",
+          "terms": [
+            { "term": "hyperparameter", "plain": "pengaturan yang kamu pilih sebelum melatih, misalnya learning rate" },
+            { "term": "step decay", "plain": "learning rate dikali angka tertentu setiap beberapa epoch" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Di awal pendakian, langkah besar membuatmu cepat naik." },
+            { "who": "Rune", "text": "Dekat puncak, langkah besar bisa membuatmu melompati puncaknya." }
+          ],
+          "guess": { "question": "Mana yang lebih masuk akal?", "options": ["Learning rate besar di awal, kecil di akhir", "Kecil di awal, besar di akhir", "Selalu sama", "Selalu nol"], "correctIndex": 0, "reveal": "Itulah ide jadwal learning rate." },
+          "steps": [
+            { "text": "Jadwal step decay: mulai η = 0,1 dan kalikan 0,5 setiap 10 epoch.", "highlight": [] },
+            { "text": "Epoch 0–9: 0,1. Epoch 10–19: 0,05. Epoch 20–29: 0,025.", "highlight": [] },
+            { "text": "Hyperparameter perlu dicoba beberapa nilai. Pemilihannya memakai data validasi.", "highlight": [] },
+            { "text": "Contoh: η = 0,1 → skor validasi 0,70. η = 0,01 → 0,82. η = 0,001 → 0,78.", "highlight": [] },
+            { "text": "Pilih η = 0,01, karena skor validasinya tertinggi.", "highlight": [] },
+            { "text": "Data uji hanya dipakai sekali di akhir. Jika dipakai untuk memilih η, skor akhir menjadi terlalu optimistis.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t17c3p1", "type": "fillNumber", "question": "η awal 0,2, dikali 0,5 setiap 5 epoch. Berapa η pada epoch 12?", "answer": 0.05, "tolerance": 0.0001, "unit": "", "why": "Pada epoch 12 sudah 2 kali penurunan (epoch 5 dan 10). 0,2 × 0,5 × 0,5 = 0,05." },
+            { "id": "t17c3p2", "type": "fillNumber", "question": "η awal 0,1, dikali 0,1 setiap 20 epoch. Berapa η pada epoch 45?", "answer": 0.001, "tolerance": 0.00001, "unit": "", "why": "Pada epoch 45 sudah 2 kali penurunan (epoch 20 dan 40). 0,1 × 0,1 × 0,1 = 0,001." },
+            { "id": "t17c3p3", "type": "choice", "question": "Data mana yang dipakai untuk menyetel hyperparameter?", "options": ["Data validasi; data uji disimpan untuk penilaian akhir", "Data uji berkali-kali", "Data latih saja", "Tidak perlu data"], "correctIndex": 0, "why": "Memakai data uji untuk memilih model membocorkan informasi uji." }
+          ],
+          "formula": { "lines": ["step decay: η = η_awal × faktor^(jumlah penurunan)", "pilih hyperparameter dengan skor validasi tertinggi"], "readAloud": "Learning rate dikali faktor tiap beberapa epoch. Pilih hyperparameter dengan skor validasi terbaik." },
+          "commonMistake": "Menyetel hyperparameter memakai data uji.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa learning rate diturunkan seiring waktu?",
+          "reviewItems": [
+            { "id": "t17c3r1", "front": "Data apa untuk menyetel hyperparameter?", "back": "Data validasi. Data uji hanya untuk penilaian akhir." },
+            { "id": "t17c3r2", "front": "Mengapa learning rate diturunkan seiring waktu?", "back": "Langkah besar di awal untuk kemajuan cepat, langkah kecil di akhir untuk konvergensi halus." }
+          ]
+        },
+        {
+          "chunkId": "t17c4",
+          "title": "Memperbaiki model yang tidak mau belajar",
+          "goal": "Setelah ini kamu bisa mendiagnosis model yang tidak belajar dengan langkah-langkah kecil.",
+          "terms": [
+            { "term": "ln(10)", "plain": "logaritma natural dari 10, kira-kira 2,30" }
+          ],
+          "scene": [
+            { "who": "Rune", "text": "Modelmu sudah berlatih lama, tetapi lossnya tidak turun." },
+            { "who": "Kamu", "text": "Apakah aku perlu model yang lebih besar?" },
+            { "who": "Rune", "text": "Jangan dulu. Mulai dari tes yang paling kecil." }
+          ],
+          "guess": { "question": "Klasifikasi 10 kelas: loss menetap di sekitar 2,30. Langkah pertama yang paling informatif?", "options": ["Mencoba menghafal satu batch kecil", "Menambah banyak lapisan", "Mengganti data uji", "Menyimpulkan tugasnya mustahil"], "correctIndex": 0, "reveal": "Kita lihat alasannya." },
+          "steps": [
+            { "text": "Acuan: pada 10 kelas, tebakan acak punya loss awal sekitar ln(10) ≈ 2,30.", "highlight": [] },
+            { "text": "Jika loss menetap di 2,30, model belum belajar apa pun.", "highlight": [] },
+            { "text": "Uji pertama: ambil satu batch kecil (misalnya 8 contoh) dan coba hafalkan.", "highlight": [] },
+            { "text": "Model yang sehat harus bisa menurunkan loss mendekati 0 pada batch sekecil itu.", "highlight": [] },
+            { "text": "Jika gagal, ada bug atau pengaturan salah: label tidak cocok, learning rate keliru, zero_grad terlewat, atau masukan belum dinormalisasi.", "highlight": [] },
+            { "text": "Jika berhasil menghafal satu batch tetapi gagal pada data penuh, periksa data, regularisasi, dan learning rate.", "highlight": [] },
+            { "text": "Jadi mulailah dari tes paling kecil yang seharusnya pasti berhasil, lalu naik pelan-pelan.", "highlight": [] }
+          ],
+          "practice": [
+            { "id": "t17c4p1", "type": "fillNumber", "question": "Klasifikasi 4 kelas. Loss tebakan acak sekitar ln(4). Berapa nilainya? (dua angka desimal)", "answer": 1.39, "tolerance": 0.01, "unit": "", "why": "ln(4) ≈ 1,386, dibulatkan 1,39." },
+            { "id": "t17c4p2", "type": "choice", "question": "Loss menetap di nilai tebakan acak. Langkah pertama yang tepat?", "options": ["Mencoba menghafal satu batch kecil untuk mencari bug", "Menambah lapisan sebanyak mungkin", "Mengganti data uji", "Menurunkan target akurasi"], "correctIndex": 0, "why": "Model sehat harus bisa menghafal batch kecil. Jika tidak, ada bug atau pengaturan yang salah." },
+            { "id": "t17c4p3", "type": "order", "question": "Urutkan langkah debugging.", "items": ["Periksa apakah loss sama dengan tebakan acak", "Coba hafalkan satu batch kecil", "Periksa label, loss, learning rate, zero_grad, dan normalisasi", "Baru perbesar model atau cari data lebih banyak"], "why": "Tes paling kecil dulu, bug dicari, dan penambahan kompleksitas belakangan." }
+          ],
+          "formula": { "lines": ["loss tebakan acak (K kelas) ≈ ln(K)", "tes pertama: hafalkan satu batch kecil"], "readAloud": "Tebakan acak pada K kelas punya loss sekitar log natural K." },
+          "commonMistake": "Langsung memperbesar model padahal penyebabnya bug kecil seperti label atau zero_grad.",
+          "summaryPrompt": "Jelaskan dengan kata-katamu: mengapa menghafal satu batch kecil adalah tes yang bagus?",
+          "reviewItems": [ { "id": "t17c4r1", "front": "Langkah pertama bila model tidak belajar?", "back": "Coba hafalkan satu batch kecil. Jika gagal, cari bug atau pengaturan yang salah." } ]
+        }
+      ]
+    }
+  ]
+}

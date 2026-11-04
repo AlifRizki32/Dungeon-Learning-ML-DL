@@ -6,9 +6,13 @@ import {
   evaluateMatchAttempt,
   evaluateOrderAttempt,
   formatBarValue,
+  formatMatrixCell,
   getAllReviewItems,
   getDueReviewItems,
+  getLessonChunkById,
+  getLessonChunksForQuest,
   getLessonChunksForTopic,
+  hasLessonChunksForQuest,
   hasLessonChunksForTopic,
   isChunkComplete,
   parseLocalizedNumber,
@@ -20,13 +24,16 @@ import {
 } from './lessonEngine';
 
 describe('Lesson Chunks v3 Engine (lessonEngine.ts)', () => {
-  it('loads chunks for Floor 1 (topics 1-6) and Floor 2 (topics 7-11), and returns empty for topics 12-28', () => {
+  it('loads chunks for Floor 1-5 (topics 1-28) and Floor 6 (quests m1-m7)', () => {
     let floor1TotalChunks = 0;
     for (let t = 1; t <= 6; t += 1) {
       assert.equal(hasLessonChunksForTopic(t), true);
       const chunks = getLessonChunksForTopic(t);
       assert.ok(chunks.length >= 3, `Topic ${t} should have at least 3 chunks`);
       floor1TotalChunks += chunks.length;
+      for (const c of chunks) {
+        assert.equal(c.realTask, undefined);
+      }
     }
     assert.equal(floor1TotalChunks, 22);
 
@@ -36,12 +43,87 @@ describe('Lesson Chunks v3 Engine (lessonEngine.ts)', () => {
       const chunks = getLessonChunksForTopic(t);
       assert.ok(chunks.length >= 3, `Topic ${t} should have at least 3 chunks`);
       floor2TotalChunks += chunks.length;
+      for (const c of chunks) {
+        assert.equal(c.realTask, undefined);
+      }
     }
     assert.equal(floor2TotalChunks, 22);
 
-    assert.equal(hasLessonChunksForTopic(12), false);
-    assert.equal(getLessonChunksForTopic(21).length, 0);
-    assert.equal(getAllReviewItems().length, 64);
+    let floor3TotalChunks = 0;
+    const chunksWithMiniLabF3: { chunkId: string; miniLab?: string }[] = [];
+    for (let t = 12; t <= 17; t += 1) {
+      assert.equal(hasLessonChunksForTopic(t), true);
+      const chunks = getLessonChunksForTopic(t);
+      assert.ok(chunks.length >= 3, `Topic ${t} should have at least 3 chunks`);
+      floor3TotalChunks += chunks.length;
+      for (const c of chunks) {
+        assert.equal(c.realTask, undefined);
+        if (c.miniLab) {
+          chunksWithMiniLabF3.push({ chunkId: c.chunkId, miniLab: c.miniLab });
+        }
+      }
+    }
+    assert.equal(floor3TotalChunks, 23);
+    assert.deepEqual(chunksWithMiniLabF3, [
+      { chunkId: 't12c1', miniLab: 'neuron' },
+      { chunkId: 't16c1', miniLab: 'softmax' },
+    ]);
+
+    let floor4TotalChunks = 0;
+    const chunksWithMiniLabF4: { chunkId: string; miniLab?: string }[] = [];
+    for (let t = 18; t <= 20; t += 1) {
+      assert.equal(hasLessonChunksForTopic(t), true);
+      const chunks = getLessonChunksForTopic(t);
+      assert.ok(chunks.length >= 4, `Topic ${t} should have at least 4 chunks`);
+      floor4TotalChunks += chunks.length;
+      for (const c of chunks) {
+        assert.equal(c.realTask, undefined);
+        if (c.miniLab) {
+          chunksWithMiniLabF4.push({ chunkId: c.chunkId, miniLab: c.miniLab });
+        }
+      }
+    }
+    assert.equal(floor4TotalChunks, 13);
+    assert.deepEqual(chunksWithMiniLabF4, [
+      { chunkId: 't19c5', miniLab: 'quant' },
+      { chunkId: 't20c2', miniLab: 'latency' },
+    ]);
+
+    let floor5TotalChunks = 0;
+    for (let t = 21; t <= 28; t += 1) {
+      assert.equal(hasLessonChunksForTopic(t), true);
+      const chunks = getLessonChunksForTopic(t);
+      assert.ok(chunks.length >= 3, `Topic ${t} should have at least 3 chunks`);
+      floor5TotalChunks += chunks.length;
+      for (const c of chunks) {
+        assert.equal(typeof c.realTask, 'string');
+        assert.ok((c.realTask || '').trim().length > 0);
+      }
+    }
+    assert.equal(floor5TotalChunks, 29);
+
+    let floor6TotalChunks = 0;
+    for (let q = 1; q <= 7; q += 1) {
+      const qId = `m${q}`;
+      assert.equal(hasLessonChunksForQuest(qId), true);
+      assert.equal(hasLessonChunksForTopic(qId), true);
+      const chunks = getLessonChunksForQuest(qId);
+      assert.ok(chunks.length >= 2, `Quest ${qId} should have at least 2 chunks`);
+      floor6TotalChunks += chunks.length;
+      for (const c of chunks) {
+        assert.equal(typeof c.realTask, 'string');
+        assert.ok((c.realTask || '').trim().length > 0);
+        assert.equal(typeof c.formulaTitle, 'string');
+        assert.ok((c.formulaTitle || '').trim().length > 0);
+        assert.equal(getLessonChunkById(c.chunkId)?.chunkId, c.chunkId);
+      }
+    }
+    assert.equal(floor6TotalChunks, 19);
+
+    // 29 + 35 + 29 + 15 + 29 + 19 = 156 review items across Floors 1-6
+    assert.equal(getAllReviewItems().length, 156);
+    const f6Review = getAllReviewItems().find((r) => r.id === 'm1c1r1');
+    assert.equal(f6Review?.questId, 'm1');
   });
 
   it('tracks chunk completion based on all practice activities attempted at least once', () => {
@@ -117,16 +199,58 @@ describe('Lesson Chunks v3 Engine (lessonEngine.ts)', () => {
     assert.equal(evaluateFillNumber('0,175', 0.18, 0.005).isCorrect, true);
     assert.equal(evaluateFillNumber('-25', -25, 0.01).isCorrect, true);
     assert.equal(evaluateFillNumber('−25', -25, 0.01).isCorrect, true);
+    // Floor 3 negative answers (-18, -12) and tight tolerances (0.0001, 0.00001, 0.01)
+    assert.equal(evaluateFillNumber(' -18 ', -18, 0).isCorrect, true);
+    assert.equal(evaluateFillNumber(' −18 ', -18, 0).isCorrect, true);
+    assert.equal(evaluateFillNumber(' -12 ', -12, 0).isCorrect, true);
+    assert.equal(evaluateFillNumber(' −12 ', -12, 0).isCorrect, true);
+    assert.equal(evaluateFillNumber('0,05', 0.05, 0.0001).isCorrect, true);
+    assert.equal(evaluateFillNumber('0,001', 0.001, 0.00001).isCorrect, true);
+    assert.equal(evaluateFillNumber('1,39', 1.39, 0.01).isCorrect, true);
+    assert.equal(evaluateFillNumber('1.386', 1.39, 0.01).isCorrect, true);
+    // Floor 4 large integers (120000, 80000) and small decimals (0.01, 0.06)
+    assert.equal(evaluateFillNumber('120000', 120000, 0).isCorrect, true);
+    assert.equal(evaluateFillNumber('120.000', 120000, 0).isCorrect, true);
+    assert.equal(evaluateFillNumber('120,000', 120000, 0).isCorrect, true);
+    assert.equal(evaluateFillNumber('80000', 80000, 0).isCorrect, true);
+    assert.equal(evaluateFillNumber('80.000', 80000, 0).isCorrect, true);
+    assert.equal(evaluateFillNumber('80,000', 80000, 0).isCorrect, true);
+    assert.equal(evaluateFillNumber('0,01', 0.01, 0.0001).isCorrect, true);
+    assert.equal(evaluateFillNumber('0.01', 0.01, 0.0001).isCorrect, true);
+    assert.equal(evaluateFillNumber('0,011', 0.01, 0.0001).isCorrect, false);
+    assert.equal(evaluateFillNumber('0,06', 0.06, 0.001).isCorrect, true);
+    assert.equal(evaluateFillNumber('0.06', 0.06, 0.001).isCorrect, true);
+    // Floor 5 decimals (0.4125, 21.5, 80.75, 2.5) and large integers (14400)
+    assert.equal(evaluateFillNumber('0,4125', 0.4125, 0.001).isCorrect, true);
+    assert.equal(evaluateFillNumber('0.4125', 0.4125, 0.001).isCorrect, true);
+    assert.equal(evaluateFillNumber('0,412', 0.4125, 0.001).isCorrect, true);
+    assert.equal(evaluateFillNumber('21,5', 21.5, 0.001).isCorrect, true);
+    assert.equal(evaluateFillNumber('80,75', 80.75, 0.01).isCorrect, true);
+    assert.equal(evaluateFillNumber('2,5', 2.5, 0.001).isCorrect, true);
+    assert.equal(evaluateFillNumber('14400', 14400, 0).isCorrect, true);
+    assert.equal(evaluateFillNumber('14.400', 14400, 0).isCorrect, true);
+    assert.equal(evaluateFillNumber('14,400', 14400, 0).isCorrect, true);
   });
 
-  it('formats bar values with up to 3 decimals, thousands separators, and "0" for zero', () => {
+  it('formats bar values and matrix cells with up to 3 decimals, thousands separators, and "0" for zero', () => {
     assert.equal(formatBarValue(0), '0');
     assert.equal(formatBarValue(-0), '0');
     assert.equal(formatBarValue(5), '5');
     assert.equal(formatBarValue(100000), '100.000');
+    assert.equal(formatBarValue(200000), '200.000');
+    assert.equal(formatBarValue(50000), '50.000');
     assert.equal(formatBarValue(0.105), '0,105');
     assert.equal(formatBarValue(0.625), '0,625');
     assert.equal(formatBarValue(1.3864), '1,386');
+    assert.equal(formatBarValue(0.09), '0,09');
+    assert.equal(formatBarValue(5.76), '5,76');
+
+    assert.equal(formatMatrixCell(-0.5), '-0.5');
+    assert.equal(formatMatrixCell(-0.05), '-0.05');
+    assert.equal(formatMatrixCell(0.7), '0.7');
+    assert.equal(formatMatrixCell(0), '0');
+    assert.equal(formatMatrixCell(-0), '0');
+    assert.equal(formatMatrixCell(3), '3');
   });
 
   it('evaluates order and match practice activities accurately', () => {
